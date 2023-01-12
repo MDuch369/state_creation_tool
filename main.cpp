@@ -1,8 +1,21 @@
-# include <iostream>
-# include <vector>
-# include <algorithm>
-# include <sstream>
-# include <fstream>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <sstream>
+#include <fstream>
+
+class State {
+
+    std::vector<std::string> provs{}, traits{}, resources{};
+    std::string name, sub{}, city{}, port{}, farm{}, mine{}, wood{};
+    unsigned int id, land{}, coal{}, iron{}, lead{}, sulfur{}, wood{}, fish{}, naval_exit{};    
+
+    State(std::string name, unsigned int id ) {
+        this->name = name;
+        this->id = id;
+    }
+
+};
 
 void save_provinces(std::vector<std::string> &provs) {
     std::string prov, tmp; 
@@ -20,7 +33,7 @@ void save_provinces(std::vector<std::string> &provs) {
     }
 }
 
-unsigned int find_states(const std::string &file, const std::string &prov) {
+unsigned int find_state(const std::string &file, const std::string &prov) {
     unsigned int cur_line{};
     std::string line{};
     
@@ -36,25 +49,25 @@ unsigned int find_states(const std::string &file, const std::string &prov) {
     return cur_line;
 }
 
-void copy_states(const unsigned int &cur_line, const std::string &file) {
-    unsigned int copy_line{};
-    std::string line{};
-    std::ifstream  src(file, std::ios::binary);
-    std::ofstream  dst("to.txt", std::ios::binary);
-        while(getline(src, line)) {
-        copy_line++;
-        if(copy_line >= cur_line - 3) {
-            if(copy_line > cur_line && line[0] == 'S') {
-                break;
-            }
-            dst<<line<<"\n";
-        }
+// void copy_state(const unsigned int &cur_line, const std::string &file) {
+//     unsigned int copy_line{};
+//     std::string line{};
+//     std::ifstream  src(file, std::ios::binary);
+//     std::ofstream  dst("to.txt", std::ios::binary);
+//         while(getline(src, line)) {
+//         copy_line++;
+//         if(copy_line >= cur_line - 3) {
+//             if(copy_line > cur_line && line[0] == 'S') {
+//                 break;
+//             }
+//             dst<<line<<"\n";
+//         }
 
-        line = {};
-    }
-    src.close();
-    dst.close();
-} 
+//         line = {};
+//     }
+//     src.close();
+//     dst.close();
+// } 
 
 void create_state(const std::vector<std::string> &pr, const std::string &state_name, const unsigned int &state_id){
     std::string str_place{"\"PLACEHOLDER\""};
