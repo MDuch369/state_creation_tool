@@ -29,9 +29,9 @@ State::State(const unsigned int &cur_line, const std::string &file) {
             if(compare_string("impassable", line)) {
                 data_vector(this->im_provs, line, 7);
             }
-
-            // TODO STATE TRAITS GO HERE
-
+            if(compare_string("traits", line)) {
+                variable_string_vector(this->traits, line);
+            }
             if(compare_string("city", line)) {
                 this->city = data(line);
             }
@@ -50,9 +50,9 @@ State::State(const unsigned int &cur_line, const std::string &file) {
             if(compare_string("arable_land", line)) {
                 this->land = data_int(line);
             }
-
-            // TODO ARABLE RESOURCES GO HERE
-
+            if(compare_string("traits", line)) {
+                variable_string_vector(this->resources, line);
+            }
             if(compare_string("bg_coal_mining", line)) {
                 this->coal = data_int(line);
             }
@@ -73,7 +73,9 @@ State::State(const unsigned int &cur_line, const std::string &file) {
             }
             //      TODO FINISH DISCOVERABLE RESOURCES
             if(compare_string("resource", line)) {
+                getline(src, line);
                 if(compare_string("bg_gold_fields", line)) {
+                    getline(src, line);
                     if(compare_string("undiscovered_amount", line)) {
                         this->gold = data_int(line);
                     }
@@ -82,11 +84,13 @@ State::State(const unsigned int &cur_line, const std::string &file) {
                     }                    
                 }
                 if(compare_string("bg_rubber", line)) {
+                    getline(src, line);
                     if(compare_string("undiscovered_amount", line)) {
                         this->rubber = data_int(line);
                     }
                 }
                 if(compare_string("bg_oil_extraction", line)) {
+                    getline(src, line);
                     if(compare_string("undiscovered_amount", line)) {
                         this->oil = data_int(line);
                     }                    
@@ -119,6 +123,19 @@ void data_vector(std::vector<std::string> &vec, const std::string &line, int len
             j++;
         }
         i++; 
+    }
+}
+
+void variable_string_vector(std::vector<std::string> &t, std::string &line) {
+    int beg_pos{}, end_pos{};
+    line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
+    beg_pos = line.find("\"") + 1;
+    end_pos = line.find('\"', beg_pos);
+
+    while( end_pos != std::string::npos ) {
+        t.push_back(line.substr(beg_pos, end_pos - beg_pos));
+        beg_pos = end_pos + 2;
+        end_pos = line.find("\"",beg_pos + 1);
     }
 }
 

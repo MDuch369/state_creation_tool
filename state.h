@@ -16,6 +16,7 @@ class State {
     unsigned int data_int(const std::string);
     void data_vector(std::vector<std::string>&, const std::string&, int);
     bool compare_string(const std::string&, std::string);
+    void variable_string_vector(std::vector<std::string> &t, std::string &line);
 
 public:
     State();
