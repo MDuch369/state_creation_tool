@@ -12,8 +12,11 @@ State::State(const unsigned int &cur_line, const std::string &file) {
     while(getline(src, line)) {
         copy_line++;
         if (copy_line >= cur_line - 3) {
-            if(compare_string("STATE", line)) { 
-                this->name = line.substr(0, line.find (" ") + 1);
+            if((copy_line > cur_line) && (line[0] == 'S')) {
+                break;
+            }
+            if(copy_line == cur_line - 3) { 
+                this->name = line.substr(0, line.find ("=") - 1);
             }
             if(compare_string("id", line)) { 
                 this->id = data_int(line);
@@ -96,20 +99,22 @@ State::State(const unsigned int &cur_line, const std::string &file) {
             }                                                                                                             
             if(compare_string("naval_exit_id", line)) {
                 this->naval_exit = data_int(line);
-            }        
+            }
+       
         }
     }
     src.close();
 }
 
 std::string State::data(const std::string &line){
-    int pos{line.find("=")};
+    int pos{line.find("=") + 2};
     return line.substr(pos, line.find ("\n") - pos);
 }
 
-unsigned int State::data_int(const std::string &line) {
-    int pos{line.find("=")};
-    return stoi(line.substr(pos, line.find ("\n") - pos));
+unsigned int State::data_int( std::string line) {
+    int pos{line.find("=") + 2};
+    std::string arg{line.substr(pos, line.find ("\n") - pos)};
+    return stoi(arg);
 }
 
 void State::data_vector(std::vector<std::string> &vec, const std::string &line, int len) {
@@ -136,7 +141,7 @@ void State::variable_string_vector(std::vector<std::string> &t, std::string &lin
     }
 }
 
-bool State::compare_string(const std::string &str, std::string l) {State::
+bool State::compare_string(const std::string &str, std::string l) {
     l.erase (std::remove(l.begin(), l.end(), ' '), l.end());
     return str == l.substr(0, str.size());
 }

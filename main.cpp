@@ -72,54 +72,86 @@ unsigned int find_state(const std::string &file, const std::string &prov) {
 
 // TODO finish discoverable resources
 void print_state(State state){
-    std::string str_place{"\"PLACEHOLDER\""};
-    int int_place{123}; 
-    
-    std::ofstream  dst("to.txt", std::ios::binary);
-    dst << "STATE_" << state.getName() << " = {" << std::endl
+    std::ofstream  dst("to.txt", std::ios::binary | std::ios::app);
+    dst << state.getName() << "= {" << std::endl
         << "    id = " << state.getId() << std::endl
         << "    subsistence_building = " << state.getSub() << std::endl
         << "    provinces = { ";
     for (std::string s : state.getProvs()) {
         dst << "\"" << s << "\" ";
     }
-    dst << " }" << std::endl 
+    dst << "}" << std::endl 
         << "    traits = { "; 
     for (std::string s : state.getTraits()) {
         dst << "\"" << s << "\" ";
     }
-    dst << " }" << std::endl 
-        << "    city = " << state.getCity() << std::endl
-        << "    port = " << state.getPort() << std::endl
-        << "    farm = " << state.getFarm() << std::endl
+    dst << "}" << std::endl 
+        << "    city = " << state.getCity() << std::endl;
+    if(state.getPort() != "") {
+        dst<< "    port = " << state.getPort() << std::endl;
+    }
+    dst << "    farm = " << state.getFarm() << std::endl
         << "    mine = " << state.getMine() << std::endl
         << "    wood = " << state.getWood() << std::endl
-        << "    arable land = " << state.getLand() << std::endl
+        << "    arable_land = " << state.getLand() << std::endl
         << "    arable_resources = { ";
     for (std::string s : state.getResources()) {
         dst << "\"" << s << "\" ";
     } 
-    dst << " }" << std::endl
-        << "    capped = {" << std::endl
-        << "        " << str_place << " = " << int_place << std::endl
-        << "        " << str_place << " = " << int_place << std::endl
-        << "    }" << std::endl
-        << " naval_exit_id = " << int_place << std::endl
-        << "}" << std::endl << std::endl;
+    dst << "}" << std::endl
+        << "    capped = {" << std::endl;
+    if(state.getIron() != 0) {
+        dst << "        bg_iron_mining = " << state.getIron() << std::endl; 
+    }
+    if(state.getCoal() != 0) {
+        dst << "        bg_coal_mining = " << state.getCoal() << std::endl; 
+    }
+    if(state.getLead() != 0) {
+        dst << "        bg_lead_mining = " << state.getLead() << std::endl; 
+    }
+    if(state.getSulfur() != 0) {
+        dst << "        bg_sulfur_mining = " << state.getSulfur() << std::endl; 
+    }
+    if(state.getLog() != 0) {
+        dst << "        bg_logging = " << state.getLog() << std::endl; 
+    }
+    if(state.getFish() != 0) {
+        dst << "        bg_fishing = " << state.getFish() << std::endl; 
+    }
+    if(state.getWhale() != 0) {
+        dst << "        bg_whaling = " << state.getWhale() << std::endl; 
+    }
+    // if(state.getOil() != 0) {
+    //     dst << "        bg_oil_extraction = " << state.getOil() << std::endl; 
+    // }
+    // if(state.getRubber() != 0) {
+    //     dst << "        bg_logging = " << state.getRubber() << std::endl; 
+    // }
+    // if(state.getGold() != 0) {
+    //     dst << "        bg_gold_mining = " << state.getGold() << std::endl; 
+    // }
+    // if(state.getDiscGold() != 0) {
+    //     dst << "        bg_whaling = " << state.getDiscGold() << std::endl; 
+    // }
+    dst << "    }" << std::endl;
+    if(state.getNavalExit() != 0) {
+       dst << "    naval_exit_id = " << state.getNavalExit() << std::endl;
+    }
+    dst << "}" << std::endl << std::endl;
 
 }
 
 //  TODO finish
-void create_map_data(const std::string &state_name, const int &state_id, const std::vector<std::string> &provs) {}
+// void create_map_data(const std::string &state_name, const int &state_id, const std::vector<std::string> &provs) {}
 
-//  TODO finish
-void create_states_files(const std::string &state_name, const std::vector<std::string> &provs) {}
+// //  TODO finish
+// void create_states_files(const std::string &state_name, const std::vector<std::string> &provs) {}
 
-//  TODO finish
-void create_pops_file(const int &provs_ratio) {}
+// //  TODO finish
+// void create_pops_file(const int &provs_ratio) {}
 
-//  TODO finish
-std::string find_files(const std::vector<std::string> &provs) {}
+// //  TODO finish
+// std::string find_files(const std::vector<std::string> &provs) {}
 
 // std::string get_file_name(const std::vector<std::string> pr ) {
 //     std::ifstream  src("from.ogv", std::ios::binary);
@@ -137,16 +169,16 @@ void debug(const std::vector<std::string> &provs) {
 
 int main() {
 
-    std::string input_file;
-    std::cout << "Podaj nazwę pliku: " << std::endl;
-    std::cin >> input_file; 
+    std::string input_file{"00_west_europe.txt"};
+    // std::cout << "Podaj nazwę pliku: " << std::endl;
+    // std::cin >> input_file; 
     std::vector<std::string> provinces = {};
     int init_num_provs{}, transfered_provs{}, remaining_provs{};
     double provs_ratio{};
 
-    save_provinces( provinces );
-    find_state(input_file, provinces[0]);
-    State Old_state(find_state(input_file, provinces[0]), input_file);
+    save_provinces(provinces);
+    // find_state(input_file, provinces[0]);
+    State Old_state(find_state(input_file, provinces[1]), input_file);
     State New_state(Old_state);
     print_state(Old_state);
     print_state(New_state);
