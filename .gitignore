@@ -1,3 +1,4 @@
 *.json
+*.gch
 a.out
 main
