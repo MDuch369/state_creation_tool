@@ -3,19 +3,20 @@
 #include <algorithm>
 #include <sstream>
 #include <fstream>
+#include "state.h"
 
-class State {
+// class State {
 
-    std::vector<std::string> provs{}, traits{}, resources{};
-    std::string name, sub{}, city{}, port{}, farm{}, mine{}, wood{};
-    unsigned int id, land{}, coal{}, iron{}, lead{}, sulfur{}, wood{}, fish{}, naval_exit{};    
+//     std::vector<std::string> provs{}, traits{}, resources{};
+//     std::string name, sub{}, city{}, port{}, farm{}, mine{}, wood{};
+//     unsigned int id, land{}, coal{}, iron{}, lead{}, sulfur{}, wood{}, fish{}, naval_exit{};    
 
-    State(std::string name, unsigned int id ) {
-        this->name = name;
-        this->id = id;
-    }
+//     State(std::string name, unsigned int id ) {
+//         this->name = name;
+//         this->id = id;
+//     }
 
-};
+// };
 
 void save_provinces(std::vector<std::string> &provs) {
     std::string prov, tmp; 
@@ -69,10 +70,7 @@ unsigned int find_state(const std::string &file, const std::string &prov) {
 //     dst.close();
 // } 
 
-void create_state(const std::vector<std::string> &pr, const std::string &state_name, const unsigned int &state_id){
-    std::string str_place{"\"PLACEHOLDER\""};
-    unsigned int int_place{123};
-    
+void print_state(const State &state){
     std::ofstream  dst("to.txt", std::ios::binary);
     dst << "STATE_" << state_name << " = {" << std::endl
         << "    id = " << state_id << std::endl
@@ -133,6 +131,9 @@ int main() {
     double provs_ratio{};
 
     save_provinces( provinces );
+    find_state(input_file, provinces[0]);
+    State Old_state(find_state(input_file, provinces[0]), input_file);
+    State New_state(Old_state);
 
     debug( provinces );
     

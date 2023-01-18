@@ -5,8 +5,6 @@
 #include <algorithm>
 #include "state.h"
 
-State::State(){}
-
 State::State(const unsigned int &cur_line, const std::string &file) {
     unsigned int copy_line{}, len{};
     std::string line{}, d{};
@@ -104,29 +102,28 @@ State::State(const unsigned int &cur_line, const std::string &file) {
     src.close();
 }
 
-std::string data(const std::string &line){
+std::string State::data(const std::string &line){
     int pos{line.find("=")};
     return line.substr(pos, line.find ("\n") - pos);
 }
 
-unsigned int data_int(const std::string &line) {
+unsigned int State::data_int(const std::string &line) {
     int pos{line.find("=")};
     return stoi(line.substr(pos, line.find ("\n") - pos));
 }
 
-void data_vector(std::vector<std::string> &vec, const std::string &line, int len) {
-    int i{}, j{};
+void State::data_vector(std::vector<std::string> &vec, const std::string &line, int len) {
+    int i{};
 
     for ( char c : line ) {
         if(c == 'x') {
-            vec[j] = line.substr(i, len);
-            j++;
+            vec.push_back(line.substr(i, len));
         }
         i++; 
     }
 }
 
-void variable_string_vector(std::vector<std::string> &t, std::string &line) {
+void State::variable_string_vector(std::vector<std::string> &t, std::string &line) {
     int beg_pos{}, end_pos{};
     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
     beg_pos = line.find("\"") + 1;
@@ -139,12 +136,10 @@ void variable_string_vector(std::vector<std::string> &t, std::string &line) {
     }
 }
 
-bool compare_string(const std::string &str, std::string l) {
+bool State::compare_string(const std::string &str, std::string l) {State::
     l.erase (std::remove(l.begin(), l.end(), ' '), l.end());
     return str == l.substr(0, str.size());
 }
-
-
 
 // void save_data ( const std::string &line, std::ifstream src) {
 //     getline(src, line);
