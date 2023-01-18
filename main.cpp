@@ -70,24 +70,36 @@ unsigned int find_state(const std::string &file, const std::string &prov) {
 //     dst.close();
 // } 
 
-void print_state(const State &state){
+// TODO finish discoverable resources
+void print_state(State state){
+    std::string str_place{"\"PLACEHOLDER\""};
+    int int_place{123}; 
+    
     std::ofstream  dst("to.txt", std::ios::binary);
-    dst << "STATE_" << state_name << " = {" << std::endl
-        << "    id = " << state_id << std::endl
-        << "    subsistence_building = " << str_place << std::endl
+    dst << "STATE_" << state.getName() << " = {" << std::endl
+        << "    id = " << state.getId() << std::endl
+        << "    subsistence_building = " << state.getSub() << std::endl
         << "    provinces = { ";
-    for (std::string s : pr) {
+    for (std::string s : state.getProvs()) {
         dst << "\"" << s << "\" ";
     }
     dst << " }" << std::endl 
-        << "    traits = { " << str_place << " }" << std::endl 
-        << "    city = " << str_place << std::endl
-        << "    port = " << str_place << std::endl
-        << "    farm = " << str_place << std::endl
-        << "    mine = " << str_place << std::endl
-        << "    wood = " << str_place << std::endl
-        << "    arable land = " << int_place << std::endl
-        << "    arable_resources = { " << str_place << " }" << std::endl
+        << "    traits = { "; 
+    for (std::string s : state.getTraits()) {
+        dst << "\"" << s << "\" ";
+    }
+    dst << " }" << std::endl 
+        << "    city = " << state.getCity() << std::endl
+        << "    port = " << state.getPort() << std::endl
+        << "    farm = " << state.getFarm() << std::endl
+        << "    mine = " << state.getMine() << std::endl
+        << "    wood = " << state.getWood() << std::endl
+        << "    arable land = " << state.getLand() << std::endl
+        << "    arable_resources = { ";
+    for (std::string s : state.getResources()) {
+        dst << "\"" << s << "\" ";
+    } 
+    dst << " }" << std::endl
         << "    capped = {" << std::endl
         << "        " << str_place << " = " << int_place << std::endl
         << "        " << str_place << " = " << int_place << std::endl
@@ -126,6 +138,8 @@ void debug(const std::vector<std::string> &provs) {
 int main() {
 
     std::string input_file;
+    std::cout << "Podaj nazwę pliku: " << std::endl;
+    std::cin >> input_file; 
     std::vector<std::string> provinces = {};
     int init_num_provs{}, transfered_provs{}, remaining_provs{};
     double provs_ratio{};
@@ -134,6 +148,9 @@ int main() {
     find_state(input_file, provinces[0]);
     State Old_state(find_state(input_file, provinces[0]), input_file);
     State New_state(Old_state);
+    print_state(Old_state);
+    print_state(New_state);
+
 
     debug( provinces );
     
