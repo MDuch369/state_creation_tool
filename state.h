@@ -4,23 +4,37 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
-#include <fstream>
+#include <fstream> 
 
 class State {
 
+    class Pop {
+        std::string culture, religion{};
+        int size;
+
+    public:
+        Pop(const std::string &, const std::string &, const int &);
+        inline std::string getCult() {
+            return culture;
+        }
+        inline std::string getRel() {
+            return religion;
+        }
+        inline int getSize() {
+            return size;
+        }
+    };
+    std::vector<State::Pop> pops{};
     std::vector<std::string> provs, traits, resources, im_provs{};
     std::string name, file_name, sub, city, port{}, farm, mine{}, wood{};
     unsigned int id, land, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit;    
 
-    std::string data(const std::string&);
+    std::string data(const std::string &);
+    void copy_pops(const std::string &, const std::string &, std::vector<State::Pop> &);
     unsigned int data_int(std::string);
-    void data_vector(std::vector<std::string>&, const std::string&, int);
-    bool compare_string(const std::string&, std::string);
+    void data_vector(std::vector<std::string> &, const std::string &, int);
+    bool compare_string(const std::string &, std::string);
     void variable_string_vector(std::vector<std::string> &t, std::string &line);
-    // class Pop {
-    //     std::string culture, religion{};
-    //     int pops;
-    // };
 
 public:
     State(const unsigned int &, const std::string &);
@@ -99,6 +113,9 @@ public:
     inline std::vector<std::string> getImProvs() {
         return im_provs;
     }            
+    inline std::vector<State::Pop> getPops() {
+        return pops;
+    }
 };
 
 

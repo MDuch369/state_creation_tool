@@ -129,6 +129,23 @@ void print_state(State state){
 
 }
 
+void print_pops(State state){
+    std::ofstream  dst("/output/files/to_pops.txt", std::ios::binary | std::ios::app);
+    dst << "    s:" << state.getName() << " = {" << std::endl
+        << "        region_state:ABC = {" << std::endl;
+    for(int i{}; i <= state.getPops().size(); i++){
+        dst << "            create_pop = {" << std::endl
+            << "                culture = " << state.getPops()[i].getCult() << std::endl;
+        if (state.getPops()[i].getRel() != "") {
+            dst << "                religion = " << state.getPops()[i].getRel() << std::endl;
+        }
+        dst << "                size = " << state.getPops()[i].getSize() << std::endl
+            << "            }" << std::endl;
+    }
+    dst << "        }" << std::endl << "    }" << std::endl;
+
+}
+
 //  TODO finish
 // void create_map_data(const std::string &state_name, const int &state_id, const std::vector<std::string> &provs) {}
 
