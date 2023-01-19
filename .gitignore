@@ -2,3 +2,6 @@
 *.gch
 a.out
 main
+state
+input
+output
