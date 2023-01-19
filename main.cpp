@@ -38,28 +38,7 @@ unsigned int find_state(const std::string &file, const std::string &prov) {
     return cur_line;
 }
 
-// void copy_state(const unsigned int &cur_line, const std::string &file) {
-//     unsigned int copy_line{};
-//     std::string line{};
-//     std::ifstream  src(file, std::ios::binary);
-//     std::ofstream  dst("to.txt", std::ios::binary);
-//         while(getline(src, line)) {
-//         copy_line++;
-//         if(copy_line >= cur_line - 3) {
-//             if(copy_line > cur_line && line[0] == 'S') {
-//                 break;
-//             }
-//             dst<<line<<"\n";
-//         }
-
-//         line = {};
-//     }
-//     src.close();
-//     dst.close();
-// } 
-
-// TODO finish discoverable resources
-void print_state(State state){
+void print_state(State &state){
     std::ofstream  dst("/output/files/to.txt", std::ios::binary | std::ios::app);
     dst << state.getName() << "= {" << std::endl
         << "    id = " << state.getId() << std::endl
@@ -129,7 +108,7 @@ void print_state(State state){
 
 }
 
-void print_pops(State state){
+void print_pops(State &state){
     std::ofstream  dst("/output/files/to_pops.txt", std::ios::binary | std::ios::app);
     dst << "    s:" << state.getName() << " = {" << std::endl
         << "        region_state:ABC = {" << std::endl;
@@ -146,36 +125,21 @@ void print_pops(State state){
 
 }
 
-//  TODO finish
-// void create_map_data(const std::string &state_name, const int &state_id, const std::vector<std::string> &provs) {}
+double calculate_ratio(State &state, const std::vector<std::string> &provs) {
+    return provs.size() / state.getProvs().size();
+}
 
-// //  TODO finish
-// void create_states_files(const std::string &state_name, const std::vector<std::string> &provs) {}
-
-// //  TODO finish
-// void create_pops_file(const int &provs_ratio) {}
-
-// //  TODO finish
-// std::string find_files(const std::vector<std::string> &provs) {}
-
-// std::string get_file_name(const std::vector<std::string> pr ) {
-//     std::ifstream  src("from.ogv", std::ios::binary);
-//     for (std::string s : pr) {
-
+// void debug(const std::vector<std::string> &provs) {
+//     for(std::string s : provs) {
+//         std::cout<< s << std::endl;
 //     }
 // }
-
-void debug(const std::vector<std::string> &provs) {
-    for(std::string s : provs) {
-        std::cout<< s << std::endl;
-    }
-}
 
 
 int main() {
 
     std::string files[15]{};
-    std::vector<std::string> provinces = {};
+    std::vector<std::string> provinces{};
     std::string path = "input/files";
     // int init_num_provs{}, transfered_provs{}, remaining_provs{};
     // double provs_ratio{};
@@ -195,7 +159,7 @@ int main() {
     print_state(New_state);
 
 
-    debug( provinces );
+    // debug( provinces );
     
     return 0;
 }
