@@ -5,10 +5,13 @@
 #include <algorithm>
 #include "state.h"
 
+// State::State() {}
+
 State::State(const unsigned int &cur_line, const std::string &file) {
     unsigned int copy_line{}, len{};
-    std::string line{}, d{};
+    std::string line{};
     std::ifstream  src(file, std::ios::binary);
+    this->file_name = file;
     while(getline(src, line)) {
         copy_line++;
         if (copy_line >= cur_line - 3) {
@@ -22,7 +25,7 @@ State::State(const unsigned int &cur_line, const std::string &file) {
                 this->id = data_int(line);
             }
             if(compare_string("subsistence_building", line)) {
-             this->sub = data(line);
+                this->sub = data(line);
             }
             if(compare_string("provinces", line)) {
                 data_vector(this->provs, line, 7);
@@ -72,7 +75,6 @@ State::State(const unsigned int &cur_line, const std::string &file) {
             if(compare_string("bg_fishing", line)) {
                 this->fish = data_int(line);
             }
-            //      TODO FINISH DISCOVERABLE RESOURCES
             if(compare_string("resource", line)) {
                 getline(src, line);
                 if(compare_string("bg_gold_fields", line)) {
@@ -105,6 +107,8 @@ State::State(const unsigned int &cur_line, const std::string &file) {
     }
     src.close();
 }
+
+
 
 std::string State::data(const std::string &line){
     int pos{line.find("=") + 2};

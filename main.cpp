@@ -3,20 +3,8 @@
 #include <algorithm>
 #include <sstream>
 #include <fstream>
+#include <filesystem>
 #include "state.h"
-
-// class State {
-
-//     std::vector<std::string> provs{}, traits{}, resources{};
-//     std::string name, sub{}, city{}, port{}, farm{}, mine{}, wood{};
-//     unsigned int id, land{}, coal{}, iron{}, lead{}, sulfur{}, wood{}, fish{}, naval_exit{};    
-
-//     State(std::string name, unsigned int id ) {
-//         this->name = name;
-//         this->id = id;
-//     }
-
-// };
 
 void save_provinces(std::vector<std::string> &provs) {
     std::string prov, tmp; 
@@ -72,7 +60,7 @@ unsigned int find_state(const std::string &file, const std::string &prov) {
 
 // TODO finish discoverable resources
 void print_state(State state){
-    std::ofstream  dst("to.txt", std::ios::binary | std::ios::app);
+    std::ofstream  dst("/output/files/to.txt", std::ios::binary | std::ios::app);
     dst << state.getName() << "= {" << std::endl
         << "    id = " << state.getId() << std::endl
         << "    subsistence_building = " << state.getSub() << std::endl
@@ -169,16 +157,22 @@ void debug(const std::vector<std::string> &provs) {
 
 int main() {
 
-    std::string input_file{"00_west_europe.txt"};
-    // std::cout << "Podaj nazwę pliku: " << std::endl;
-    // std::cin >> input_file; 
+    std::string files[15]{};
     std::vector<std::string> provinces = {};
-    int init_num_provs{}, transfered_provs{}, remaining_provs{};
-    double provs_ratio{};
+    std::string path = "input/files";
+    // int init_num_provs{}, transfered_provs{}, remaining_provs{};
+    // double provs_ratio{};
+
+    int i{};
+    for (const auto & entry : std::filesystem::directory_iterator(path)){
+        files[i] = entry.path();
+        files[i] = files[i].substr(12, files[i].length() - 12);
+        i++;
+    }
 
     save_provinces(provinces);
     // find_state(input_file, provinces[0]);
-    State Old_state(find_state(input_file, provinces[1]), input_file);
+    State Old_state(find_state(files[0], provinces[1]), files[0]);
     State New_state(Old_state);
     print_state(Old_state);
     print_state(New_state);
