@@ -11,6 +11,7 @@ void save_provinces(std::vector<std::string> &provs) {
     
     std::cout<<"Enter provinces to transfer: "<<std::endl;
     std::getline(std::cin, prov);
+    prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end());
     prov.erase (std::remove(prov.begin(), prov.end(), ' '), prov.end());
     transform(prov.begin(), prov.end(), prov.begin(), toupper);
 
@@ -39,7 +40,7 @@ unsigned int find_state(const std::string &file, const std::string &prov) {
 }
 
 void print_state(State &state){
-    std::ofstream  dst("/output/files/to.txt", std::ios::binary | std::ios::app);
+    std::ofstream  dst("output/files/to.txt", std::ios::binary | std::ios::app);
     dst << state.getName() << "= {" << std::endl
         << "    id = " << state.getId() << std::endl
         << "    subsistence_building = " << state.getSub() << std::endl
@@ -109,10 +110,10 @@ void print_state(State &state){
 }
 
 void print_pops(State &state){
-    std::ofstream  dst("/output/files/to_pops.txt", std::ios::binary | std::ios::app);
+    std::ofstream  dst("output/files/to_pops.txt", std::ios::binary | std::ios::app);
     dst << "    s:" << state.getName() << " = {" << std::endl
         << "        region_state:ABC = {" << std::endl;
-    for(int i{}; i <= state.getPops().size(); i++){
+    for(int i{}; i < state.getPops().size(); i++){
         dst << "            create_pop = {" << std::endl
             << "                culture = " << state.getPops()[i].getCult() << std::endl;
         if (state.getPops()[i].getRel() != "") {
@@ -128,6 +129,13 @@ void print_pops(State &state){
 double calculate_ratio(State &state, const std::vector<std::string> &provs) {
     return provs.size() / state.getProvs().size();
 }
+// TODO refactor
+void calculate_pops(State &donor, State &state, const double &ratio) {
+    // const std::vector<State::Pop> *ptr = state.getPopsPtr();
+    for(int i{}; i < donor.getPops().size(); i++) {
+        state.add_pop(donor.getPops()[i].getCult(), donor.getPops()[i].getRel(), donor.getPops()[i].getSize(), ratio);
+    }
+}
 
 // void debug(const std::vector<std::string> &provs) {
 //     for(std::string s : provs) {
@@ -141,13 +149,14 @@ int main() {
     std::string files[15]{};
     std::vector<std::string> provinces{};
     std::string path = "input/files";
+    double provs_ratio{};
     // int init_num_provs{}, transfered_provs{}, remaining_provs{};
-    // double provs_ratio{};
 
     int i{};
     for (const auto & entry : std::filesystem::directory_iterator(path)){
         files[i] = entry.path();
-        files[i] = files[i].substr(12, files[i].length() - 12);
+        // files[i] = files[i].substr(12, files[i].length() - 12);
+        std::cout << i << " " << files[i] << std::endl;
         i++;
     }
 
@@ -155,8 +164,13 @@ int main() {
     // find_state(input_file, provinces[0]);
     State Old_state(find_state(files[0], provinces[1]), files[0]);
     State New_state(Old_state);
+    provs_ratio = calculate_ratio(Old_state, provinces);
+    Old_state.copy_pops("input/pops/05_north_america.txt", "STATE_LOUISIANA");
+    calculate_pops(Old_state, New_state, provs_ratio);
     print_state(Old_state);
     print_state(New_state);
+    print_pops(Old_state);
+    print_pops(New_state);
 
 
     // debug( provinces );
