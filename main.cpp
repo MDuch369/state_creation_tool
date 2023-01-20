@@ -18,8 +18,9 @@ void save_provinces(std::vector<std::string> &provs) {
     std::stringstream ss(prov);
 
     while(getline(ss, tmp, 'X')){
+        if(tmp != "") {
         provs.push_back(tmp);
-
+        }
     }
 }
 
