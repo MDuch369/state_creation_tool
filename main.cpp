@@ -127,7 +127,9 @@ void print_pops(State &state){
 }
 
 double calculate_ratio(State &state, const std::vector<std::string> &provs) {
-    return provs.size() / state.getProvs().size();
+    double i{provs.size()}, j{state.getProvs().size()};
+    double result{i / j};
+    return result;
 }
 // TODO refactor
 void calculate_pops(State &donor, State &state, const double &ratio) {
@@ -149,7 +151,7 @@ int main() {
     std::string files[15]{};
     std::vector<std::string> provinces{};
     std::string path = "input/files";
-    double provs_ratio{};
+    double provs_ratio;
     // int init_num_provs{}, transfered_provs{}, remaining_provs{};
 
     int i{};
