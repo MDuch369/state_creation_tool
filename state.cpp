@@ -106,11 +106,11 @@ State::State(const unsigned int &cur_line, const std::string &file) {
     src.close();
 }
 
-State::Pop::Pop(const std::string &cult, const std::string &rel, const int &s)
-    : culture{cult}, religion{rel}, size{s} {}
+State::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
+    : culture{cult}, religion{rel}, type{t}, size{s} {}
 
 void State::copy_pops(const std::string &file, const std::string &name/*, std::vector<State::Pop> &vec*/) {
-    std::string line, cul, rel{};
+    std::string line, cul, rel{}, t{};
     int s;
     std::ifstream  src(file, std::ios::binary);
     
@@ -125,6 +125,10 @@ void State::copy_pops(const std::string &file, const std::string &name/*, std::v
                 }
                 if(compare_string("create_pop", line)) {
                     getline(src, line);
+                    if(compare_string("pop_type", line)) {
+                        t = data(line);
+                        getline(src, line);
+                    }
                     if(compare_string("culture", line)) {
                         cul = data(line);
                         getline(src, line);
@@ -138,7 +142,7 @@ void State::copy_pops(const std::string &file, const std::string &name/*, std::v
                         getline(src, line);
                     }
                     if(compare_string("}", line)) {
-                       this->pops.emplace_back(cul, rel, s);
+                       this->pops.emplace_back(cul, rel, t, s);
                        rel = "";
                     }
                 }
@@ -148,8 +152,8 @@ void State::copy_pops(const std::string &file, const std::string &name/*, std::v
     }
 }
 
-void State::add_pop(const std::string &cul, const std::string &rel, const int &size,  const double &r) {
-    this->pops.emplace_back(cul, rel, size * r);
+void State::add_pop(const std::string &cul, const std::string &rel, const std::string &type, const int &size,  const double &r) {
+    this->pops.emplace_back(cul, rel, type, size * r);
 }
 
 std::string State::data(const std::string &line){

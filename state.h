@@ -9,16 +9,19 @@
 class State {
 
     class Pop {
-        std::string culture, religion{};
+        std::string culture, religion{}, type{};
         int size;
 
     public:
-        Pop(const std::string &, const std::string &, const int &);
+        Pop(const std::string &, const std::string &, const std::string &, const int &);
         inline std::string getCult() {
             return culture;
         }
         inline std::string getRel() {
             return religion;
+        }
+        inline std::string getType() {
+            return type;
         }
         inline int getSize() {
             return size;
@@ -38,7 +41,7 @@ class State {
 public:
     void copy_pops(const std::string &, const std::string &/*, std::vector<State::Pop> &*/);
     State(const unsigned int &, const std::string &);
-    void add_pop(const std::string &, const std::string &, const int &,  const double &);
+    void add_pop(const std::string &, const std::string &, const std::string &, const int &,  const double &);
     inline std::string getName() {
     	return name;
 	}
