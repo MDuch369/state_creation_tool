@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "state.h"
 
+// constructors
 State::State(const unsigned int &cur_line, const std::string &file) {
     unsigned int copy_line{}, len{};
     std::string line{};
@@ -26,10 +27,10 @@ State::State(const unsigned int &cur_line, const std::string &file) {
                 this->sub = data(line);
             }
             if(compare_string("provinces", line)) {
-                data_vector(this->provs, line, 7);
+                data_vector(this->provs, line, 6);
             }
             if(compare_string("impassable", line)) {
-                data_vector(this->im_provs, line, 7);
+                data_vector(this->im_provs, line, 6);
             }
             if(compare_string("traits", line)) {
                 variable_string_vector(this->traits, line);
@@ -52,7 +53,7 @@ State::State(const unsigned int &cur_line, const std::string &file) {
             if(compare_string("arable_land", line)) {
                 this->land = data_int(line);
             }
-            if(compare_string("traits", line)) {
+            if(compare_string("arable_resources", line)) {
                 variable_string_vector(this->resources, line);
             }
             if(compare_string("bg_coal_mining", line)) {
@@ -105,10 +106,11 @@ State::State(const unsigned int &cur_line, const std::string &file) {
     }
     src.close();
 }
-
+State::State(const unsigned int res[]) 
+    :land{res[0]}, coal{res[1]}, iron{res[2]}, lead{res[3]}, sulfur{res[4]}, log{res[5]}, fish{res[6]}, whale{res[7]}, oil{res[8]}, rubber{res[9]}, gold{res[10]}, disc_gold{res[11]} {}
 State::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
     : culture{cult}, religion{rel}, type{t}, size{s} {}
-
+// pops
 void State::copy_pops(const std::string &file, const std::string &name/*, std::vector<State::Pop> &vec*/) {
     std::string line, cul, rel{}, t{};
     int s;
@@ -151,33 +153,29 @@ void State::copy_pops(const std::string &file, const std::string &name/*, std::v
         }
     }
 }
-
-void State::add_pop(const std::string &cul, const std::string &rel, const std::string &type, const int &size,  const double &r) {
-    this->pops.emplace_back(cul, rel, type, size * r);
+void State::add_pop(const std::string &cul, const std::string &rel, const std::string &type, const int &size) {
+    this->pops.emplace_back(cul, rel, type, size);
 }
-
+// data calculating/copying
 std::string State::data(const std::string &line){
     int pos{line.find("=") + 2};
     return line.substr(pos, line.find ("\n") - pos);
 }
-
 unsigned int State::data_int( std::string line) {
     int pos{line.find("=") + 2};
     std::string arg{line.substr(pos, line.find ("\n") - pos)};
     return stoi(arg);
 }
-
 void State::data_vector(std::vector<std::string> &vec, const std::string &line, int len) {
     int i{};
 
     for ( char c : line ) {
         if(c == 'x') {
-            vec.push_back(line.substr(i, len));
+            vec.push_back(line.substr(i + 1, len));
         }
         i++; 
     }
 }
-
 void State::variable_string_vector(std::vector<std::string> &t, std::string &line) {
     int beg_pos{}, end_pos{};
     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
@@ -190,13 +188,58 @@ void State::variable_string_vector(std::vector<std::string> &t, std::string &lin
         end_pos = line.find("\"",beg_pos + 1);
     }
 }
-
 bool State::compare_string(const std::string &str, std::string l) {
     l.erase (std::remove(l.begin(), l.end(), '\t'), l.end());
     l.erase (std::remove(l.begin(), l.end(), ' '), l.end());
     return str == l.substr(0, str.size());
 }
+void State::copy_state_info(State &st) {
+    this->traits = st.getTraits();
+    this->sub = st.getSub();
+    this->resources = st.getResources();
+    this->naval_exit = st.getNavalExit();
 
+}
+void State::calculate_remaining_provs(State &st) {
+    for (std::string a : st.getProvs()) {
+        for(int i{}; i < provs.size(); i++) {
+            if (a == provs[i]) {
+                provs.erase(provs.begin() + i);
+            }
+        }
+    }
+}
+// Setters
+void State::setName(const std::string &n) {
+    this->name = n;
+}
+void State::setId(const int &i) {
+    this->id = i;
+}
+void State::setProvs(const std::vector<std::string> &p) {
+    this->provs = p;
+}
+void State::setProv(const int &i, const std::string &s) {
+    this->provs[i] = s;
+}
+void State::setPopSize(const int &i, const int &size) {
+    this->pops[i].setSize(size);
+}
+void State::Pop::setSize(const int &size) {
+    this->size = size;
+}
+// void State::setTraits(const std::vector<std::string> &tr) {
+//     this->traits = tr;
+// }
 // void save_data ( const std::string &line, std::ifstream src) {
 //     getline(src, line);
+// }
+// void State::setSub(const std::string &s){
+//     this->sub = s;
+// }
+// void State::setTraits(const std::vector<std::string> &t){
+//     this->traits = t;
+// }
+// void State::setResources(const std::vector<std::string> &r){
+//     this->resources = r;
 // }

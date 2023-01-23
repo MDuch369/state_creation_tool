@@ -6,6 +6,18 @@
 #include <filesystem>
 #include "state.h"
 
+    // TODO sort the list of files
+void file_list(const std::string & path, std::string *files) {
+        int i{};
+    for (const auto & entry : std::filesystem::directory_iterator(path)){
+        files[i] = entry.path();
+        // files[i] = files[i].substr(12, files[i].length() - 12);
+        std::cout << i << " " << files[i] << std::endl;
+        i++;
+    }
+
+}
+
 void save_provinces(std::vector<std::string> &provs) {
     std::string prov, tmp; 
     
@@ -47,7 +59,7 @@ void print_state(State &state){
         << "\tsubsistence_building = " << state.getSub() << std::endl
         << "\tprovinces = { ";
     for (std::string s : state.getProvs()) {
-        dst << "\"" << s << "\" ";
+        dst << "\"x" << s << "\" ";
     }
     dst << "}" << std::endl 
         << "\ttraits = { "; 
@@ -90,18 +102,18 @@ void print_state(State &state){
     if(state.getWhale() != 0) {
         dst << "\t\tbg_whaling = " << state.getWhale() << std::endl; 
     }
-    // if(state.getOil() != 0) {
-    //     dst << "\t\tbg_oil_extraction = " << state.getOil() << std::endl; 
-    // }
-    // if(state.getRubber() != 0) {
-    //     dst << "\t\tbg_logging = " << state.getRubber() << std::endl; 
-    // }
-    // if(state.getGold() != 0) {
-    //     dst << "\t\tbg_gold_mining = " << state.getGold() << std::endl; 
-    // }
-    // if(state.getDiscGold() != 0) {
-    //     dst << "\t\tbg_whaling = " << state.getDiscGold() << std::endl; 
-    // }
+    if(state.getOil() != 0) {
+        dst << "\t\tbg_oil_extraction = " << state.getOil() << std::endl; 
+    }
+    if(state.getRubber() != 0) {
+        dst << "\t\tbg_logging = " << state.getRubber() << std::endl; 
+    }
+    if(state.getGold() != 0) {
+        dst << "\t\tbg_gold_mining = " << state.getGold() << std::endl; 
+    }
+    if(state.getDiscGold() != 0) {
+        dst << "\t\tbg_whaling = " << state.getDiscGold() << std::endl; 
+    }
     dst << "\t}" << std::endl;
     if(state.getNavalExit() != 0) {
        dst << "\tnaval_exit_id = " << state.getNavalExit() << std::endl;
@@ -139,9 +151,101 @@ double calculate_ratio(State &state, const std::vector<std::string> &provs) {
 void calculate_pops(State &donor, State &state, const double &ratio) {
     // const std::vector<State::Pop> *ptr = state.getPopsPtr();
     for(int i{}; i < donor.getPops().size(); i++) {
-        state.add_pop(donor.getPops()[i].getCult(), donor.getPops()[i].getRel(), donor.getPops()[i].getType(), donor.getPops()[i].getSize(), ratio);
+        state.add_pop(donor.getPops()[i].getCult(), donor.getPops()[i].getRel(), donor.getPops()[i].getType(), donor.getPops()[i].getSize() * ratio);
     }
 }
+
+void calculate_remaining_pops(State &donor, State &remain, State &state) {
+    for(int i{}; i < donor.getPops().size(); i++) {
+        // remain.setPopSize(i, donor.getPops()[i].getSize() - state.getPops()[i].getSize());
+        remain.add_pop(donor.getPops()[i].getCult(), donor.getPops()[i].getRel(), donor.getPops()[i].getType(), donor.getPops()[i].getSize() - state.getPops()[i].getSize());
+    }
+}
+
+// TODO for next version change this to be member of State class
+State calculate_resources(State &donor, const double &ratio) {
+    unsigned int res[12]{};
+    res[0] = donor.getLand() * ratio;
+    if(donor.getCoal() != 0){
+        res[1] = donor.getCoal() * ratio;
+    } 
+    if(donor.getIron() != 0){
+        res[2] = donor.getIron() * ratio;
+    }
+    if(donor.getLead() != 0){
+        res[3] = donor.getLead() * ratio;
+    }
+    if(donor.getSulfur() != 0){
+        res[4] = donor.getSulfur() * ratio;
+    }
+    if(donor.getLog() != 0){
+        res[5] = donor.getLog() * ratio;
+    }
+    if(donor.getFish() != 0){
+        res[6] = donor.getFish() * ratio;
+    }
+    if(donor.getWhale() != 0){
+        res[7] = donor.getWhale() * ratio;
+    }
+    if(donor.getOil() != 0){
+        res[8] = donor.getOil() * ratio;
+    }
+    if(donor.getRubber() != 0){
+        res[9] = donor.getRubber() * ratio;
+    }
+    if(donor.getGold() != 0){
+        res[10] = donor.getGold() * ratio;
+    }
+    if(donor.getDiscGold() != 0){
+        res[11] = donor.getDiscGold() * ratio;
+    }
+    State St(res);
+    return St;
+}
+
+State calculate_remaining_resources(State &donor, State &state) {
+        unsigned int res[12]{};
+    res[0] = donor.getLand() - state.getLand();
+    if(donor.getCoal() != 0){
+        res[1] = donor.getCoal() - state.getCoal();
+    } 
+    if(donor.getIron() != 0){
+        res[2] = donor.getIron() - state.getIron();
+    }
+    if(donor.getLead() != 0){
+        res[3] = donor.getLead() - state.getLead();
+    }
+    if(donor.getSulfur() != 0){
+        res[4] = donor.getSulfur() - state.getSulfur();
+    }
+    if(donor.getLog() != 0){
+        res[5] = donor.getLog() - state.getLog();
+    }
+    if(donor.getFish() != 0){
+        res[6] = donor.getFish() - state.getFish();
+    }
+    if(donor.getWhale() != 0){
+        res[7] = donor.getWhale() - state.getWhale();
+    }
+    if(donor.getOil() != 0){
+        res[8] = donor.getOil() - state.getOil();
+    }
+    if(donor.getRubber() != 0){
+        res[9] = donor.getRubber() - state.getRubber();
+    }
+    if(donor.getGold() != 0){
+        res[10] = donor.getGold() - state.getGold();
+    }
+    if(donor.getDiscGold() != 0){
+        res[11] = donor.getDiscGold() - state.getDiscGold();
+    }
+    State St(res);
+    return St;
+}
+
+// void add_state_info(State &donor, State &state) {
+//     state.setName(new_state_name)
+// }
 
 // void debug(const std::vector<std::string> &provs) {
 //     for(std::string s : provs) {
@@ -150,32 +254,50 @@ void calculate_pops(State &donor, State &state, const double &ratio) {
 // }
 
 
-int main() {
 
+int main() {
+// variables
     std::string files[15]{};
     std::vector<std::string> provinces{};
-    std::string path = "input/files";
-    double provs_ratio;
-    // int init_num_provs{}, transfered_provs{}, remaining_provs{};
+    std::string path{"input/files"}, strat_reg{}, new_state_name("NEW_STATE");
+    int new_state_id{666}; 
+    double provs_ratio; // TODO for next version change this to be member of state class
 
-    int i{};
-    for (const auto & entry : std::filesystem::directory_iterator(path)){
-        files[i] = entry.path();
-        // files[i] = files[i].substr(12, files[i].length() - 12);
-        std::cout << i << " " << files[i] << std::endl;
-        i++;
-    }
-
+// creating list of files
+    file_list(path, files);
     save_provinces(provinces);
     // find_state(input_file, provinces[0]);
+    // ! temporary args
     State Old_state(find_state(files[0], provinces[1]), files[0]);
-    State New_state(Old_state);
+    // State New_state(Old_state);
     provs_ratio = calculate_ratio(Old_state, provinces);
+    // ! temporary args
     Old_state.copy_pops("input/pops/05_north_america.txt", "STATE_LOUISIANA");
+    // calculate_resources(Old_state, provs_ratio);
+    State New_state = calculate_resources(Old_state, provs_ratio);
+    State Remaining_state = calculate_remaining_resources(Old_state, New_state);
+
+// setting new state info
+    New_state.setName(new_state_name);
+    New_state.setId(new_state_id);
+    New_state.setProvs(provinces);
+    New_state.copy_state_info(Old_state);
+    Remaining_state.setName(Old_state.getName());
+    Remaining_state.setId(Old_state.getId());
+    Remaining_state.setProvs(Old_state.getProvs());
+    Remaining_state.calculate_remaining_provs(New_state);
+    Remaining_state.copy_state_info(Old_state);
+
+// calculating pops
     calculate_pops(Old_state, New_state, provs_ratio);
-    print_state(Old_state);
+    calculate_remaining_pops(Old_state, Remaining_state, New_state);
+
+// printing states
+    print_state(Old_state); //for debugging purposes
+    print_state(Remaining_state);
     print_state(New_state);
-    print_pops(Old_state);
+    print_pops(Old_state); //for debugging purposes
+    print_pops(Remaining_state);
     print_pops(New_state);
 
 
