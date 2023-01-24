@@ -6,7 +6,7 @@
 #include <filesystem>
 #include "state.h"
 
-    // TODO sort the list of files
+// TODO sort the list of files
 void file_list(const std::string & path, std::string *files) {
         int i{};
     for (const auto & entry : std::filesystem::directory_iterator(path)){
@@ -16,6 +16,15 @@ void file_list(const std::string & path, std::string *files) {
         i++;
     }
 
+}
+
+void new_state_info(int &id, std::string &name) {
+    std::cout << "Name of the state to be created: " << std::endl;
+    std::cin >> name;
+    std::cout << std::endl;
+    std::cout << "Id of the state to be created: " << std::endl;
+    std::cin >> id;
+    std::cout << std::endl;
 }
 
 void save_provinces(std::vector<std::string> &provs) {
@@ -52,8 +61,11 @@ unsigned int find_state(const std::string &file, const std::string &prov) {
     return cur_line;
 }
 
+// void find_file() {}
+
+// TODO all the funcions below should be moved inside class in next version
 void print_state(State &state){
-    std::ofstream  dst("output/files/to.txt", std::ios::binary | std::ios::app);
+    std::ofstream  dst("output/map_data/state_regions/to.txt", std::ios::binary | std::ios::app);
     dst << state.getName() << "= {" << std::endl
         << "\tid = " << state.getId() << std::endl
         << "\tsubsistence_building = " << state.getSub() << std::endl
@@ -123,7 +135,7 @@ void print_state(State &state){
 }
 
 void print_pops(State &state){
-    std::ofstream  dst("output/files/to_pops.txt", std::ios::binary | std::ios::app);
+    std::ofstream  dst("output/common/history/pops/to_pops.txt", std::ios::binary | std::ios::app);
     dst << "\ts:" << state.getName() << " = {" << std::endl
         << "\t\tregion_state:ABC = {" << std::endl;
     for(int i{}; i < state.getPops().size(); i++){
@@ -162,7 +174,6 @@ void calculate_remaining_pops(State &donor, State &remain, State &state) {
     }
 }
 
-// TODO for next version change this to be member of State class
 State calculate_resources(State &donor, const double &ratio) {
     unsigned int res[12]{};
     res[0] = donor.getLand() * ratio;
@@ -259,16 +270,16 @@ int main() {
 // variables
     std::string files[15]{};
     std::vector<std::string> provinces{};
-    std::string path{"input/files"}, strat_reg{}, new_state_name("NEW_STATE");
-    int new_state_id{666}; 
+    std::string path{"input/files"}, new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
+    int new_state_id{/*666*/}; 
     double provs_ratio; // TODO for next version change this to be member of state class
 
-// creating list of files
     file_list(path, files);
     save_provinces(provinces);
+    new_state_info(new_state_id, new_state_name);
     // find_state(input_file, provinces[0]);
     // ! temporary args
-    State Old_state(find_state(files[0], provinces[1]), files[0]);
+    State Old_state(find_state(files[0], provinces[0]), files[0]);
     // State New_state(Old_state);
     provs_ratio = calculate_ratio(Old_state, provinces);
     // ! temporary args
@@ -277,7 +288,7 @@ int main() {
     State New_state = calculate_resources(Old_state, provs_ratio);
     State Remaining_state = calculate_remaining_resources(Old_state, New_state);
 
-// setting new state info
+// setting new states info
     New_state.setName(new_state_name);
     New_state.setId(new_state_id);
     New_state.setProvs(provinces);
