@@ -13,15 +13,13 @@
 //     }
 // }
 
+// TODO refactor
 void save_i_o_path(/*std::string &input, std::string &output*/) {
     std::filesystem::path in{}, out{};
     std::string line{};
     std::ofstream  dst("inoutpath.txt", std::ios::binary | std::ios::app);
     std::cout << "Enter the game path: " << std::endl;
-    // std::getline(std::cin, line);
-    while(std::cin) {
-
-    }
+    std::getline(std::cin, line);
     in = line;
     dst << "input: " << in << std::endl;
     std::cout << "Enter path to the mod: " << std::endl;
@@ -29,7 +27,7 @@ void save_i_o_path(/*std::string &input, std::string &output*/) {
     out = line;
     dst << "output: " << out << std::endl;
 }
-
+// TODO refactor
 void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) {
     std::string line{};
     std::ifstream  src("inoutpath.txt", std::ios::binary);
@@ -82,7 +80,7 @@ void save_provinces(std::vector<std::string> &provs) {
         }
     }
 }
-
+// TODO refactor
 unsigned int find_state(const std::string &file, const std::string &prov) {
     unsigned int cur_line{};
     std::string line{};
@@ -312,6 +310,7 @@ int main() {
     std::string /*path{"input/files"},*/ new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
     int new_state_id{/*666*/}; 
     double provs_ratio; // TODO for next version change this to be member of state class
+    
     // ? make this a function
     if (std::filesystem::exists("inoutpath.txt")){
         load_i_o_path(input, output);
@@ -319,16 +318,17 @@ int main() {
         save_i_o_path();
         load_i_o_path(input, output);
     }
+    
     file_list(input, files);
     save_provinces(provinces);
     new_state_info(new_state_id, new_state_name);
     // find_state(input_file, provinces[0]);
     // ! temporary args
-    State Old_state(find_state(files[0], provinces[0]), files[0]);
+    State Old_state(find_state(files[14], provinces[0]), files[14]);
     // State New_state(Old_state);
     provs_ratio = calculate_ratio(Old_state, provinces);
     // ! temporary args
-    Old_state.copy_pops("input/pops/05_north_america.txt", "STATE_LOUISIANA");
+    Old_state.copy_pops("input/pops/05_north_america.txt"/*, "STATE_LOUISIANA"*/ );
     // calculate_resources(Old_state, provs_ratio);
     State New_state = calculate_resources(Old_state, provs_ratio);
     State Remaining_state = calculate_remaining_resources(Old_state, New_state);

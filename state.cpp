@@ -111,14 +111,14 @@ State::State(const unsigned int res[])
 State::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
     : culture{cult}, religion{rel}, type{t}, size{s} {}
 // pops
-void State::copy_pops(const std::string &file, const std::string &name/*, std::vector<State::Pop> &vec*/) {
+void State::copy_pops(const std::string &file/*, const std::string &name, std::vector<State::Pop> &vec*/) {
     std::string line, cul, rel{}, t{};
     int s;
     std::ifstream  src(file, std::ios::binary);
     
     // TODO implement handling of different region states
     while(getline(src, line)){
-        if(line.find(name, 0) != std::string::npos) {
+        if(line.find(this->name, 0) != std::string::npos) {
             getline(src, line);
             while(true) {
                 getline(src, line);

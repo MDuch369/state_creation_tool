@@ -49,7 +49,7 @@ public:
     State(const unsigned int &, const std::string &);
     State(const unsigned int[]);
 // pops  
-    void copy_pops(const std::string &, const std::string &/*, std::vector<State::Pop> &*/);
+    void copy_pops(const std::string &/*, const std::string &, std::vector<State::Pop> &*/);
     void add_pop(const std::string &, const std::string &, const std::string &, const int &);
 // data manipulation
     void copy_state_info(State &);
