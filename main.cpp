@@ -15,12 +15,18 @@
 
 void save_i_o_path(/*std::string &input, std::string &output*/) {
     std::filesystem::path in{}, out{};
+    std::string line{};
     std::ofstream  dst("inoutpath.txt", std::ios::binary | std::ios::app);
     std::cout << "Enter the game path: " << std::endl;
-    std::cin >> in;
+    // std::getline(std::cin, line);
+    while(std::cin) {
+
+    }
+    in = line;
     dst << "input: " << in << std::endl;
     std::cout << "Enter path to the mod: " << std::endl;
-    std::cin >> out;
+    std::getline(std::cin, line);
+    out = line;
     dst << "output: " << out << std::endl;
 }
 
@@ -29,16 +35,17 @@ void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) {
     std::ifstream  src("inoutpath.txt", std::ios::binary);
     while(getline(src, line)){
         if(line.find("input: ") != std::string::npos) {
-            in = line.substr(8, std::string::npos);
+            // TODO find a better way to do this
+            in = line.substr(8, line.length() - 10);
         }
         if(line.find("output: ") != std::string::npos) {
-            out = line.substr(9, std::string::npos);
+            // TODO find a better way to do this
+            out = line.substr(9, line.length() - 11);
         }
     }
 }
-
 // TODO sort the list of files
-void file_list(const std::string &path, std::string *files) {
+void file_list(const std::filesystem::path &path, std::string *files) {
         int i{};
     for (const auto & entry : std::filesystem::directory_iterator(path)){
         files[i] = entry.path();
@@ -300,19 +307,19 @@ State calculate_remaining_resources(State &donor, State &state) {
 int main() {
 // variables
     std::filesystem::path input{}, output{};
-    std::string files[15]{};
+    std::string files[16]{};
     std::vector<std::string> provinces{};
-    std::string path{"input/files"}, new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
+    std::string /*path{"input/files"},*/ new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
     int new_state_id{/*666*/}; 
     double provs_ratio; // TODO for next version change this to be member of state class
-    
+    // ? make this a function
     if (std::filesystem::exists("inoutpath.txt")){
         load_i_o_path(input, output);
     } else {
         save_i_o_path();
         load_i_o_path(input, output);
     }
-    file_list(path, files);
+    file_list(input, files);
     save_provinces(provinces);
     new_state_info(new_state_id, new_state_name);
     // find_state(input_file, provinces[0]);
