@@ -6,8 +6,39 @@
 #include <filesystem>
 #include "state.h"
 
+// void check_i_o_data() {
+//     for (const auto & entry : std::filesystem::directory_iterator(path)){
+//         // std::cout << i << " " << files[i] << std::endl;
+//         i++;
+//     }
+// }
+
+void save_i_o_path(/*std::string &input, std::string &output*/) {
+    std::filesystem::path in{}, out{};
+    std::ofstream  dst("inoutpath.txt", std::ios::binary | std::ios::app);
+    std::cout << "Enter the game path: " << std::endl;
+    std::cin >> in;
+    dst << "input: " << in << std::endl;
+    std::cout << "Enter path to the mod: " << std::endl;
+    std::cin >> out;
+    dst << "output: " << out << std::endl;
+}
+
+void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) {
+    std::string line{};
+    std::ifstream  src("inoutpath.txt", std::ios::binary);
+    while(getline(src, line)){
+        if(line.find("input: ") != std::string::npos) {
+            in = line.substr(8, std::string::npos);
+        }
+        if(line.find("output: ") != std::string::npos) {
+            out = line.substr(9, std::string::npos);
+        }
+    }
+}
+
 // TODO sort the list of files
-void file_list(const std::string & path, std::string *files) {
+void file_list(const std::string &path, std::string *files) {
         int i{};
     for (const auto & entry : std::filesystem::directory_iterator(path)){
         files[i] = entry.path();
@@ -268,12 +299,19 @@ State calculate_remaining_resources(State &donor, State &state) {
 
 int main() {
 // variables
+    std::filesystem::path input{}, output{};
     std::string files[15]{};
     std::vector<std::string> provinces{};
     std::string path{"input/files"}, new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
     int new_state_id{/*666*/}; 
     double provs_ratio; // TODO for next version change this to be member of state class
-
+    
+    if (std::filesystem::exists("inoutpath.txt")){
+        load_i_o_path(input, output);
+    } else {
+        save_i_o_path();
+        load_i_o_path(input, output);
+    }
     file_list(path, files);
     save_provinces(provinces);
     new_state_info(new_state_id, new_state_name);
