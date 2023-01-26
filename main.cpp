@@ -190,6 +190,35 @@ void print_pops(State &state){
 
 }
 
+void print_buildings(State &state){
+    // std::string region{state.getBuildings()[0].getRegion()};
+    std::ofstream  dst("output/common/history/buildings/to_buildings.txt", std::ios::binary | std::ios::app);
+    int size{state.getBuildings().size()};
+   
+    dst << "\ts:" << state.getName() << " = {" << std::endl;
+    dst << "\t\tregion_state:" << state.getBuildings()[0].getRegion() <<" = {" << std::endl;
+    for(int i{}; i < size; i++){
+        std::string reg{state.getBuildings()[i].getRegion()};
+        if(state.getBuildings()[i].getLvl() > 0 ) {
+            if(i > 0 && reg != state.getBuildings()[i-1].getRegion()) {
+                dst << "\t\tregion_state:" << reg <<" = {" << std::endl;
+            }
+            dst << "\t\t\tcreate_building = {" << std::endl;
+            dst << "\t\t\t\tbuilding = " << state.getBuildings()[i].getType() << std::endl;
+            dst << "\t\t\t\tlevel = " << state.getBuildings()[i].getLvl() << std::endl;
+            dst << "\t\t\t\treserves = " << state.getBuildings()[i].getRes() << std::endl;
+            dst << "\t\t\t\tactivate_production_methods = " << state.getBuildings()[i].getProd() << std::endl << "\t\t\t}" << std::endl;
+        }
+        if(i < (size - 1) && reg != state.getBuildings()[i+1].getRegion() ) {
+            dst << "\t\t}" << std::endl;
+        }
+        if(i == size - 1) {
+            dst << "\t\t}" << std::endl;
+        }
+    }
+    dst << "\t}" << std::endl;
+}
+
 double calculate_ratio(State &state, const std::vector<std::string> &provs) {
     double i{provs.size()}, j{state.getProvs().size()};
     double result{i / j};
@@ -370,6 +399,9 @@ int main() {
     print_pops(Old_state); //for debugging purposes
     print_pops(Remaining_state);
     print_pops(New_state);
+    print_buildings(Old_state); //for debugging purposes
+    print_buildings(Remaining_state);
+    print_buildings(New_state);
 
 
     // debug( provinces );
