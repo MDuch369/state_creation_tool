@@ -35,12 +35,30 @@ class State {
 
     class Building {
     // data
-        std::string type, region, dlc{}, prod_med;
+        std::string type, region, dlc{}, prod;
         int level, reserves;
     public:
     // constructor
         Building(const std::string &, const std::string &, const std::string &, const std::string &, const int &, const int &);
     // getters
+        inline std::string getType() {
+            return type;
+        }
+        inline std::string getRegion() {
+            return region;
+        }
+        inline std::string getDlc() {
+            return dlc;
+        }
+        inline std::string getProd() {
+            return prod;
+        }
+        inline int getLvl() {
+            return level;
+        }
+        inline int getRes() {
+            return reserves;
+        }        
     // setters
     };
 //data 
@@ -67,6 +85,7 @@ public:
     void add_pop(const std::string &, const std::string &, const std::string &, const int &);
 // buildings
     void create_buildings(const std::string &);
+    void add_building(const std::string &, const std::string &, const std::string &, const std::string &, const int &, const int &);
 // data manipulation
     void copy_state_info(State &);
     void remove_prov ();
@@ -149,6 +168,9 @@ public:
     }            
     inline std::vector<State::Pop> getPops() {
         return pops;
+    }
+    inline std::vector<State::Building> getBuildings() {
+        return buildings;
     }
 // setters
    void setSub(const std::string &);

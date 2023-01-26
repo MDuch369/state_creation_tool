@@ -197,7 +197,6 @@ double calculate_ratio(State &state, const std::vector<std::string> &provs) {
 }
 // TODO refactor
 void calculate_pops(State &donor, State &state, const double &ratio) {
-    // const std::vector<State::Pop> *ptr = state.getPopsPtr();
     for(int i{}; i < donor.getPops().size(); i++) {
         state.add_pop(donor.getPops()[i].getCult(), donor.getPops()[i].getRel(), donor.getPops()[i].getType(), donor.getPops()[i].getSize() * ratio);
     }
@@ -207,6 +206,20 @@ void calculate_remaining_pops(State &donor, State &remain, State &state) {
     for(int i{}; i < donor.getPops().size(); i++) {
         // remain.setPopSize(i, donor.getPops()[i].getSize() - state.getPops()[i].getSize());
         remain.add_pop(donor.getPops()[i].getCult(), donor.getPops()[i].getRel(), donor.getPops()[i].getType(), donor.getPops()[i].getSize() - state.getPops()[i].getSize());
+    }
+}
+
+void calculate_buildings(State &donor, State &state, const double &ratio) {
+    for(int i{}; i < donor.getBuildings().size(); i++) {
+        double lvl = donor.getBuildings()[i].getLvl() * ratio;
+        state.add_building(donor.getBuildings()[i].getType(), donor.getBuildings()[i].getRegion(), donor.getBuildings()[i].getDlc(), donor.getBuildings()[i].getProd(), donor.getBuildings()[i].getRes(), lvl);
+    }
+}
+
+void calculate_remaining_buildings(State &donor, State &remain, State &state) {
+    for(int i{}; i < donor.getBuildings().size(); i++) {
+        // remain.setBuildingsize(i, donor.getBuildings()[i].getSize() - state.getBuildings()[i].getSize());
+        remain.add_building(donor.getBuildings()[i].getType(), donor.getBuildings()[i].getRegion(), donor.getBuildings()[i].getDlc(), donor.getBuildings()[i].getProd(), donor.getBuildings()[i].getRes(), donor.getBuildings()[i].getLvl() - state.getBuildings()[i].getLvl());
     }
 }
 
@@ -344,11 +357,12 @@ int main() {
     Remaining_state.setProvs(Old_state.getProvs());
     Remaining_state.calculate_remaining_provs(New_state);
     Remaining_state.copy_state_info(Old_state);
-
 // calculating pops
     calculate_pops(Old_state, New_state, provs_ratio);
     calculate_remaining_pops(Old_state, Remaining_state, New_state);
-
+// calculating buildings
+    calculate_buildings(Old_state, New_state, provs_ratio);
+    calculate_remaining_buildings(Old_state, Remaining_state, New_state);
 // printing states
     print_state(Old_state); //for debugging purposes
     print_state(Remaining_state);

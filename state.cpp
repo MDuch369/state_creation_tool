@@ -110,8 +110,8 @@ State::State(const unsigned int res[])
     :land{res[0]}, coal{res[1]}, iron{res[2]}, lead{res[3]}, sulfur{res[4]}, log{res[5]}, fish{res[6]}, whale{res[7]}, oil{res[8]}, rubber{res[9]}, gold{res[10]}, disc_gold{res[11]} {}
 State::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
     : culture{cult}, religion{rel}, type{t}, size{s} {}
-State::Building::Building(const std::string &type, const std::string &reg, const std::string &dlc, const std::string &pr_m, const int &lvl, const int &res) 
-    : type{type}, region{reg}, dlc{dlc}, prod_med{pr_m}, level{lvl}, reserves{res} {}
+State::Building::Building(const std::string &type, const std::string &reg, const std::string &dlc, const std::string &pr, const int &lvl, const int &res) 
+    : type{type}, region{reg}, dlc{dlc}, prod{pr}, level{lvl}, reserves{res} {}
 // pops
 void State::copy_pops(const std::string &file/*, const std::string &name, std::vector<State::Pop> &vec*/) {
     std::string line, cul, rel{}, t{};
@@ -203,7 +203,9 @@ void State::create_buildings(const std::string &file){
         }
     }
 }
-
+void State::add_building(const std::string &type, const std::string &reg, const std::string &dlc, const std::string &pr, const int &res, const int &lvl) {
+    this->buildings.emplace_back(type, reg, dlc, pr, lvl, res);
+}
 // data calculating/copying
 std::string State::data( std::string &line){
     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
