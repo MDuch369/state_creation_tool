@@ -100,7 +100,7 @@ unsigned int find_state(const std::string &file, const std::string &prov) {
 // void find_file() {}
 
 // TODO all the funcions below should be moved inside class in next version
-void print_state(State &state){
+void print_state_region(State &state){
     std::ofstream  dst("output/map_data/state_regions/to.txt", std::ios::binary | std::ios::app);
     dst << state.getName() << "= {" << std::endl
         << "\tid = " << state.getId() << std::endl
@@ -217,6 +217,24 @@ void print_buildings(State &state){
         }
     }
     dst << "\t}" << std::endl;
+}
+
+void print_state(State &state) {
+    std::ofstream  dst("output/common/history/to_states.txt", std::ios::binary | std::ios::app);
+    std::string placeholder{"[ABC]"};
+    dst << "\ts:" << state.getName() << " = {" << std::endl;
+    dst << "\t\tcreate_state = {" 
+        << "\t\t\tcountry = c:" << placeholder << std::endl
+        << "\t\t\towned_provinces = { ";
+    for(std::string s : state.getProvs()) {
+        dst << s << " ";
+    }
+    dst << "}" << std::endl
+        <<  "\t\t}" << std::endl;
+    for(std::string t : state.getHomelands()) {
+        dst << "\t\tadd_homeland = " << t << std::endl;
+    }
+    dst << "\t}" << std::endl
 }
 
 double calculate_ratio(State &state, const std::vector<std::string> &provs) {
@@ -394,9 +412,9 @@ int main() {
     calculate_buildings(Old_state, New_state, provs_ratio);
     calculate_remaining_buildings(Old_state, Remaining_state, New_state);
 // printing states
-    print_state(Old_state); //for debugging purposes
-    print_state(Remaining_state);
-    print_state(New_state);
+    print_state_region(Old_state); //for debugging purposes
+    print_state_region(Remaining_state);
+    print_state_region(New_state);
     print_pops(Old_state); //for debugging purposes
     print_pops(Remaining_state);
     print_pops(New_state);
