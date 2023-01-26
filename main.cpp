@@ -223,7 +223,7 @@ void print_state(State &state) {
     std::ofstream  dst("output/common/history/to_states.txt", std::ios::binary | std::ios::app);
     std::string placeholder{"[ABC]"};
     dst << "\ts:" << state.getName() << " = {" << std::endl;
-    dst << "\t\tcreate_state = {" 
+    dst << "\t\tcreate_state = {" << std::endl
         << "\t\t\tcountry = c:" << placeholder << std::endl
         << "\t\t\towned_provinces = { ";
     for(std::string s : state.getProvs()) {
@@ -234,7 +234,7 @@ void print_state(State &state) {
     for(std::string t : state.getHomelands()) {
         dst << "\t\tadd_homeland = " << t << std::endl;
     }
-    dst << "\t}" << std::endl
+    dst << "\t}" << std::endl;
 }
 
 double calculate_ratio(State &state, const std::vector<std::string> &provs) {
@@ -421,6 +421,9 @@ int main() {
     print_buildings(Old_state); //for debugging purposes
     print_buildings(Remaining_state);
     print_buildings(New_state);
+    print_state(Old_state); //for debugging purposes
+    print_state(Remaining_state);
+    print_state(New_state);
 
 
     // debug( provinces );
