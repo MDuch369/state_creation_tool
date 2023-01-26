@@ -64,7 +64,7 @@ class State {
 //data 
     std::vector<State::Pop> pops{};
     std::vector<State::Building> buildings{};
-    std::vector<std::string> provs, traits, resources, im_provs{};
+    std::vector<std::string> provs, traits, resources, im_provs{}, homelands{};
     std::string name, file_name, sub, city, port{}, farm, mine{}, wood{};
     unsigned int id, land, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{}; 
 // Functions:
@@ -80,8 +80,7 @@ public:
     State(const unsigned int &, const std::string &);
     State(const unsigned int[]);
 // pops  
-    // TODO rename to create_pops
-    void copy_pops(const std::string &/*, const std::string &, std::vector<State::Pop> &*/);
+    void create_pops(const std::string &/*, const std::string &, std::vector<State::Pop> &*/);
     void add_pop(const std::string &, const std::string &, const std::string &, const int &);
 // buildings
     void create_buildings(const std::string &);
@@ -90,6 +89,7 @@ public:
     void copy_state_info(State &);
     void remove_prov ();
     void calculate_remaining_provs(State &);
+    void create_homelands(const std::string &);
 // getters
     inline std::string getName() {
     	return name;
@@ -171,6 +171,9 @@ public:
     }
     inline std::vector<State::Building> getBuildings() {
         return buildings;
+    }
+    inline std::vector<std::string> getHomelands() {
+        return homelands;
     }
 // setters
    void setSub(const std::string &);

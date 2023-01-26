@@ -113,7 +113,7 @@ State::Pop::Pop(const std::string &cult, const std::string &rel, const std::stri
 State::Building::Building(const std::string &type, const std::string &reg, const std::string &dlc, const std::string &pr, const int &lvl, const int &res) 
     : type{type}, region{reg}, dlc{dlc}, prod{pr}, level{lvl}, reserves{res} {}
 // pops
-void State::copy_pops(const std::string &file/*, const std::string &name, std::vector<State::Pop> &vec*/) {
+void State::create_pops(const std::string &file/*, const std::string &name, std::vector<State::Pop> &vec*/) {
     std::string line, cul, rel{}, t{};
     int s;
     std::ifstream  src(file, std::ios::binary);
@@ -250,6 +250,7 @@ void State::copy_state_info(State &st) {
     this->sub = st.getSub();
     this->resources = st.getResources();
     this->naval_exit = st.getNavalExit();
+    this->homelands = st.getHomelands();
 
 }
 void State::calculate_remaining_provs(State &st) {
@@ -261,6 +262,26 @@ void State::calculate_remaining_provs(State &st) {
         }
     }
 }
+void State::create_homelands(const std::string &file) {
+    std::string line;
+    std::ifstream  src(file, std::ios::binary);
+
+    while(getline(src, line)) {
+        if(line.find(this->name, 0) != std::string::npos) {
+            getline(src, line);
+            while(true) {
+                if(compare_string("s:STATE", line) == true) {
+                    break;
+                }
+                getline(src, line);
+                if(compare_string("add_homeland", line)) {
+                    this->homelands.push_back(data(line));
+                }
+            }
+        }
+    }    
+}
+
 // Setters
 void State::setName(const std::string &n) {
     this->name = n;

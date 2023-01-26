@@ -191,12 +191,12 @@ void print_pops(State &state){
 }
 
 void print_buildings(State &state){
-    // std::string region{state.getBuildings()[0].getRegion()};
     std::ofstream  dst("output/common/history/buildings/to_buildings.txt", std::ios::binary | std::ios::app);
     int size{state.getBuildings().size()};
    
     dst << "\ts:" << state.getName() << " = {" << std::endl;
     dst << "\t\tregion_state:" << state.getBuildings()[0].getRegion() <<" = {" << std::endl;
+
     for(int i{}; i < size; i++){
         std::string reg{state.getBuildings()[i].getRegion()};
         if(state.getBuildings()[i].getLvl() > 0 ) {
@@ -370,8 +370,9 @@ int main() {
     // State New_state(Old_state);
     provs_ratio = calculate_ratio(Old_state, provinces);
     // ! temporary args
-    Old_state.copy_pops("input/pops/05_north_america.txt"/*, "STATE_LOUISIANA"*/ );
+    Old_state.create_pops("input/pops/05_north_america.txt"/*, "STATE_LOUISIANA"*/ );
     Old_state.create_buildings("input/buildings/05_north_america.txt"/*, "STATE_LOUISIANA"*/ );
+    Old_state.create_homelands("input/00_states.txt"/*, "STATE_LOUISIANA"*/ );
     // calculate_resources(Old_state, provs_ratio);
     State New_state = calculate_resources(Old_state, provs_ratio);
     State Remaining_state = calculate_remaining_resources(Old_state, New_state);
