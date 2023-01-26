@@ -7,6 +7,7 @@
 #include <fstream> 
 
 class State {
+//    sublcasses
     class Pop {
     // data
         std::string culture, religion{}, type{};
@@ -31,14 +32,26 @@ class State {
     // setters
         void setSize(const int &);
     };
+
+    class Building {
+    // data
+        std::string type, region, dlc{}, prod_med;
+        int level, reserves;
+    public:
+    // constructor
+        Building(const std::string &, const std::string &, const std::string &, const std::string &, const int &, const int &);
+    // getters
+    // setters
+    };
 //data 
     std::vector<State::Pop> pops{};
+    std::vector<State::Building> buildings{};
     std::vector<std::string> provs, traits, resources, im_provs{};
     std::string name, file_name, sub, city, port{}, farm, mine{}, wood{};
     unsigned int id, land, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{}; 
 // Functions:
 // private data manipulation 
-    std::string data(const std::string &);
+    std::string data( std::string &);
     unsigned int data_int(std::string);
     void data_vector(std::vector<std::string> &, const std::string &, int);
     bool compare_string(const std::string &, std::string);
@@ -49,8 +62,11 @@ public:
     State(const unsigned int &, const std::string &);
     State(const unsigned int[]);
 // pops  
+    // TODO rename to create_pops
     void copy_pops(const std::string &/*, const std::string &, std::vector<State::Pop> &*/);
     void add_pop(const std::string &, const std::string &, const std::string &, const int &);
+// buildings
+    void create_buildings(const std::string &);
 // data manipulation
     void copy_state_info(State &);
     void remove_prov ();

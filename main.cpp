@@ -329,6 +329,7 @@ int main() {
     provs_ratio = calculate_ratio(Old_state, provinces);
     // ! temporary args
     Old_state.copy_pops("input/pops/05_north_america.txt"/*, "STATE_LOUISIANA"*/ );
+    Old_state.create_buildings("input/buildings/05_north_america.txt"/*, "STATE_LOUISIANA"*/ );
     // calculate_resources(Old_state, provs_ratio);
     State New_state = calculate_resources(Old_state, provs_ratio);
     State Remaining_state = calculate_remaining_resources(Old_state, New_state);

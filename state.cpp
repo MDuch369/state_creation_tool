@@ -110,6 +110,8 @@ State::State(const unsigned int res[])
     :land{res[0]}, coal{res[1]}, iron{res[2]}, lead{res[3]}, sulfur{res[4]}, log{res[5]}, fish{res[6]}, whale{res[7]}, oil{res[8]}, rubber{res[9]}, gold{res[10]}, disc_gold{res[11]} {}
 State::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
     : culture{cult}, religion{rel}, type{t}, size{s} {}
+State::Building::Building(const std::string &type, const std::string &reg, const std::string &dlc, const std::string &pr_m, const int &lvl, const int &res) 
+    : type{type}, region{reg}, dlc{dlc}, prod_med{pr_m}, level{lvl}, reserves{res} {}
 // pops
 void State::copy_pops(const std::string &file/*, const std::string &name, std::vector<State::Pop> &vec*/) {
     std::string line, cul, rel{}, t{};
@@ -148,7 +150,6 @@ void State::copy_pops(const std::string &file/*, const std::string &name, std::v
                        rel = "";
                     }
                 }
-
             }
         }
     }
@@ -156,13 +157,62 @@ void State::copy_pops(const std::string &file/*, const std::string &name, std::v
 void State::add_pop(const std::string &cul, const std::string &rel, const std::string &type, const int &size) {
     this->pops.emplace_back(cul, rel, type, size);
 }
+// buildings
+void State::create_buildings(const std::string &file){
+    std::string line, reg, pm, build, dlc{};
+    int level, res;
+    std::ifstream  src(file, std::ios::binary);
+    
+    while(getline(src, line)) {
+        if(line.find(this->name, 0) != std::string::npos) {
+            getline(src, line);
+            while(true) {
+                if(compare_string("region_state", line) == true){
+                    int pos{line.find(":") + 1};
+                    reg = line.substr(pos, line.find ("=") - pos);
+                }
+                getline(src, line);
+                if(compare_string("s:STATE", line) == true) {
+                    break;
+                }
+                if(compare_string("create_building", line)) {
+                    getline(src, line);
+                    if(compare_string("building", line)) {
+                        build = data(line);
+                        getline(src, line);
+                    }
+                    if(compare_string("level", line)) {
+                        level = data_int(line);
+                        getline(src, line);
+                    }
+                    if(compare_string("reserves", line)) {
+                        res = data_int(line);
+                        getline(src, line);
+                    }
+                    if(compare_string("activate_production_methods", line)) {
+                        pm = data(line);
+                        getline(src, line);
+                    }
+                    if(compare_string("}", line)) {
+                       this->buildings.emplace_back(build, reg, dlc, pm, level, res);
+                       res = 0;
+                       pm = "";
+                    }
+                }
+            }
+        }
+    }
+}
+
 // data calculating/copying
-std::string State::data(const std::string &line){
-    int pos{line.find("=") + 2};
+std::string State::data( std::string &line){
+    line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
+    int pos{line.find("=") + 1};
     return line.substr(pos, line.find ("\n") - pos);
 }
 unsigned int State::data_int( std::string line) {
-    int pos{line.find("=") + 2};
+    line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
+    int pos{line.find("=") + 1};
     std::string arg{line.substr(pos, line.find ("\n") - pos)};
     return stoi(arg);
 }
