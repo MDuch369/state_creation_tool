@@ -66,7 +66,8 @@ class State {
     std::vector<State::Building> buildings{};
     std::vector<std::string> provs, traits, resources, im_provs{}, homelands{};
     std::string name, file_name, sub, city, port{}, farm, mine{}, wood{};
-    unsigned int id, land, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{}; 
+    unsigned int id, land, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{};
+    // double ratio; 
 // Functions:
 // private data manipulation 
     std::string data( std::string &);

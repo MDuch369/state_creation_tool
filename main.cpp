@@ -6,14 +6,8 @@
 #include <filesystem>
 #include "state.h"
 
-// void check_i_o_data() {
-//     for (const auto & entry : std::filesystem::directory_iterator(path)){
-//         // std::cout << i << " " << files[i] << std::endl;
-//         i++;
-//     }
-// }
-
-// TODO refactor
+// input/output paths
+    // TODO refactor
 void save_i_o_path(/*std::string &input, std::string &output*/) {
     std::filesystem::path in{}, out{};
     std::string line{};
@@ -27,7 +21,7 @@ void save_i_o_path(/*std::string &input, std::string &output*/) {
     out = line;
     dst << "output: " << out << std::endl;
 }
-// TODO refactor
+    // TODO refactor
 void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) {
     std::string line{};
     std::ifstream  src("inoutpath.txt", std::ios::binary);
@@ -50,7 +44,7 @@ void check_i_o_file(std::filesystem::path &in, std::filesystem::path &out) {
         load_i_o_path(in, out);
     }
 }
-// TODO sort the list of files
+    // TODO sort the list of files
 void file_list(const std::filesystem::path &path, std::filesystem::path *files) {
         int i{};
     for (const auto & entry : std::filesystem::directory_iterator(path)){
@@ -58,7 +52,7 @@ void file_list(const std::filesystem::path &path, std::filesystem::path *files) 
         i++;
     }
 }
-
+// state info input
 void new_state_info(int &id, std::string &name) {
     std::cout << "Name of the state to be created: " << std::endl;
     std::cin >> name;
@@ -67,7 +61,6 @@ void new_state_info(int &id, std::string &name) {
     std::cin >> id;
     std::cout << std::endl;
 }
-
 void save_provinces(std::vector<std::string> &provs) {
     std::string prov, tmp; 
     
@@ -85,8 +78,9 @@ void save_provinces(std::vector<std::string> &provs) {
         }
     }
 }
-// ? move these two functions inside state class
-// TODO refactor
+// file browsing 
+    // ? move these two functions inside state class
+    // TODO refactor
 unsigned int find_state(const std::string &file, const std::string &prov) {
     unsigned int cur_line{};
     std::string line{};
@@ -101,7 +95,6 @@ unsigned int find_state(const std::string &file, const std::string &prov) {
     src.close();
     return cur_line;
 }
-
 std::string find_file(std::filesystem::path *files, const std::string &prov ) {
     std::string line{};
     // std::ifstream  src(file, std::ios::binary);
@@ -116,8 +109,8 @@ std::string find_file(std::filesystem::path *files, const std::string &prov ) {
         src.close();
     }
 }
-
-// TODO all the funcions below should be moved inside class in next version
+// state data 
+    // TODO all the funcions below should be moved inside class in next version
 // void print_state_region(State &state){
 //     std::ofstream  dst("output/map_data/state_regions/to.txt", std::ios::binary | std::ios::app);
 //     dst << state.getName() << "= {" << std::endl
@@ -256,34 +249,30 @@ double calculate_ratio(State &state, const std::vector<std::string> &provs) {
     double result{i / j};
     return result;
 }
-// TODO refactor
+    // TODO refactor
 void calculate_pops(State &donor, State &state, const double &ratio) {
     for(int i{}; i < donor.getPops().size(); i++) {
         state.add_pop(donor.getPops()[i].getCult(), donor.getPops()[i].getRel(), donor.getPops()[i].getType(), donor.getPops()[i].getSize() * ratio);
     }
 }
-
 void calculate_remaining_pops(State &donor, State &remain, State &state) {
     for(int i{}; i < donor.getPops().size(); i++) {
         // remain.setPopSize(i, donor.getPops()[i].getSize() - state.getPops()[i].getSize());
         remain.add_pop(donor.getPops()[i].getCult(), donor.getPops()[i].getRel(), donor.getPops()[i].getType(), donor.getPops()[i].getSize() - state.getPops()[i].getSize());
     }
 }
-
 void calculate_buildings(State &donor, State &state, const double &ratio) {
     for(int i{}; i < donor.getBuildings().size(); i++) {
         double lvl = donor.getBuildings()[i].getLvl() * ratio;
         state.add_building(donor.getBuildings()[i].getType(), donor.getBuildings()[i].getRegion(), donor.getBuildings()[i].getDlc(), donor.getBuildings()[i].getProd(), donor.getBuildings()[i].getRes(), lvl);
     }
 }
-
 void calculate_remaining_buildings(State &donor, State &remain, State &state) {
     for(int i{}; i < donor.getBuildings().size(); i++) {
         // remain.setBuildingsize(i, donor.getBuildings()[i].getSize() - state.getBuildings()[i].getSize());
         remain.add_building(donor.getBuildings()[i].getType(), donor.getBuildings()[i].getRegion(), donor.getBuildings()[i].getDlc(), donor.getBuildings()[i].getProd(), donor.getBuildings()[i].getRes(), donor.getBuildings()[i].getLvl() - state.getBuildings()[i].getLvl());
     }
 }
-
 State calculate_resources(State &donor, const double &ratio) {
     unsigned int res[12]{};
     res[0] = donor.getLand() * ratio;
@@ -323,7 +312,6 @@ State calculate_resources(State &donor, const double &ratio) {
     State St(res);
     return St;
 }
-
 State calculate_remaining_resources(State &donor, State &state) {
         unsigned int res[12]{};
     res[0] = donor.getLand() - state.getLand();
@@ -363,10 +351,6 @@ State calculate_remaining_resources(State &donor, State &state) {
     State St(res);
     return St;
 }
-
-// void add_state_info(State &donor, State &state) {
-//     state.setName(new_state_name)
-// }
 
 // debug functions 
 // void debug(const std::vector<std::string> &provs) {
