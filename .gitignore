@@ -1,6 +1,7 @@
 *.json
 *.gch
 *.txt
+*.ods
 a.out
 main
 state
