@@ -43,15 +43,12 @@ void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) {
     }
 }
 // TODO sort the list of files
-void file_list(const std::filesystem::path &path, std::string *files) {
+void file_list(const std::filesystem::path &path, std::filesystem::path *files) {
         int i{};
     for (const auto & entry : std::filesystem::directory_iterator(path)){
         files[i] = entry.path();
-        // files[i] = files[i].substr(12, files[i].length() - 12);
-        std::cout << i << " " << files[i] << std::endl;
         i++;
     }
-
 }
 
 void new_state_info(int &id, std::string &name) {
@@ -84,7 +81,6 @@ void save_provinces(std::vector<std::string> &provs) {
 unsigned int find_state(const std::string &file, const std::string &prov) {
     unsigned int cur_line{};
     std::string line{};
-    
     std::ifstream  src(file, std::ios::binary);
 
     while(getline(src, line)) {
@@ -97,7 +93,20 @@ unsigned int find_state(const std::string &file, const std::string &prov) {
     return cur_line;
 }
 
-// void find_file() {}
+std::string find_file(std::filesystem::path *files, const std::string &prov ) {
+    std::string line{};
+    // std::ifstream  src(file, std::ios::binary);
+    for(int i{}; i < 16; i++) {
+        std::ifstream src(files[i], std::ios::binary);
+        while(getline(src, line)) {
+            if (line.find(prov, 0) != std::string::npos) {
+                // break;
+                return files[i].filename();
+            }
+        }
+        src.close();
+    }
+}
 
 // TODO all the funcions below should be moved inside class in next version
 void print_state_region(State &state){
@@ -354,20 +363,23 @@ State calculate_remaining_resources(State &donor, State &state) {
 //     state.setName(new_state_name)
 // }
 
+// debug functions 
 // void debug(const std::vector<std::string> &provs) {
 //     for(std::string s : provs) {
 //         std::cout<< s << std::endl;
 //     }
 // }
-
-
+void debug_print_file_list(const std::filesystem::path *files) {
+    for (int i{}; i < 16; i++){
+        std::cout << i << " " << files[i] << std::endl;
+    }
+}
 
 int main() {
 // variables
-    std::filesystem::path input{}, output{};
-    std::string files[16]{};
+    std::filesystem::path files[16], input{}, output{};
     std::vector<std::string> provinces{};
-    std::string /*path{"input/files"},*/ new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
+    std::string filename,/*path{"input/files"},*/ new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
     int new_state_id{/*666*/}; 
     double provs_ratio; // TODO for next version change this to be member of state class
     
@@ -380,18 +392,20 @@ int main() {
     }
     
     file_list(input, files);
+    // std::sort(files[0], files[15]);
+
+    debug_print_file_list(files);
+
     save_provinces(provinces);
     new_state_info(new_state_id, new_state_name);
-    // find_state(input_file, provinces[0]);
+    filename = find_file(files, provinces[0]);
     // ! temporary args
     State Old_state(find_state(files[14], provinces[0]), files[14]);
-    // State New_state(Old_state);
     provs_ratio = calculate_ratio(Old_state, provinces);
     // ! temporary args
-    Old_state.create_pops("input/pops/05_north_america.txt"/*, "STATE_LOUISIANA"*/ );
-    Old_state.create_buildings("input/buildings/05_north_america.txt"/*, "STATE_LOUISIANA"*/ );
-    Old_state.create_homelands("input/00_states.txt"/*, "STATE_LOUISIANA"*/ );
-    // calculate_resources(Old_state, provs_ratio);
+    Old_state.create_pops("input/pops/" + filename);
+    Old_state.create_buildings("input/buildings/" + filename);
+    Old_state.create_homelands("input/00_states.txt");
     State New_state = calculate_resources(Old_state, provs_ratio);
     State Remaining_state = calculate_remaining_resources(Old_state, New_state);
 

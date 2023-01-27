@@ -7,7 +7,7 @@
 #include <fstream> 
 
 class State {
-//    sublcasses
+//sublcasses
     class Pop {
     // data
         std::string culture, religion{}, type{};
@@ -79,17 +79,21 @@ public:
 // constructors 
     State(const unsigned int &, const std::string &);
     State(const unsigned int[]);
+
 // pops  
     void create_pops(const std::string &/*, const std::string &, std::vector<State::Pop> &*/);
     void add_pop(const std::string &, const std::string &, const std::string &, const int &);
+
 // buildings
     void create_buildings(const std::string &);
     void add_building(const std::string &, const std::string &, const std::string &, const std::string &, const int &, const int &);
+
 // data manipulation
     void copy_state_info(State &);
     void remove_prov ();
     void calculate_remaining_provs(State &);
     void create_homelands(const std::string &);
+
 // getters
     inline std::string getName() {
     	return name;
@@ -175,6 +179,7 @@ public:
     inline std::vector<std::string> getHomelands() {
         return homelands;
     }
+
 // setters
    void setSub(const std::string &);
    void setTraits(const std::vector<std::string> &);

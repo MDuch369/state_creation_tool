@@ -112,6 +112,7 @@ State::Pop::Pop(const std::string &cult, const std::string &rel, const std::stri
     : culture{cult}, religion{rel}, type{t}, size{s} {}
 State::Building::Building(const std::string &type, const std::string &reg, const std::string &dlc, const std::string &pr, const int &lvl, const int &res) 
     : type{type}, region{reg}, dlc{dlc}, prod{pr}, level{lvl}, reserves{res} {}
+
 // pops
 void State::create_pops(const std::string &file/*, const std::string &name, std::vector<State::Pop> &vec*/) {
     std::string line, cul, rel{}, t{};
@@ -157,6 +158,7 @@ void State::create_pops(const std::string &file/*, const std::string &name, std:
 void State::add_pop(const std::string &cul, const std::string &rel, const std::string &type, const int &size) {
     this->pops.emplace_back(cul, rel, type, size);
 }
+
 // buildings
 void State::create_buildings(const std::string &file){
     std::string line, reg, pm, build, dlc{};
@@ -206,6 +208,7 @@ void State::create_buildings(const std::string &file){
 void State::add_building(const std::string &type, const std::string &reg, const std::string &dlc, const std::string &pr, const int &res, const int &lvl) {
     this->buildings.emplace_back(type, reg, dlc, pr, lvl, res);
 }
+
 // data calculating/copying
 std::string State::data( std::string &line){
     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
