@@ -393,8 +393,7 @@ int main() {
     
     file_list(input, files);
     // std::sort(files[0], files[15]);
-
-    debug_print_file_list(files);
+    // debug_print_file_list(files);
 
     save_provinces(provinces);
     new_state_info(new_state_id, new_state_name);
