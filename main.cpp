@@ -77,6 +77,7 @@ void save_provinces(std::vector<std::string> &provs) {
         }
     }
 }
+// ? move these two functions inside state class
 // TODO refactor
 unsigned int find_state(const std::string &file, const std::string &prov) {
     unsigned int cur_line{};
@@ -109,142 +110,138 @@ std::string find_file(std::filesystem::path *files, const std::string &prov ) {
 }
 
 // TODO all the funcions below should be moved inside class in next version
-void print_state_region(State &state){
-    std::ofstream  dst("output/map_data/state_regions/to.txt", std::ios::binary | std::ios::app);
-    dst << state.getName() << "= {" << std::endl
-        << "\tid = " << state.getId() << std::endl
-        << "\tsubsistence_building = " << state.getSub() << std::endl
-        << "\tprovinces = { ";
-    for (std::string s : state.getProvs()) {
-        dst << "\"x" << s << "\" ";
-    }
-    dst << "}" << std::endl 
-        << "\ttraits = { "; 
-    for (std::string s : state.getTraits()) {
-        dst << "\"" << s << "\" ";
-    }
-    dst << "}" << std::endl 
-        << "\tcity = " << state.getCity() << std::endl;
-    if(state.getPort() != "") {
-        dst<< "\tport = " << state.getPort() << std::endl;
-    }
-    dst << "\tfarm = " << state.getFarm() << std::endl
-        << "\tmine = " << state.getMine() << std::endl
-        << "\twood = " << state.getWood() << std::endl
-        << "\tarable_land = " << state.getLand() << std::endl
-        << "\tarable_resources = { ";
-    for (std::string s : state.getResources()) {
-        dst << "\"" << s << "\" ";
-    } 
-    dst << "}" << std::endl
-        << "\tcapped = {" << std::endl;
-    if(state.getIron() != 0) {
-        dst << "\t\tbg_iron_mining = " << state.getIron() << std::endl; 
-    }
-    if(state.getCoal() != 0) {
-        dst << "\t\tbg_coal_mining = " << state.getCoal() << std::endl; 
-    }
-    if(state.getLead() != 0) {
-        dst << "\t\tbg_lead_mining = " << state.getLead() << std::endl; 
-    }
-    if(state.getSulfur() != 0) {
-        dst << "\t\tbg_sulfur_mining = " << state.getSulfur() << std::endl; 
-    }
-    if(state.getLog() != 0) {
-        dst << "\t\tbg_logging = " << state.getLog() << std::endl; 
-    }
-    if(state.getFish() != 0) {
-        dst << "\t\tbg_fishing = " << state.getFish() << std::endl; 
-    }
-    if(state.getWhale() != 0) {
-        dst << "\t\tbg_whaling = " << state.getWhale() << std::endl; 
-    }
-    if(state.getOil() != 0) {
-        dst << "\t\tbg_oil_extraction = " << state.getOil() << std::endl; 
-    }
-    if(state.getRubber() != 0) {
-        dst << "\t\tbg_logging = " << state.getRubber() << std::endl; 
-    }
-    if(state.getGold() != 0) {
-        dst << "\t\tbg_gold_mining = " << state.getGold() << std::endl; 
-    }
-    if(state.getDiscGold() != 0) {
-        dst << "\t\tbg_whaling = " << state.getDiscGold() << std::endl; 
-    }
-    dst << "\t}" << std::endl;
-    if(state.getNavalExit() != 0) {
-       dst << "\tnaval_exit_id = " << state.getNavalExit() << std::endl;
-    }
-    dst << "}" << std::endl << std::endl;
+// void print_state_region(State &state){
+//     std::ofstream  dst("output/map_data/state_regions/to.txt", std::ios::binary | std::ios::app);
+//     dst << state.getName() << "= {" << std::endl
+//         << "\tid = " << state.getId() << std::endl
+//         << "\tsubsistence_building = " << state.getSub() << std::endl
+//         << "\tprovinces = { ";
+//     for (std::string s : state.getProvs()) {
+//         dst << "\"x" << s << "\" ";
+//     }
+//     dst << "}" << std::endl 
+//         << "\ttraits = { "; 
+//     for (std::string s : state.getTraits()) {
+//         dst << "\"" << s << "\" ";
+//     }
+//     dst << "}" << std::endl 
+//         << "\tcity = " << state.getCity() << std::endl;
+//     if(state.getPort() != "") {
+//         dst<< "\tport = " << state.getPort() << std::endl;
+//     }
+//     dst << "\tfarm = " << state.getFarm() << std::endl
+//         << "\tmine = " << state.getMine() << std::endl
+//         << "\twood = " << state.getWood() << std::endl
+//         << "\tarable_land = " << state.getLand() << std::endl
+//         << "\tarable_resources = { ";
+//     for (std::string s : state.getResources()) {
+//         dst << "\"" << s << "\" ";
+//     } 
+//     dst << "}" << std::endl
+//         << "\tcapped = {" << std::endl;
+//     if(state.getIron() != 0) {
+//         dst << "\t\tbg_iron_mining = " << state.getIron() << std::endl; 
+//     }
+//     if(state.getCoal() != 0) {
+//         dst << "\t\tbg_coal_mining = " << state.getCoal() << std::endl; 
+//     }
+//     if(state.getLead() != 0) {
+//         dst << "\t\tbg_lead_mining = " << state.getLead() << std::endl; 
+//     }
+//     if(state.getSulfur() != 0) {
+//         dst << "\t\tbg_sulfur_mining = " << state.getSulfur() << std::endl; 
+//     }
+//     if(state.getLog() != 0) {
+//         dst << "\t\tbg_logging = " << state.getLog() << std::endl; 
+//     }
+//     if(state.getFish() != 0) {
+//         dst << "\t\tbg_fishing = " << state.getFish() << std::endl; 
+//     }
+//     if(state.getWhale() != 0) {
+//         dst << "\t\tbg_whaling = " << state.getWhale() << std::endl; 
+//     }
+//     if(state.getOil() != 0) {
+//         dst << "\t\tbg_oil_extraction = " << state.getOil() << std::endl; 
+//     }
+//     if(state.getRubber() != 0) {
+//         dst << "\t\tbg_logging = " << state.getRubber() << std::endl; 
+//     }
+//     if(state.getGold() != 0) {
+//         dst << "\t\tbg_gold_mining = " << state.getGold() << std::endl; 
+//     }
+//     if(state.getDiscGold() != 0) {
+//         dst << "\t\tbg_whaling = " << state.getDiscGold() << std::endl; 
+//     }
+//     dst << "\t}" << std::endl;
+//     if(state.getNavalExit() != 0) {
+//        dst << "\tnaval_exit_id = " << state.getNavalExit() << std::endl;
+//     }
+//     dst << "}" << std::endl << std::endl;
+// }
 
-}
+// void print_pops(State &state){
+//     std::ofstream  dst("output/common/history/pops/to_pops.txt", std::ios::binary | std::ios::app);
+//     dst << "\ts:" << state.getName() << " = {" << std::endl
+//         << "\t\tregion_state:ABC = {" << std::endl;
+//     for(int i{}; i < state.getPops().size(); i++){
+//         dst << "\t\t\tcreate_pop = {" << std::endl;
+//         if (state.getPops()[i].getType() != "") {
+//             dst << "\t\t\t\tpop_type = " << state.getPops()[i].getType() << std::endl;
+//         }
+//         dst << "\t\t\t\tculture = " << state.getPops()[i].getCult() << std::endl;
+//         if (state.getPops()[i].getRel() != "") {
+//             dst << "\t\t\t\treligion = " << state.getPops()[i].getRel() << std::endl;
+//         }
+//         dst << "\t\t\t\tsize = " << state.getPops()[i].getSize() << std::endl
+//             << "\t\t\t}" << std::endl;
+//     }
+//     dst << "\t\t}" << std::endl << "\t}" << std::endl;
+// }
 
-void print_pops(State &state){
-    std::ofstream  dst("output/common/history/pops/to_pops.txt", std::ios::binary | std::ios::app);
-    dst << "\ts:" << state.getName() << " = {" << std::endl
-        << "\t\tregion_state:ABC = {" << std::endl;
-    for(int i{}; i < state.getPops().size(); i++){
-        dst << "\t\t\tcreate_pop = {" << std::endl;
-        if (state.getPops()[i].getType() != "") {
-            dst << "\t\t\t\tpop_type = " << state.getPops()[i].getType() << std::endl;
-        }
-        dst << "\t\t\t\tculture = " << state.getPops()[i].getCult() << std::endl;
-        if (state.getPops()[i].getRel() != "") {
-            dst << "\t\t\t\treligion = " << state.getPops()[i].getRel() << std::endl;
-        }
-        dst << "\t\t\t\tsize = " << state.getPops()[i].getSize() << std::endl
-            << "\t\t\t}" << std::endl;
-    }
-    dst << "\t\t}" << std::endl << "\t}" << std::endl;
+// void print_buildings(State &state){
+//     std::ofstream  dst("output/common/history/buildings/to_buildings.txt", std::ios::binary | std::ios::app);
+//     int size{state.getBuildings().size()};
+//     dst << "\ts:" << state.getName() << " = {" << std::endl;
+//     dst << "\t\tregion_state:" << state.getBuildings()[0].getRegion() <<" = {" << std::endl;
+//     for(int i{}; i < size; i++){
+//         std::string reg{state.getBuildings()[i].getRegion()};
+//         if(state.getBuildings()[i].getLvl() > 0 ) {
+//             if(i > 0 && reg != state.getBuildings()[i-1].getRegion()) {
+//                 dst << "\t\tregion_state:" << reg <<" = {" << std::endl;
+//             }
+//             dst << "\t\t\tcreate_building = {" << std::endl;
+//             dst << "\t\t\t\tbuilding = " << state.getBuildings()[i].getType() << std::endl;
+//             dst << "\t\t\t\tlevel = " << state.getBuildings()[i].getLvl() << std::endl;
+//             dst << "\t\t\t\treserves = " << state.getBuildings()[i].getRes() << std::endl;
+//             dst << "\t\t\t\tactivate_production_methods = " << state.getBuildings()[i].getProd() << std::endl << "\t\t\t}" << std::endl;
+//         }
+//         if(i < (size - 1) && reg != state.getBuildings()[i+1].getRegion() ) {
+//             dst << "\t\t}" << std::endl;
+//         }
+//         if(i == size - 1) {
+//             dst << "\t\t}" << std::endl;
+//         }
+//     }
+//     dst << "\t}" << std::endl;
+// }
 
-}
-
-void print_buildings(State &state){
-    std::ofstream  dst("output/common/history/buildings/to_buildings.txt", std::ios::binary | std::ios::app);
-    int size{state.getBuildings().size()};
-   
-    dst << "\ts:" << state.getName() << " = {" << std::endl;
-    dst << "\t\tregion_state:" << state.getBuildings()[0].getRegion() <<" = {" << std::endl;
-
-    for(int i{}; i < size; i++){
-        std::string reg{state.getBuildings()[i].getRegion()};
-        if(state.getBuildings()[i].getLvl() > 0 ) {
-            if(i > 0 && reg != state.getBuildings()[i-1].getRegion()) {
-                dst << "\t\tregion_state:" << reg <<" = {" << std::endl;
-            }
-            dst << "\t\t\tcreate_building = {" << std::endl;
-            dst << "\t\t\t\tbuilding = " << state.getBuildings()[i].getType() << std::endl;
-            dst << "\t\t\t\tlevel = " << state.getBuildings()[i].getLvl() << std::endl;
-            dst << "\t\t\t\treserves = " << state.getBuildings()[i].getRes() << std::endl;
-            dst << "\t\t\t\tactivate_production_methods = " << state.getBuildings()[i].getProd() << std::endl << "\t\t\t}" << std::endl;
-        }
-        if(i < (size - 1) && reg != state.getBuildings()[i+1].getRegion() ) {
-            dst << "\t\t}" << std::endl;
-        }
-        if(i == size - 1) {
-            dst << "\t\t}" << std::endl;
-        }
-    }
-    dst << "\t}" << std::endl;
-}
-
-void print_state(State &state) {
-    std::ofstream  dst("output/common/history/to_states.txt", std::ios::binary | std::ios::app);
-    std::string placeholder{"[ABC]"};
-    dst << "\ts:" << state.getName() << " = {" << std::endl;
-    dst << "\t\tcreate_state = {" << std::endl
-        << "\t\t\tcountry = c:" << placeholder << std::endl
-        << "\t\t\towned_provinces = { ";
-    for(std::string s : state.getProvs()) {
-        dst << s << " ";
-    }
-    dst << "}" << std::endl
-        <<  "\t\t}" << std::endl;
-    for(std::string t : state.getHomelands()) {
-        dst << "\t\tadd_homeland = " << t << std::endl;
-    }
-    dst << "\t}" << std::endl;
-}
+// void print_state(State &state) {
+//     std::ofstream  dst("output/common/history/to_states.txt", std::ios::binary | std::ios::app);
+//     std::string placeholder{"[ABC]"};
+//     dst << "\ts:" << state.getName() << " = {" << std::endl;
+//     dst << "\t\tcreate_state = {" << std::endl
+//         << "\t\t\tcountry = c:" << placeholder << std::endl
+//         << "\t\t\towned_provinces = { ";
+//     for(std::string s : state.getProvs()) {
+//         dst << s << " ";
+//     }
+//     dst << "}" << std::endl
+//         <<  "\t\t}" << std::endl;
+//     for(std::string t : state.getHomelands()) {
+//         dst << "\t\tadd_homeland = " << t << std::endl;
+//     }
+//     dst << "\t}" << std::endl;
+// }
 
 double calculate_ratio(State &state, const std::vector<std::string> &provs) {
     double i{provs.size()}, j{state.getProvs().size()};
@@ -425,18 +422,18 @@ int main() {
     calculate_buildings(Old_state, New_state, provs_ratio);
     calculate_remaining_buildings(Old_state, Remaining_state, New_state);
 // printing states
-    print_state_region(Old_state); //for debugging purposes
-    print_state_region(Remaining_state);
-    print_state_region(New_state);
-    print_pops(Old_state); //for debugging purposes
-    print_pops(Remaining_state);
-    print_pops(New_state);
-    print_buildings(Old_state); //for debugging purposes
-    print_buildings(Remaining_state);
-    print_buildings(New_state);
-    print_state(Old_state); //for debugging purposes
-    print_state(Remaining_state);
-    print_state(New_state);
+    Old_state.print_state_region(); //for debugging purposes
+    Remaining_state.print_state_region();
+    New_state.print_state_region();
+    Old_state.print_pops(); //for debugging purposes
+    Remaining_state.print_pops();
+    New_state.print_pops();
+    Old_state.print_buildings(); //for debugging purposes
+    Remaining_state.print_buildings();
+    New_state.print_buildings();
+    Old_state.print_state(); //for debugging purposes
+    Remaining_state.print_state();
+    New_state.print_state();
 
 
     // debug( provinces );

@@ -94,6 +94,12 @@ public:
     void calculate_remaining_provs(State &);
     void create_homelands(const std::string &);
 
+// data printing
+    void print_state_region();
+    void print_pops();
+    void print_buildings();
+    void print_state();
+
 // getters
     inline std::string getName() {
     	return name;
