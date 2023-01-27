@@ -42,6 +42,14 @@ void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) {
         }
     }
 }
+void check_i_o_file(std::filesystem::path &in, std::filesystem::path &out) {
+    if (std::filesystem::exists("inoutpath.txt")){
+        load_i_o_path(in, out);
+    } else {
+        save_i_o_path();
+        load_i_o_path(in, out);
+    }
+}
 // TODO sort the list of files
 void file_list(const std::filesystem::path &path, std::filesystem::path *files) {
         int i{};
@@ -380,18 +388,10 @@ int main() {
     int new_state_id{/*666*/}; 
     double provs_ratio; // TODO for next version change this to be member of state class
     
-    // ? make this a function
-    if (std::filesystem::exists("inoutpath.txt")){
-        load_i_o_path(input, output);
-    } else {
-        save_i_o_path();
-        load_i_o_path(input, output);
-    }
-    
+    check_i_o_file(input, output);
     file_list(input, files);
     // std::sort(files[0], files[15]);
     // debug_print_file_list(files);
-
     save_provinces(provinces);
     new_state_info(new_state_id, new_state_name);
     filename = find_file(files, provinces[0]);
