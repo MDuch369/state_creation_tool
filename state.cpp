@@ -6,7 +6,7 @@
 #include "state.h"
 
 // constructors
-State::State(const unsigned int &cur_line, const std::string &file) {
+State::State(const unsigned int &cur_line, const std::string &file) { // copies data from map_data/state_regions
     unsigned int copy_line{}, len{};
     std::string line{};
     std::ifstream  src(file, std::ios::binary);
@@ -452,3 +452,60 @@ void State::Pop::setSize(const int &size) {
 // void State::setResources(const std::vector<std::string> &r){
 //     this->resources = r;
 // }
+
+// State_transfer class
+
+
+// constructor
+State_transfer::State_transfer(const std::string &name, const int &id, std::string &provs) {
+    std::string prov, tmp; 
+    this->name = name;
+    this->id = id;
+    
+    std::getline(std::cin, prov);
+    prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end());
+    prov.erase (std::remove(prov.begin(), prov.end(), ' '), prov.end());
+    transform(prov.begin(), prov.end(), prov.begin(), toupper);
+
+    std::stringstream ss(prov);
+
+    while(getline(ss, tmp, 'X')){
+        if(tmp != "") {
+        this->provs.push_back(tmp);
+        }
+    }
+}
+
+// data calculating/copying
+double State_transfer::calculate_ratio(const std::vector<std::string> &pr) {
+    // double i{pr.size()}, j{this->provs.size()};
+    // double result{pr.size() / this->provs.size()};
+    return pr.size() / this->provs.size();
+}
+    // ! TODO finish
+unsigned int State_transfer::find_states(const std::string &path, std::vector<State_transfer> &states) {
+    std::vector<std::string> diff_origin_st{};
+    // std::string *pr = &this->provs[0]; 
+    auto pr = provs.begin();
+    unsigned int cur_line{};
+    std::string line{};
+    // bool mult_donor_st{false};
+    std::ifstream  src(path + "common/history/states/00_states.txt", std::ios::binary);
+
+    while(getline(src, line)) {
+        cur_line++;
+        if (line.find(*pr, 0) != std::string::npos) {
+            pr++;
+            while(pr != provs.end()) {
+                if ((line.find(*pr, 0) == std::string::npos)) {
+                    diff_origin_st.push_back(*pr);
+                    pr = provs.erase(pr);
+                } else { pr++; }
+            }          
+            break;
+        }
+    }
+    states.emplace_back(this->name, this->id, diff_origin_st);
+    src.close();
+    return cur_line;
+}

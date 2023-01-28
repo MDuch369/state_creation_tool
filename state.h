@@ -8,6 +8,7 @@
 
 class State {
 //sublcasses
+protected:
     class Pop {
     // data
         std::string culture, religion{}, type{};
@@ -67,7 +68,6 @@ class State {
     std::vector<std::string> provs, traits, resources, im_provs{}, homelands{};
     std::string name, file_name, sub, city, port{}, farm, mine{}, wood{};
     unsigned int id, land, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{};
-    // double ratio; 
 // Functions:
 // private data manipulation 
     std::string data( std::string &);
@@ -196,6 +196,20 @@ public:
    void setProv(const int &, const std::string &);
    void setPopSize(const int &, const int &);
    // void setResources(const std::vector<std::string> &);
+};
+
+class State_transfer : public State {
+// data
+    std::string origin{};
+    double ratio; 
+
+// Functions:
+    double calculate_ratio(const std::vector<std::string> &); 
+    unsigned int find_states(const std::string &, std::vector<State_transfer> &);
+public:
+// constructors
+    State_transfer(const std::string &, const int &, std::string &);
+    State_transfer(const std::string &, const int &, const std::vector<std::string> &);
 };
 
 #endif

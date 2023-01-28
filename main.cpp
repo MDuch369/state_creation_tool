@@ -7,8 +7,7 @@
 #include "state.h"
 
 // input/output paths
-    // TODO refactor
-void save_i_o_path(/*std::string &input, std::string &output*/) {
+void save_i_o_path(/*std::string &input, std::string &output*/) { // TODO refactor
     std::filesystem::path in{}, out{};
     std::string line{};
     std::ofstream  dst("inoutpath.txt", std::ios::binary | std::ios::app);
@@ -21,8 +20,7 @@ void save_i_o_path(/*std::string &input, std::string &output*/) {
     out = line;
     dst << "output: " << out << std::endl;
 }
-    // TODO refactor
-void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) {
+void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) { // TODO refactor
     std::string line{};
     std::ifstream  src("inoutpath.txt", std::ios::binary);
     while(getline(src, line)){
@@ -44,24 +42,36 @@ void check_i_o_file(std::filesystem::path &in, std::filesystem::path &out) {
         load_i_o_path(in, out);
     }
 }
-    // TODO sort the list of files
-void file_list(const std::filesystem::path &path, std::filesystem::path *files) {
+void file_list(const std::filesystem::path &path, std::filesystem::path *files) { // TODO sort the list of files
         int i{};
     for (const auto & entry : std::filesystem::directory_iterator(path)){
         files[i] = entry.path();
         i++;
     }
 }
+
 // state info input
-void new_state_info(int &id, std::string &name) {
-    std::cout << "Name of the state to be created: " << std::endl;
-    std::cin >> name;
-    std::cout << std::endl;
-    std::cout << "Id of the state to be created: " << std::endl;
-    std::cin >> id;
-    std::cout << std::endl;
+std::vector<State_transfer> new_state_info() {
+    int id{}, num{};
+    std::string name{}, provs{};
+    std::vector<State_transfer> states;
+    std::cout << "Numbeer of states to be created: " << std::endl;
+    std::cin >> num;
+    for(int i{}; i < num; i++) {
+        std::cout << "Name of the state to be created number" << i + 1 << ": " << std::endl;
+        std::cin >> name;
+        std::cout << std::endl;
+        std::cout << "Id of the state to be created number" << i + 1 << ": " << std::endl;
+        std::cin >> id;
+        std::cout << std::endl;
+        std::cout << "Provinces to transfer to state number" << i + 1 << ": " << std::endl;
+        std::cin >> provs;
+        std::cout << std::endl;
+        states.emplace_back(name, id, provs);
+    } 
+    return states;
 }
-void save_provinces(std::vector<std::string> &provs) {
+void save_provinces(std::vector<std::string> &provs) { // ! DEPRECATED
     std::string prov, tmp; 
     
     std::cout<<"Enter provinces to transfer: "<<std::endl;
@@ -79,12 +89,10 @@ void save_provinces(std::vector<std::string> &provs) {
     }
 }
 // file browsing 
-    // ? move these two functions inside state class
-    // TODO refactor
-unsigned int find_state(const std::string &file, const std::string &prov) {
+unsigned int find_states(const std::string &path, const std::string &prov) {
     unsigned int cur_line{};
     std::string line{};
-    std::ifstream  src(file, std::ios::binary);
+    std::ifstream  src(path + "common/history/states/00_states.txt", std::ios::binary);
 
     while(getline(src, line)) {
         cur_line++;
@@ -95,6 +103,7 @@ unsigned int find_state(const std::string &file, const std::string &prov) {
     src.close();
     return cur_line;
 }
+//  move inside class
 std::string find_file(std::filesystem::path *files, const std::string &prov ) {
     std::string line{};
     // std::ifstream  src(file, std::ios::binary);
@@ -179,7 +188,6 @@ std::string find_file(std::filesystem::path *files, const std::string &prov ) {
 //     }
 //     dst << "}" << std::endl << std::endl;
 // }
-
 // void print_pops(State &state){
 //     std::ofstream  dst("output/common/history/pops/to_pops.txt", std::ios::binary | std::ios::app);
 //     dst << "\ts:" << state.getName() << " = {" << std::endl
@@ -198,7 +206,6 @@ std::string find_file(std::filesystem::path *files, const std::string &prov ) {
 //     }
 //     dst << "\t\t}" << std::endl << "\t}" << std::endl;
 // }
-
 // void print_buildings(State &state){
 //     std::ofstream  dst("output/common/history/buildings/to_buildings.txt", std::ios::binary | std::ios::app);
 //     int size{state.getBuildings().size()};
@@ -225,7 +232,6 @@ std::string find_file(std::filesystem::path *files, const std::string &prov ) {
 //     }
 //     dst << "\t}" << std::endl;
 // }
-
 // void print_state(State &state) {
 //     std::ofstream  dst("output/common/history/to_states.txt", std::ios::binary | std::ios::app);
 //     std::string placeholder{"[ABC]"};
@@ -243,12 +249,12 @@ std::string find_file(std::filesystem::path *files, const std::string &prov ) {
 //     }
 //     dst << "\t}" << std::endl;
 // }
+// double calculate_ratio(State &state, const std::vector<std::string> &provs) {
+//     double i{provs.size()}, j{state.getProvs().size()};
+//     double result{i / j};
+//     return result;
+// }
 
-double calculate_ratio(State &state, const std::vector<std::string> &provs) {
-    double i{provs.size()}, j{state.getProvs().size()};
-    double result{i / j};
-    return result;
-}
     // TODO refactor
 void calculate_pops(State &donor, State &state, const double &ratio) {
     for(int i{}; i < donor.getPops().size(); i++) {
@@ -368,6 +374,7 @@ int main() {
 // variables
     std::filesystem::path files[16], input{}, output{};
     std::vector<std::string> provinces{};
+    std::vector<State_transfer> tr_states{};
     std::string filename,/*path{"input/files"},*/ new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
     int new_state_id{/*666*/}; 
     double provs_ratio; // TODO for next version change this to be member of state class
@@ -376,13 +383,11 @@ int main() {
     file_list(input, files);
     // std::sort(files[0], files[15]);
     // debug_print_file_list(files);
-    save_provinces(provinces);
-    new_state_info(new_state_id, new_state_name);
+    save_provinces(provinces); //! DEPRECATED
+    tr_states = new_state_info();
     filename = find_file(files, provinces[0]);
-    // ! temporary args
-    State Old_state(find_state(files[14], provinces[0]), files[14]);
-    provs_ratio = calculate_ratio(Old_state, provinces);
-    // ! temporary args
+    State Old_state(find_states(files[14], provinces[0]), files[14]);
+    // provs_ratio = calculate_ratio(Old_state, provinces);
     Old_state.create_pops("input/pops/" + filename);
     Old_state.create_buildings("input/buildings/" + filename);
     Old_state.create_homelands("input/00_states.txt");
