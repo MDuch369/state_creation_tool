@@ -3,9 +3,14 @@
 #include <sstream>
 #include <fstream>
 #include <algorithm>
+#include <filesystem>
 #include "state.h"
 
 // constructors
+State::State(const std::filesystem::path &path) {
+    std::string line{};
+    std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);   
+}
 State::State(const unsigned int &cur_line, const std::string &file) { // copies data from map_data/state_regions
     unsigned int copy_line{}, len{};
     std::string line{};

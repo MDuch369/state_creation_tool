@@ -50,6 +50,17 @@ void file_list(const std::filesystem::path &path, std::filesystem::path *files) 
     }
 }
 
+void save_states(const std::filesystem::path &path) {
+    std::string line{};
+    std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);  
+
+    while(getline(src, line)) {
+        if(line.find("s:", 0) != std::string::npos) {
+            
+        }
+    }
+}
+
 // state info input
 std::vector<State_transfer> new_state_info() {
     int id{}, num{};
@@ -372,6 +383,7 @@ void debug_print_file_list(const std::filesystem::path *files) {
 
 int main() {
 // variables
+    std::vector<State>{};
     std::filesystem::path files[16], input{}, output{};
     std::vector<std::string> provinces{};
     std::vector<State_transfer> tr_states{};

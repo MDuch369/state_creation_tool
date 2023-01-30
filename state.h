@@ -4,7 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
-#include <fstream> 
+#include <fstream>
+#include <filesystem> 
 
 class State {
 //sublcasses
@@ -69,15 +70,10 @@ protected:
     std::string name, file_name, sub, city, port{}, farm, mine{}, wood{};
     unsigned int id, land, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{};
 // Functions:
-// private data manipulation 
-    std::string data( std::string &);
-    unsigned int data_int(std::string);
-    void data_vector(std::vector<std::string> &, const std::string &, int);
-    bool compare_string(const std::string &, std::string);
-    void variable_string_vector(std::vector<std::string> &t, std::string &line);
 
 public:
 // constructors 
+    State(const std::filesystem::path &);
     State(const unsigned int &, const std::string &);
     State(const unsigned int[]);
 
@@ -94,6 +90,11 @@ public:
     void remove_prov ();
     void calculate_remaining_provs(State &);
     void create_homelands(const std::string &);
+    std::string data( std::string &);
+    unsigned int data_int(std::string);
+    void data_vector(std::vector<std::string> &, const std::string &, int);
+    bool compare_string(const std::string &, std::string);
+    void variable_string_vector(std::vector<std::string> &t, std::string &line);
 
 // data printing
     void print_state_region();
