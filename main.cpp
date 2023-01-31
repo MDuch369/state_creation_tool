@@ -73,7 +73,7 @@ void file_list(const std::filesystem::path &path, std::filesystem::path *files) 
     }
 }
 // creating an array of states info
-void save_states(const std::filesystem::path &path, std::vector<State> &states) {
+void save_states(const std::filesystem::path &path, std::vector<State> &states) { //? refactor
     std::string line{}, name{}, country{}, type{};
     std::vector<std::string> provs{}, homelands{}, claims{};
     std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);  
@@ -83,25 +83,30 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
             name = data(line, ':');
             states.emplace_back(name);
             int cur{states.size() - 1};
-            getline(src, line);
-            if(line.find("create_state", 0) != std::string::npos) {
-                getline(src, line);
-                country = data(line);
-                getline(src, line);
-                data_vector(provs, line, 6);
-                states[cur].create_country(country, provs);
-                getline(src, line);
-                if(line.find("state_type", 0) != std::string::npos) {
-                    int pres{states[cur].getCountries().size() - 1};
-                    states[cur].getCountries()[pres].setCountryType(data(line));
+            while(getline(src, line)) {
+                if(line.find("create_state", 0) != std::string::npos) {
                     getline(src, line);
+                    country = data(line);
+                    getline(src, line);
+                    data_vector(provs, line, 6);
+                    states[cur].create_country(country, provs);
+                    getline(src, line);
+                    if(line.find("state_type", 0) != std::string::npos) {
+                        int pres{states[cur].getCountries().size() - 1};
+                        states[cur].getCountries()[pres].setCountryType(data(line));
+                    }
+                }
+                if(line.find("add_homeland", 0) != std::string::npos) {
+                    break;
                 }
             }
-            if(line.find("add_homeland", 0) != std::string::npos) {
+            while(line.find("add_homeland", 0) != std::string::npos) {
                 states[cur].setHomeland(data(line));
+                getline(src, line);
             }
-            if(line.find("add_claim", 0) != std::string::npos) {
+            while(line.find("add_claim", 0) != std::string::npos) {
                 states[cur].setClaim(data(line));
+                getline(src, line);
             }
         }
     }
