@@ -72,8 +72,9 @@ void file_list(const std::filesystem::path &path, std::filesystem::path *files) 
         i++;
     }
 }
+
 // creating an array of states info
-void save_states(const std::filesystem::path &path, std::vector<State> &states) { //? refactor
+void save_states(const std::filesystem::path &path, std::vector<State> &states) { // TODO tidy up (remove unnecesary strings in entries)
     std::string line{}, name{}, country{}, type{};
     std::vector<std::string> provs{}, homelands{}, claims{};
     std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);  
@@ -90,6 +91,7 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
                     getline(src, line);
                     data_vector(provs, line, 6);
                     states[cur].create_country(country, provs);
+                    provs.clear();
                     getline(src, line);
                     if(line.find("state_type", 0) != std::string::npos) {
                         int pres{states[cur].getCountries().size() - 1};
@@ -133,23 +135,20 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
 //     } 
 //     return states;
 // }
-void save_provinces(std::vector<std::string> &provs) { // ! DEPRECATED
-    std::string prov, tmp; 
-    
-    std::cout<<"Enter provinces to transfer: "<<std::endl;
-    std::getline(std::cin, prov);
-    prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end());
-    prov.erase (std::remove(prov.begin(), prov.end(), ' '), prov.end());
-    transform(prov.begin(), prov.end(), prov.begin(), toupper);
-
-    std::stringstream ss(prov);
-
-    while(getline(ss, tmp, 'X')){
-        if(tmp != "") {
-        provs.push_back(tmp);
-        }
-    }
-}
+// void save_provinces(std::vector<std::string> &provs) {
+//     std::string prov, tmp; 
+//     std::cout<<"Enter provinces to transfer: "<<std::endl;
+//     std::getline(std::cin, prov);
+//     prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end());
+//     prov.erase (std::remove(prov.begin(), prov.end(), ' '), prov.end());
+//     transform(prov.begin(), prov.end(), prov.begin(), toupper);
+//     std::stringstream ss(prov);
+//     while(getline(ss, tmp, 'X')){
+//         if(tmp != "") {
+//         provs.push_back(tmp);
+//         }
+//     }
+// }
 // file browsing 
 unsigned int find_states(const std::string &path, const std::string &prov) {
     unsigned int cur_line{};
@@ -448,7 +447,7 @@ int main() {
     // std::sort(files[0], files[15]);
     // debug_print_file_list(files);
     
-    // save_provinces(provinces); //! DEPRECATED
+    // save_provinces(provinces); 
     // tr_states = new_state_info();
     filename = find_file(files, provinces[0]);
     State Old_state(find_states(files[14], provinces[0]), files[14]);
