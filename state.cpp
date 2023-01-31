@@ -113,10 +113,12 @@ State::State(const unsigned int &cur_line, const std::string &file) { // copies 
 }
 State::State(const unsigned int res[]) 
     :land{res[0]}, coal{res[1]}, iron{res[2]}, lead{res[3]}, sulfur{res[4]}, log{res[5]}, fish{res[6]}, whale{res[7]}, oil{res[8]}, rubber{res[9]}, gold{res[10]}, disc_gold{res[11]} {}
+State::State(const std::string &name) :name{name} {} 
 State::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
     : culture{cult}, religion{rel}, type{t}, size{s} {}
 State::Building::Building(const std::string &type, const std::string &reg, const std::string &dlc, const std::string &pr, const int &lvl, const int &res) 
     : type{type}, region{reg}, dlc{dlc}, prod{pr}, level{lvl}, reserves{res} {}
+State::Country::Country(const std::string &name, const std::vector<std::string> &pr) :country{name}, provs{pr} {}
 
 // pops
 void State::create_pops(const std::string &file/*, const std::string &name, std::vector<State::Pop> &vec*/) {
@@ -424,24 +426,12 @@ void State::print_state() {
 }
 
 // Setters
-void State::setName(const std::string &n) {
-    this->name = n;
-}
-void State::setId(const int &i) {
-    this->id = i;
-}
-void State::setProvs(const std::vector<std::string> &p) {
-    this->provs = p;
-}
-void State::setProv(const int &i, const std::string &s) {
-    this->provs[i] = s;
-}
-void State::setPopSize(const int &i, const int &size) {
-    this->pops[i].setSize(size);
-}
-void State::Pop::setSize(const int &size) {
-    this->size = size;
-}
+void State::setName(const std::string &n) {this->name = n;}
+void State::setId(const int &i) {this->id = i;}
+void State::setProvs(const std::vector<std::string> &p) {this->provs = p;}
+void State::setProv(const int &i, const std::string &s) {this->provs[i] = s;}
+void State::setPopSize(const int &i, const int &size) {this->pops[i].setSize(size);}
+void State::Pop::setSize(const int &size) {this->size = size;}
 // void State::setTraits(const std::vector<std::string> &tr) {
 //     this->traits = tr;
 // }
@@ -457,60 +447,62 @@ void State::Pop::setSize(const int &size) {
 // void State::setResources(const std::vector<std::string> &r){
 //     this->resources = r;
 // }
+void State::setHomeland(const std::string &home) {this->homelands.push_back(home);}
+void State::setClaim(const std::string &claim) {this->claims.push_back(claim);}
+void State::Country::setCountryType(const std::string &type) {this->type = type;}
 
 // State_transfer class
 
-
 // constructor
-State_transfer::State_transfer(const std::string &name, const int &id, std::string &provs) {
-    std::string prov, tmp; 
-    this->name = name;
-    this->id = id;
+// State_transfer::State_transfer(const std::string &name, const int &id, std::string &provs) {
+//     std::string prov, tmp; 
+//     this->name = name;
+//     this->id = id;
     
-    std::getline(std::cin, prov);
-    prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end());
-    prov.erase (std::remove(prov.begin(), prov.end(), ' '), prov.end());
-    transform(prov.begin(), prov.end(), prov.begin(), toupper);
+//     std::getline(std::cin, prov);
+//     prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end());
+//     prov.erase (std::remove(prov.begin(), prov.end(), ' '), prov.end());
+//     transform(prov.begin(), prov.end(), prov.begin(), toupper);
 
-    std::stringstream ss(prov);
+//     std::stringstream ss(prov);
 
-    while(getline(ss, tmp, 'X')){
-        if(tmp != "") {
-        this->provs.push_back(tmp);
-        }
-    }
-}
+//     while(getline(ss, tmp, 'X')){
+//         if(tmp != "") {
+//         this->provs.push_back(tmp);
+//         }
+//     }
+// }
 
-// data calculating/copying
-double State_transfer::calculate_ratio(const std::vector<std::string> &pr) {
-    // double i{pr.size()}, j{this->provs.size()};
-    // double result{pr.size() / this->provs.size()};
-    return pr.size() / this->provs.size();
-}
-    // ! TODO finish
-unsigned int State_transfer::find_states(const std::string &path, std::vector<State_transfer> &states) {
-    std::vector<std::string> diff_origin_st{};
-    // std::string *pr = &this->provs[0]; 
-    auto pr = provs.begin();
-    unsigned int cur_line{};
-    std::string line{};
-    // bool mult_donor_st{false};
-    std::ifstream  src(path + "common/history/states/00_states.txt", std::ios::binary);
+// // data calculating/copying
+// double State_transfer::calculate_ratio(const std::vector<std::string> &pr) {
+//     // double i{pr.size()}, j{this->provs.size()};
+//     // double result{pr.size() / this->provs.size()};
+//     return pr.size() / this->provs.size();
+// }
+//     // ! TODO finish
+// unsigned int State_transfer::find_states(const std::string &path, std::vector<State_transfer> &states) {
+//     std::vector<std::string> diff_origin_st{};
+//     // std::string *pr = &this->provs[0]; 
+//     auto pr = provs.begin();
+//     unsigned int cur_line{};
+//     std::string line{};
+//     // bool mult_donor_st{false};
+//     std::ifstream  src(path + "common/history/states/00_states.txt", std::ios::binary);
 
-    while(getline(src, line)) {
-        cur_line++;
-        if (line.find(*pr, 0) != std::string::npos) {
-            pr++;
-            while(pr != provs.end()) {
-                if ((line.find(*pr, 0) == std::string::npos)) {
-                    diff_origin_st.push_back(*pr);
-                    pr = provs.erase(pr);
-                } else { pr++; }
-            }          
-            break;
-        }
-    }
-    states.emplace_back(this->name, this->id, diff_origin_st);
-    src.close();
-    return cur_line;
-}
+//     while(getline(src, line)) {
+//         cur_line++;
+//         if (line.find(*pr, 0) != std::string::npos) {
+//             pr++;
+//             while(pr != provs.end()) {
+//                 if ((line.find(*pr, 0) == std::string::npos)) {
+//                     diff_origin_st.push_back(*pr);
+//                     pr = provs.erase(pr);
+//                 } else { pr++; }
+//             }          
+//             break;
+//         }
+//     }
+//     states.emplace_back(this->name, this->id, diff_origin_st);
+//     src.close();
+//     return cur_line;
+// }

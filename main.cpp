@@ -6,6 +6,29 @@
 #include <filesystem>
 #include "state.h"
 
+
+// data maniopulation
+std::string data(std::string &line){
+    line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
+    int pos{line.find("=") + 1};
+    return line.substr(pos, line.find ("\n") - pos);
+}
+std::string data(std::string &line, const char &delim){
+    line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
+    int pos{line.find(delim) + 1};
+    return line.substr(pos, line.find ("\n") - pos);
+}
+void data_vector(std::vector<std::string> &vec, const std::string &line, int len) {
+    int i{};
+
+    for ( char c : line ) {
+        if(c == 'x') {
+            vec.push_back(line.substr(i + 1, len));
+        }
+        i++; 
+    }
+}
+
 // input/output paths
 void save_i_o_path(/*std::string &input, std::string &output*/) { // TODO refactor
     std::filesystem::path in{}, out{};
@@ -44,44 +67,66 @@ void check_i_o_file(std::filesystem::path &in, std::filesystem::path &out) {
 }
 void file_list(const std::filesystem::path &path, std::filesystem::path *files) { // TODO sort the list of files
         int i{};
-    for (const auto & entry : std::filesystem::directory_iterator(path)){
+    for (const auto & entry : std::filesystem::directory_iterator(path / "map_data/state_regions/")){
         files[i] = entry.path();
         i++;
     }
 }
-
-void save_states(const std::filesystem::path &path) {
-    std::string line{};
+// creating an array of states info
+void save_states(const std::filesystem::path &path, std::vector<State> &states) {
+    std::string line{}, name{}, country{}, type{};
+    std::vector<std::string> provs{}, homelands{}, claims{};
     std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);  
 
     while(getline(src, line)) {
         if(line.find("s:", 0) != std::string::npos) {
-            
+            name = data(line, ':');
+            states.push_back(name);
+            State cur{*states.end()};
+            getline(src, line);
+            if(line.find("country", 0) != std::string::npos) {
+                country = data(line);
+                getline(src, line);
+                data_vector(provs, line, 6);
+                cur.getCountries().emplace_back(country, provs);
+                getline(src, line);
+                if(line.find("state_type", 0)) {
+                    auto pres{*cur.getCountries().end()};
+                    pres.setCountryType(data(line));
+                    getline(src, line);
+                }
+            }
+            if(line.find("add_homeland", 0) != std::string::npos) {
+                cur.setHomeland(data(line));
+            }
+            if(line.find("add_claim", 0) != std::string::npos) {
+                cur.setClaim(data(line));
+            }
         }
     }
 }
 
 // state info input
-std::vector<State_transfer> new_state_info() {
-    int id{}, num{};
-    std::string name{}, provs{};
-    std::vector<State_transfer> states;
-    std::cout << "Numbeer of states to be created: " << std::endl;
-    std::cin >> num;
-    for(int i{}; i < num; i++) {
-        std::cout << "Name of the state to be created number" << i + 1 << ": " << std::endl;
-        std::cin >> name;
-        std::cout << std::endl;
-        std::cout << "Id of the state to be created number" << i + 1 << ": " << std::endl;
-        std::cin >> id;
-        std::cout << std::endl;
-        std::cout << "Provinces to transfer to state number" << i + 1 << ": " << std::endl;
-        std::cin >> provs;
-        std::cout << std::endl;
-        states.emplace_back(name, id, provs);
-    } 
-    return states;
-}
+// std::vector<State_transfer> new_state_info() {
+//     int id{}, num{};
+//     std::string name{}, provs{};
+//     std::vector<State_transfer> states;
+//     std::cout << "Numbeer of states to be created: " << std::endl;
+//     std::cin >> num;
+//     for(int i{}; i < num; i++) {
+//         std::cout << "Name of the state to be created number" << i + 1 << ": " << std::endl;
+//         std::cin >> name;
+//         std::cout << std::endl;
+//         std::cout << "Id of the state to be created number" << i + 1 << ": " << std::endl;
+//         std::cin >> id;
+//         std::cout << std::endl;
+//         std::cout << "Provinces to transfer to state number" << i + 1 << ": " << std::endl;
+//         std::cin >> provs;
+//         std::cout << std::endl;
+//         states.emplace_back(name, id, provs);
+//     } 
+//     return states;
+// }
 void save_provinces(std::vector<std::string> &provs) { // ! DEPRECATED
     std::string prov, tmp; 
     
@@ -278,18 +323,18 @@ void calculate_remaining_pops(State &donor, State &remain, State &state) {
         remain.add_pop(donor.getPops()[i].getCult(), donor.getPops()[i].getRel(), donor.getPops()[i].getType(), donor.getPops()[i].getSize() - state.getPops()[i].getSize());
     }
 }
-void calculate_buildings(State &donor, State &state, const double &ratio) {
-    for(int i{}; i < donor.getBuildings().size(); i++) {
-        double lvl = donor.getBuildings()[i].getLvl() * ratio;
-        state.add_building(donor.getBuildings()[i].getType(), donor.getBuildings()[i].getRegion(), donor.getBuildings()[i].getDlc(), donor.getBuildings()[i].getProd(), donor.getBuildings()[i].getRes(), lvl);
-    }
-}
-void calculate_remaining_buildings(State &donor, State &remain, State &state) {
-    for(int i{}; i < donor.getBuildings().size(); i++) {
-        // remain.setBuildingsize(i, donor.getBuildings()[i].getSize() - state.getBuildings()[i].getSize());
-        remain.add_building(donor.getBuildings()[i].getType(), donor.getBuildings()[i].getRegion(), donor.getBuildings()[i].getDlc(), donor.getBuildings()[i].getProd(), donor.getBuildings()[i].getRes(), donor.getBuildings()[i].getLvl() - state.getBuildings()[i].getLvl());
-    }
-}
+// void calculate_buildings(State &donor, State &state, const double &ratio) {
+//     for(int i{}; i < donor.getBuildings().size(); i++) {
+//         double lvl = donor.getBuildings()[i].getLvl() * ratio;
+//         state.add_building(donor.getBuildings()[i].getType(), donor.getBuildings()[i].getRegion(), donor.getBuildings()[i].getDlc(), donor.getBuildings()[i].getProd(), donor.getBuildings()[i].getRes(), lvl);
+//     }
+// }
+// void calculate_remaining_buildings(State &donor, State &remain, State &state) {
+//     for(int i{}; i < donor.getBuildings().size(); i++) {
+//         // remain.setBuildingsize(i, donor.getBuildings()[i].getSize() - state.getBuildings()[i].getSize());
+//         remain.add_building(donor.getBuildings()[i].getType(), donor.getBuildings()[i].getRegion(), donor.getBuildings()[i].getDlc(), donor.getBuildings()[i].getProd(), donor.getBuildings()[i].getRes(), donor.getBuildings()[i].getLvl() - state.getBuildings()[i].getLvl());
+//     }
+// }
 State calculate_resources(State &donor, const double &ratio) {
     unsigned int res[12]{};
     res[0] = donor.getLand() * ratio;
@@ -383,20 +428,22 @@ void debug_print_file_list(const std::filesystem::path *files) {
 
 int main() {
 // variables
-    std::vector<State>{};
+    std::vector<State> states{};
     std::filesystem::path files[16], input{}, output{};
     std::vector<std::string> provinces{};
-    std::vector<State_transfer> tr_states{};
+    // std::vector<State_transfer> tr_states{};
     std::string filename,/*path{"input/files"},*/ new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
     int new_state_id{/*666*/}; 
     double provs_ratio; // TODO for next version change this to be member of state class
     
     check_i_o_file(input, output);
     file_list(input, files);
+    save_states(input, states);
     // std::sort(files[0], files[15]);
     // debug_print_file_list(files);
+    
     save_provinces(provinces); //! DEPRECATED
-    tr_states = new_state_info();
+    // tr_states = new_state_info();
     filename = find_file(files, provinces[0]);
     State Old_state(find_states(files[14], provinces[0]), files[14]);
     // provs_ratio = calculate_ratio(Old_state, provinces);
@@ -420,8 +467,8 @@ int main() {
     calculate_pops(Old_state, New_state, provs_ratio);
     calculate_remaining_pops(Old_state, Remaining_state, New_state);
 // calculating buildings
-    calculate_buildings(Old_state, New_state, provs_ratio);
-    calculate_remaining_buildings(Old_state, Remaining_state, New_state);
+    // calculate_buildings(Old_state, New_state, provs_ratio);
+    // calculate_remaining_buildings(Old_state, Remaining_state, New_state);
 // printing states
     Old_state.print_state_region(); //for debugging purposes
     Remaining_state.print_state_region();

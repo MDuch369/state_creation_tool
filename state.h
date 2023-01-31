@@ -10,6 +10,17 @@
 class State {
 //sublcasses
 protected:
+    class Country {
+        std::string country, type{};
+        std::vector<std::string> provs;
+    
+    public:
+    // constructors
+        Country(const std::string &, const std::vector<std::string> &);
+    // setters
+        void setCountryType(const std::string &);
+    };
+
     class Pop {
     // data
         std::string culture, religion{}, type{};
@@ -66,7 +77,7 @@ protected:
 //data 
     std::vector<State::Pop> pops{};
     std::vector<State::Building> buildings{};
-    std::vector<std::string> provs, traits, resources, im_provs{}, homelands{};
+    std::vector<std::string> provs, traits, resources, im_provs{}, homelands{}, claims{};
     std::string name, file_name, sub, city, port{}, farm, mine{}, wood{};
     unsigned int id, land, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{};
 // Functions:
@@ -76,6 +87,7 @@ public:
     State(const std::filesystem::path &);
     State(const unsigned int &, const std::string &);
     State(const unsigned int[]);
+    State(const std::string &);
 
 // pops  
     void create_pops(const std::string &/*, const std::string &, std::vector<State::Pop> &*/);
@@ -181,12 +193,9 @@ public:
     inline std::vector<State::Pop> getPops() {
         return pops;
     }
-    inline std::vector<State::Building> getBuildings() {
-        return buildings;
-    }
-    inline std::vector<std::string> getHomelands() {
-        return homelands;
-    }
+    // inline std::vector<State::Building> getBuildingvoid save_states
+    inline std::vector<std::string> getHomelands() {return homelands;}
+    inline std::vector<State::Country> getCountries() {} 
 
 // setters
    void setSub(const std::string &);
@@ -197,20 +206,22 @@ public:
    void setProv(const int &, const std::string &);
    void setPopSize(const int &, const int &);
    // void setResources(const std::vector<std::string> &);
+   void setHomeland(const std::string &);
+   void setClaim(const std::string &);
 };
 
-class State_transfer : public State {
-// data
-    std::string origin{};
-    double ratio; 
+// class State_transfer : public State {
+// // data
+//     std::string origin{};
+//     double ratio; 
 
-// Functions:
-    double calculate_ratio(const std::vector<std::string> &); 
-    unsigned int find_states(const std::string &, std::vector<State_transfer> &);
-public:
-// constructors
-    State_transfer(const std::string &, const int &, std::string &);
-    State_transfer(const std::string &, const int &, const std::vector<std::string> &);
-};
+// // Functions:
+//     double calculate_ratio(const std::vector<std::string> &); 
+//     unsigned int find_states(const std::string &, std::vector<State_transfer> &);
+// public:
+// // constructors
+//     State_transfer(const std::string &, const int &, std::string &);
+//     // State_transfer(const std::string &, const int &, const std::vector<std::string> &);
+// };
 
 #endif
