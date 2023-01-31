@@ -81,26 +81,27 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
     while(getline(src, line)) {
         if(line.find("s:", 0) != std::string::npos) {
             name = data(line, ':');
-            states.push_back(name);
-            State cur{*states.end()};
+            states.emplace_back(name);
+            int cur{states.size() - 1};
             getline(src, line);
-            if(line.find("country", 0) != std::string::npos) {
+            if(line.find("create_state", 0) != std::string::npos) {
+                getline(src, line);
                 country = data(line);
                 getline(src, line);
                 data_vector(provs, line, 6);
-                cur.getCountries().emplace_back(country, provs);
+                states[cur].create_country(country, provs);
                 getline(src, line);
-                if(line.find("state_type", 0)) {
-                    auto pres{*cur.getCountries().end()};
-                    pres.setCountryType(data(line));
+                if(line.find("state_type", 0) != std::string::npos) {
+                    int pres{states[cur].getCountries().size() - 1};
+                    states[cur].getCountries()[pres].setCountryType(data(line));
                     getline(src, line);
                 }
             }
             if(line.find("add_homeland", 0) != std::string::npos) {
-                cur.setHomeland(data(line));
+                states[cur].setHomeland(data(line));
             }
             if(line.find("add_claim", 0) != std::string::npos) {
-                cur.setClaim(data(line));
+                states[cur].setClaim(data(line));
             }
         }
     }
@@ -442,7 +443,7 @@ int main() {
     // std::sort(files[0], files[15]);
     // debug_print_file_list(files);
     
-    save_provinces(provinces); //! DEPRECATED
+    // save_provinces(provinces); //! DEPRECATED
     // tr_states = new_state_info();
     filename = find_file(files, provinces[0]);
     State Old_state(find_states(files[14], provinces[0]), files[14]);

@@ -75,6 +75,7 @@ protected:
     // setters
     };
 //data 
+    std::vector<State::Country> countries{};
     std::vector<State::Pop> pops{};
     std::vector<State::Building> buildings{};
     std::vector<std::string> provs, traits, resources, im_provs{}, homelands{}, claims{};
@@ -88,6 +89,9 @@ public:
     State(const unsigned int &, const std::string &);
     State(const unsigned int[]);
     State(const std::string &);
+
+// countries
+    void create_country(const std::string &, std::vector<std::string> &);
 
 // pops  
     void create_pops(const std::string &/*, const std::string &, std::vector<State::Pop> &*/);
@@ -195,7 +199,7 @@ public:
     }
     // inline std::vector<State::Building> getBuildingvoid save_states
     inline std::vector<std::string> getHomelands() {return homelands;}
-    inline std::vector<State::Country> getCountries() {} 
+    inline std::vector<State::Country>& getCountries() {return countries;} 
 
 // setters
    void setSub(const std::string &);

@@ -120,6 +120,11 @@ State::Building::Building(const std::string &type, const std::string &reg, const
     : type{type}, region{reg}, dlc{dlc}, prod{pr}, level{lvl}, reserves{res} {}
 State::Country::Country(const std::string &name, const std::vector<std::string> &pr) :country{name}, provs{pr} {}
 
+// Countries
+void State::create_country(const std::string &name, std::vector<std::string> &pr) {
+    this->countries.emplace_back(name, pr);
+}
+
 // pops
 void State::create_pops(const std::string &file/*, const std::string &name, std::vector<State::Pop> &vec*/) {
     std::string line, cul, rel{}, t{};
