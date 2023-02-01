@@ -56,10 +56,10 @@ State::State(const unsigned int &cur_line, const std::string &file) { // copies 
                 this->wood = data(line);
             }
             if(compare_string("arable_land", line)) {
-                this->land = data_int(line);
+                this->ar_land = data_int(line);
             }
             if(compare_string("arable_resources", line)) {
-                variable_string_vector(this->resources, line);
+                variable_string_vector(this->ar_res, line);
             }
             if(compare_string("bg_coal_mining", line)) {
                 this->coal = data_int(line);
@@ -112,7 +112,7 @@ State::State(const unsigned int &cur_line, const std::string &file) { // copies 
     src.close();
 }
 State::State(const unsigned int res[]) 
-    :land{res[0]}, coal{res[1]}, iron{res[2]}, lead{res[3]}, sulfur{res[4]}, log{res[5]}, fish{res[6]}, whale{res[7]}, oil{res[8]}, rubber{res[9]}, gold{res[10]}, disc_gold{res[11]} {}
+    :ar_land{res[0]}, coal{res[1]}, iron{res[2]}, lead{res[3]}, sulfur{res[4]}, log{res[5]}, fish{res[6]}, whale{res[7]}, oil{res[8]}, rubber{res[9]}, gold{res[10]}, disc_gold{res[11]} {}
 State::State(const std::string &name) :name{name} {} 
 State::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
     : culture{cult}, religion{rel}, type{t}, size{s} {}
@@ -263,7 +263,7 @@ bool State::compare_string(const std::string &str, std::string l) {
 void State::copy_state_info(State &st) {
     this->traits = st.getTraits();
     this->sub = st.getSub();
-    this->resources = st.getResources();
+    this->ar_res = st.getResources();
     this->naval_exit = st.getNavalExit();
     this->homelands = st.getHomelands();
 
@@ -320,9 +320,9 @@ void State::print_state_region(){
     dst << "\tfarm = " << this->farm << std::endl
         << "\tmine = " << this->mine << std::endl
         << "\twood = " << this->wood << std::endl
-        << "\tarable_land = " << this->land << std::endl
+        << "\tarable_land = " << this->ar_land << std::endl
         << "\tarable_resources = { ";
-    for (std::string s : this->resources) {
+    for (std::string s : this->ar_res) {
         dst << "\"" << s << "\" ";
     } 
     dst << "}" << std::endl
@@ -433,6 +433,11 @@ void State::print_state() {
 // Setters
 void State::setName(const std::string &n) {this->name = n;}
 void State::setId(const std::string &i) {this->id = i;}
+void State::setSub(const std::string &s){this->sub = s;}
+void State::setTraits(const std::vector<std::string> &t){this->traits = t;}
+void State::setLand(const int &l){this->ar_land = l;}
+void State::setArRes(const std::vector<std::string> &r) {this->ar_res = r;}
+void State::setRes(const int r[10]){ for(int i{}; i < 10; i++) {this->res[i] = r[i];} }
 void State::setProvs(const std::vector<std::string> &p) {this->provs = p;}
 void State::setProv(const int &i, const std::string &s) {this->provs[i] = s;}
 void State::setPopSize(const int &i, const int &size) {this->pops[i].setSize(size);}
@@ -450,7 +455,7 @@ void State::Pop::setSize(const int &size) {this->size = size;}
 //     this->traits = t;
 // }
 // void State::setResources(const std::vector<std::string> &r){
-//     this->resources = r;
+//     this->ar_res = r;
 // }
 void State::setHomeland(const std::string &home) {this->homelands.push_back(home);}
 void State::setClaim(const std::string &claim) {this->claims.push_back(claim);}

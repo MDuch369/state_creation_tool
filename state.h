@@ -78,9 +78,9 @@ protected:
     std::vector<State::Country> countries{};
     std::vector<State::Pop> pops{};
     std::vector<State::Building> buildings{};
-    std::vector<std::string> provs, traits, resources, im_provs{}, homelands{}, claims{};
+    std::vector<std::string> provs, traits, ar_res, im_provs{}, homelands{}, claims{};
     std::string id, name, file_name, sub, city, port{}, farm, mine{}, wood{};
-    unsigned int land, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{};
+    unsigned int ar_land, res[10]{}, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{};
 // Functions:
 
 public:
@@ -142,7 +142,7 @@ public:
     	return id;
 	}
     inline unsigned int getLand() {
-    	return land;
+    	return ar_land;
 	}
     inline unsigned int getCoal() {
     	return coal;
@@ -187,7 +187,7 @@ public:
         return traits;
     }
     inline std::vector<std::string> getResources() {
-        return resources;
+        return ar_res;
     }
     inline std::vector<std::string> getImProvs() {
         return im_provs;
@@ -201,9 +201,12 @@ public:
 
 // setters
    void setName(const std::string &);
+   void setId(const std::string &);
    void setSub(const std::string &);
    void setTraits(const std::vector<std::string> &);
-   void setId(const std::string &);
+   void setLand(const int &);
+   void setArRes(const std::vector<std::string> &);
+   void setRes(const int [10]);
    void setProvs(const std::vector<std::string> &);
    void setProv(const int &, const std::string &);
    void setPopSize(const int &, const int &);

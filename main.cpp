@@ -150,7 +150,7 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
         std::ifstream  src(file, std::ios::binary);
         while(getline(src, line)) {
             if(line.find("STATE", 0) != std::string::npos) {
-                int cap_res[10];
+                int cap_res[10]{};
                 // int pos{line.find ("_") + 1};
                 // std::string name{line.substr(pos, line.find(" ", pos) - pos)};
                 // std::string name{line.substr(line.find("_"), line.find(" "))}; // I don't know why it works, but it does 
@@ -162,8 +162,8 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
                 getline(src, line);
                 std::string subsist{data(line)};
                 getline(src, line);
-                std::vector<std::string> provs{};
-                data_vector(provs, line, 6);
+                // std::vector<std::string> provs{};
+                // data_vector(provs, line, 6);
                 getline(src, line);
                 std::vector<std::string> traits{};
                 variable_string_vector(traits, line);
@@ -205,15 +205,13 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
                 // saving the data
                 for (State &st : states) {
                     std::ofstream  dst("debug_state_list.txt", std::ios::binary | std::ios::app);
-                    // for(char c : name) {dst << c;}
-                    // int l2{name.size()};
-                    // dst << " " << l2 << std::endl;
-                    // for(char c : st.getName()) {dst << c;}
-                    // int l1{st.getName().size()};
-                    // dst << " " << l1 << std::endl;
                     if(st.getName() == name) {
                         st.setId(id);
-                        dst << "gucci" << std::endl;
+                        st.setSub(subsist);
+                        st.setTraits(traits);
+                        st.setLand(ar_land);
+                        st.setArRes(ar_res);
+                        st.setRes(cap_res);
                     }
                 }
             }
