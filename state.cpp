@@ -432,7 +432,7 @@ void State::print_state() {
 
 // Setters
 void State::setName(const std::string &n) {this->name = n;}
-void State::setId(const int &i) {this->id = i;}
+void State::setId(const std::string &i) {this->id = i;}
 void State::setProvs(const std::vector<std::string> &p) {this->provs = p;}
 void State::setProv(const int &i, const std::string &s) {this->provs[i] = s;}
 void State::setPopSize(const int &i, const int &size) {this->pops[i].setSize(size);}

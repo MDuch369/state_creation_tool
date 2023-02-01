@@ -8,6 +8,7 @@
 
 
 // data maniopulation
+// TODO try to use olymorphism here
 std::string data(std::string &line){
     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
     int pos{line.find("=") + 1};
@@ -18,6 +19,12 @@ std::string data(std::string &line, const char &delim){
     int pos{line.find(delim) + 1};
     return line.substr(pos, line.find ("\n") - pos);
 }
+unsigned int data_int( std::string line) {
+    line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
+    int pos{line.find("=") + 1};
+    std::string arg{line.substr(pos, line.find ("\n") - pos)};
+    return stoi(arg);
+}
 void data_vector(std::vector<std::string> &vec, const std::string &line, int len) {
     int i{};
 
@@ -26,6 +33,18 @@ void data_vector(std::vector<std::string> &vec, const std::string &line, int len
             vec.push_back(line.substr(i + 1, len));
         }
         i++; 
+    }
+}
+void variable_string_vector(std::vector<std::string> &t, std::string &line) {
+    int beg_pos{}, end_pos{};
+    line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
+    beg_pos = line.find("\"") + 1;
+    end_pos = line.find('\"', beg_pos);
+
+    while( end_pos != std::string::npos ) {
+        t.push_back(line.substr(beg_pos, end_pos - beg_pos));
+        beg_pos = end_pos + 2;
+        end_pos = line.find("\"",beg_pos + 1);
     }
 }
 
@@ -68,6 +87,7 @@ void check_i_o_file(std::filesystem::path &in, std::filesystem::path &out) {
 void file_list(const std::filesystem::path &path, std::filesystem::path *files) { // TODO sort the list of files
         int i{};
     for (const auto & entry : std::filesystem::directory_iterator(path / "map_data/state_regions/")){
+        if(entry.path().filename() == "99_seas.txt") {continue;}
         files[i] = entry.path();
         i++;
     }
@@ -81,7 +101,9 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
 
     while(getline(src, line)) {
         if(line.find("s:", 0) != std::string::npos) {
-            name = data(line, ':');
+            name = data(line, '_'); // TODO make this a separate function
+            name.erase (std::remove(name.begin(), name.end(), '='), name.end()); // TODO find a better solution for removing unwanted chars
+            name.erase (std::remove(name.begin(), name.end(), '{'), name.end());
             states.emplace_back(name);
             int cur{states.size() - 1};
             while(getline(src, line)) {
@@ -111,6 +133,92 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
                 getline(src, line);
             }
         }
+    }
+}
+
+void save_state_info(const std::filesystem::path &path, std::vector<State> &states, const std::filesystem::path *files) {
+    std::string line;
+    // int id{};
+    std::filesystem::path pops{"common/history/pops"}, buildings{"common/history/buildings"}, regions{"map_data/state_regions"};
+
+    std::filesystem::path regs[15]{};
+    for(int i {}; i < 15; i++){
+        regs[i] = path / regions / files[i];
+    }
+
+    for(const auto &file : regs) {
+        std::ifstream  src(file, std::ios::binary);
+        while(getline(src, line)) {
+            if(line.find("STATE", 0) != std::string::npos) {
+                int cap_res[10];
+                // int pos{line.find ("_") + 1};
+                // std::string name{line.substr(pos, line.find(" ", pos) - pos)};
+                // std::string name{line.substr(line.find("_"), line.find(" "))}; // I don't know why it works, but it does 
+                std::string name = data(line, '_'); // TODO make this a separate function
+                name.erase (std::remove(name.begin(), name.end(), '='), name.end()); 
+                name.erase (std::remove(name.begin(), name.end(), '{'), name.end());
+                getline(src, line);
+                std::string id{data(line)};
+                getline(src, line);
+                std::string subsist{data(line)};
+                getline(src, line);
+                std::vector<std::string> provs{};
+                data_vector(provs, line, 6);
+                getline(src, line);
+                std::vector<std::string> traits{};
+                variable_string_vector(traits, line);
+                // getline(src, line);
+                // ! TODO implement copying of hubs here
+                while(getline(src, line)) { if(line.find("arable_land", 0) != std::string::npos) {break;} }
+                int ar_land{};
+                ar_land = data_int(line);
+                getline(src, line);
+                std::vector<std::string> ar_res{};
+                variable_string_vector(ar_res, line);
+                getline(src, line);
+                while(getline(src, line)){
+                    if(line.find("bg_coal_mining", 0) != std::string::npos){cap_res[0] = data_int(line);}
+                    if(line.find("bg_iron_mining", 0) != std::string::npos){cap_res[1] = data_int(line);}
+                    if(line.find("bg_sulfur_mining", 0) != std::string::npos){cap_res[2] = data_int(line);}
+                    if(line.find("bg_logging", 0) != std::string::npos){cap_res[3] = data_int(line);}
+                    if(line.find("bg_whaling", 0) != std::string::npos){cap_res[4] = data_int(line);}
+                    if(line.find("bg_fishing", 0) != std::string::npos){cap_res[5] = data_int(line);}
+                    if(line.find("bg_gold_fields", 0) != std::string::npos){
+                        getline(src, line);
+                        getline(src, line);
+                        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[6] = data_int(line);}
+                        getline(src, line);
+                        if(line.find("discovered_amount", 0) != std::string::npos) {cap_res[7] = data_int(line);}
+                    }
+                    if(line.find("bg_rubber", 0) != std::string::npos){
+                        getline(src, line);
+                        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[8] = data_int(line);}
+                    }
+                    if(line.find("bg_oil_extraction", 0) != std::string::npos) {
+                        getline(src, line);
+                        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[9] = data_int(line);}
+                    }
+                    // getline(src, line);
+                    if(line.find("", 0) != std::string::npos) {break;}
+                // ! TODO add naval exit saving 
+                }
+                // saving the data
+                for (State &st : states) {
+                    std::ofstream  dst("debug_state_list.txt", std::ios::binary | std::ios::app);
+                    // for(char c : name) {dst << c;}
+                    // int l2{name.size()};
+                    // dst << " " << l2 << std::endl;
+                    // for(char c : st.getName()) {dst << c;}
+                    // int l1{st.getName().size()};
+                    // dst << " " << l1 << std::endl;
+                    if(st.getName() == name) {
+                        st.setId(id);
+                        dst << "gucci" << std::endl;
+                    }
+                }
+            }
+        }
+        // src.close();
     }
 }
 
@@ -165,20 +273,20 @@ unsigned int find_states(const std::string &path, const std::string &prov) {
     return cur_line;
 }
 //  move inside class
-std::string find_file(std::filesystem::path *files, const std::string &prov ) {
-    std::string line{};
-    // std::ifstream  src(file, std::ios::binary);
-    for(int i{}; i < 16; i++) {
-        std::ifstream src(files[i], std::ios::binary);
-        while(getline(src, line)) {
-            if (line.find(prov, 0) != std::string::npos) {
-                // break;
-                return files[i].filename();
-            }
-        }
-        src.close();
-    }
-}
+// std::string find_file(std::filesystem::path *files, const std::string &prov ) {
+//     std::string line{};
+//     // std::ifstream  src(file, std::ios::binary);
+//     for(int i{}; i < 15; i++) {
+//         std::ifstream src(files[i], std::ios::binary);
+//         while(getline(src, line)) {
+//             if (line.find(prov, 0) != std::string::npos) {
+//                 // break;
+//                 return files[i].filename();
+//             }
+//         }
+//         src.close();
+//     }
+// }
 // state data 
     // TODO all the funcions below should be moved inside class in next version
 // void print_state_region(State &state){
@@ -434,7 +542,7 @@ void debug_print_file_list(const std::filesystem::path *files) {
 int main() {
 // variables
     std::vector<State> states{};
-    std::filesystem::path files[16], input{}, output{};
+    std::filesystem::path files[15], input{}, output{};
     std::vector<std::string> provinces{};
     // std::vector<State_transfer> tr_states{};
     std::string filename,/*path{"input/files"},*/ new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
@@ -444,12 +552,13 @@ int main() {
     check_i_o_file(input, output);
     file_list(input, files);
     save_states(input, states);
+    save_state_info(input, states, files);
     // std::sort(files[0], files[15]);
     // debug_print_file_list(files);
     
     // save_provinces(provinces); 
     // tr_states = new_state_info();
-    filename = find_file(files, provinces[0]);
+    // filename = find_file(files, provinces[0]);
     State Old_state(find_states(files[14], provinces[0]), files[14]);
     // provs_ratio = calculate_ratio(Old_state, provinces);
     Old_state.create_pops("input/pops/" + filename);
@@ -460,7 +569,7 @@ int main() {
 
 // setting new states info
     New_state.setName(new_state_name);
-    New_state.setId(new_state_id);
+    // New_state.setId(new_state_id);
     New_state.setProvs(provinces);
     New_state.copy_state_info(Old_state);
     Remaining_state.setName(Old_state.getName());
