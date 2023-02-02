@@ -8,7 +8,7 @@
 
 
 // data maniopulation
-// TODO try to use olymorphism here
+// TODO try to use polymorphism here
 std::string data(std::string &line){
     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
     int pos{line.find("=") + 1};
@@ -47,7 +47,18 @@ void variable_string_vector(std::vector<std::string> &t, std::string &line) {
         end_pos = line.find("\"",beg_pos + 1);
     }
 }
-
+std::string name(std::string &line ) {
+    // std::string name = data(line, '_'); // TODO make this a separate function
+    int pos{};
+    line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
+    line.erase (std::remove(line.begin(), line.end(), '='), line.end()); 
+    line.erase (std::remove(line.begin(), line.end(), '{'), line.end());
+    if(line.find("s:", 0) != std::string::npos) {
+        pos = line.find(":") + 1;
+    } else {pos = line.find("") + 1;}
+    std::string name{line.substr(pos, line.find ("\n") - pos)};
+    return name;
+}
 // input/output paths
 void save_i_o_path(/*std::string &input, std::string &output*/) { // TODO refactor
     std::filesystem::path in{}, out{};
@@ -142,9 +153,11 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
     std::filesystem::path pops{"common/history/pops"}, buildings{"common/history/buildings"}, regions{"map_data/state_regions"};
 
     std::filesystem::path regs[15]{};
-    for(int i {}; i < 15; i++){
-        regs[i] = path / regions / files[i];
-    }
+    std::filesystem::path ps[15]{};
+    std::filesystem::path builds[15]{};
+    for(int i {}; i < 15; i++){regs[i] = path / regions / files[i];}
+    for(int i {}; i < 15; i++){ps[i] = path / pops / files[i];}
+    for(int i {}; i < 15; i++){builds[i] = path / buildings / files[i];}
 
     for(const auto &file : regs) {
         std::ifstream  src(file, std::ios::binary);
@@ -199,6 +212,7 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
                         if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[9] = data_int(line);}
                     }
                     // getline(src, line);
+                    if(line.find("naval_exit_id", 0) != std::string::npos) {std::string nav_ex{data(line)};}
                     if(line.find("", 0) != std::string::npos) {break;}
                 // ! TODO add naval exit saving 
                 }
@@ -213,11 +227,53 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
                         st.setArRes(ar_res);
                         st.setRes(cap_res);
                     }
+                    dst.close();
                 }
             }
         }
         // src.close();
     }
+    for(const auto &file : ps) {
+        std::ifstream  src(file, std::ios::binary);
+        getline(src, line);
+        while(getline(src, line)) {
+            if(line.find("STATE", 0) != std::string::npos) {
+                std::string name = data(line, ':'); // TODO make this a separate function
+                name.erase (std::remove(name.begin(), name.end(), '='), name.end()); 
+                name.erase (std::remove(name.begin(), name.end(), '{'), name.end());
+                if(line.find("region_state", 0) != std::string::npos) {
+                    std::string country{data(line)};
+                    getline(src, line);
+                    if(line.find("pop_type", 0) != std::string::npos) {
+                        std::string typ{data(line)};
+                        getline(src, line);
+                    }
+                    std::string cult{data(line)};
+                    getline(src, line);
+                    if(line.find("religion", 0) != std::string::npos) {
+                        std::string rel{data(line)};
+                        getline(src, line);
+                    }
+                    int size{data_int(line)};
+                                    for (State &st : states) {
+                    std::ofstream  dst("debug_state_list.txt", std::ios::binary | std::ios::app);
+                    if(st.getName() == name) {
+                        st.setId(id);
+                        st.setSub(subsist);
+                        st.setTraits(traits);
+                        st.setLand(ar_land);
+                        st.setArRes(ar_res);
+                        st.setRes(cap_res);
+                    }
+                }
+                }
+            }
+        }
+    }
+    for(const auto &file : builds) {
+
+    }
+
 }
 
 // state info input
