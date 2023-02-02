@@ -11,25 +11,16 @@ class State {
 //sublcasses
 protected:
     class Country {
-        std::string country, type{};
-        std::vector<std::string> provs;
-    
-    public:
-    // constructors
-        Country(const std::string &, const std::vector<std::string> &);
-    // setters
-        void setCountryType(const std::string &);
-    };
-
-    class Pop {
-    // data
+    // subclasses
+        class Pop {
+        // data
         std::string culture, religion{}, type{};
         int size;
 
-    public:
-    // constructor
+        public:
+        // constructor
         Pop(const std::string &, const std::string &, const std::string &, const int &);
-    // getters
+        // getters
         inline std::string getCult() {
             return culture;
         }
@@ -42,18 +33,18 @@ protected:
         inline int getSize() {
             return size;
         }
-    // setters
+        // setters
         void setSize(const int &);
-    };
+        };
 
-    class Building {
-    // data
+        class Building {
+        // data
         std::string type, region, dlc{}, prod;
         int level, reserves;
-    public:
-    // constructor
+        public:
+        // constructor
         Building(const std::string &, const std::string &, const std::string &, const std::string &, const int &, const int &);
-    // getters
+        // getters
         inline std::string getType() {
             return type;
         }
@@ -72,14 +63,26 @@ protected:
         inline int getRes() {
             return reserves;
         }        
+        // setters
+        };
+    // data
+        std::string country, type{};
+        std::vector<std::string> provs;
+        std::vector<State::Country::Pop> pops{};
+        std::vector<State::Country::Building> buildings{};
+
+    public:
+    // constructors
+        Country(const std::string &, const std::vector<std::string> &);
     // setters
+        void setCountryType(const std::string &);
     };
+
 //data 
     std::vector<State::Country> countries{};
-    std::vector<State::Pop> pops{};
-    std::vector<State::Building> buildings{};
+
     std::vector<std::string> provs, traits, ar_res, im_provs{}, homelands{}, claims{};
-    std::string id, name, file_name, sub, city, port{}, farm, mine{}, wood{};
+    std::string id, name, hubs[5]{}, file_name, sub, city, port{}, farm, mine{}, wood{};
     unsigned int ar_land, res[10]{}, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{};
 // Functions:
 
@@ -120,81 +123,31 @@ public:
 
 // getters
     inline std::string getName() {return name;}
-    inline std::string getSub() {
-    	return sub;
-	}
-    inline std::string getCity() {
-    	return city;
-	}
-    inline std::string getPort() {
-    	return port;
-	}
-    inline std::string getFarm() {
-    	return farm;
-	}
-    inline std::string getMine() {
-    	return mine;
-	}
-    inline std::string getWood() {
-    	return wood;
-	}
-    inline std::string getId() {
-    	return id;
-	}
-    inline unsigned int getLand() {
-    	return ar_land;
-	}
-    inline unsigned int getCoal() {
-    	return coal;
-	}
-    inline unsigned int getIron() {
-    	return iron;
-	}
-    inline unsigned int getLead() {
-    	return lead;
-	}
-    inline unsigned int getSulfur() {
-    	return sulfur;
-	}
-    inline unsigned int getLog() {
-    	return log;
-	}
-    inline unsigned int getFish() {
-    	return fish;
-	}
-    inline unsigned int getWhale() {
-    	return whale;
-	}
-    inline unsigned int getOil() {
-    	return oil;
-	}
-    inline unsigned int getRubber() {
-    	return rubber;
-	}
-    inline unsigned int getGold() {
-    	return gold;
-	}
-    inline unsigned int getDiscGold() {
-    	return disc_gold;
-	}
-    inline unsigned int getNavalExit() {
-    	return naval_exit;
-	}
-    inline std::vector<std::string> getProvs() {
-        return provs;
-    }
-    inline std::vector<std::string> getTraits() {
-        return traits;
-    }
-    inline std::vector<std::string> getResources() {
-        return ar_res;
-    }
-    inline std::vector<std::string> getImProvs() {
-        return im_provs;
-    }            
-    inline std::vector<State::Pop> getPops() {
-        return pops;
-    }
+    inline std::string getSub() {return sub;}
+    inline std::string getCity() {return city;}
+    inline std::string getPort() {return port;}
+    inline std::string getFarm() {return farm;}
+    inline std::string getMine() {return mine;}
+    inline std::string getWood() {return wood;}
+    inline std::string getId() {return id;}
+    inline unsigned int getLand() {return ar_land;}
+    inline unsigned int getCoal() {return coal;}
+    inline unsigned int getIron() {return iron;}
+    inline unsigned int getLead() {return lead;}
+    inline unsigned int getSulfur() {return sulfur;}
+    inline unsigned int getLog() {return log;}
+    inline unsigned int getFish() {return fish;}
+    inline unsigned int getWhale() {return whale;}
+    inline unsigned int getOil() {return oil;}
+    inline unsigned int getRubber() {return rubber;}
+    inline unsigned int getGold() {return gold;}
+    inline unsigned int getDiscGold() {return disc_gold;}
+    inline unsigned int getNavalExit() {return naval_exit;}
+    inline std::vector<std::string> getProvs() {return provs;}
+    inline std::vector<std::string> getTraits() {return traits;}
+    inline std::vector<std::string> getResources() {return ar_res;}
+    inline std::vector<std::string> getImProvs() {return im_provs;}            
+    inline std::vector<State::Pop> getPops() {return pops;}
     // inline std::vector<State::Building> getBuildingvoid save_states
     inline std::vector<std::string> getHomelands() {return homelands;}
     inline std::vector<State::Country>& getCountries() {return countries;} 
@@ -204,6 +157,7 @@ public:
    void setId(const std::string &);
    void setSub(const std::string &);
    void setTraits(const std::vector<std::string> &);
+   void setHubs(const std::string [5]);
    void setLand(const int &);
    void setArRes(const std::vector<std::string> &);
    void setRes(const int [10]);

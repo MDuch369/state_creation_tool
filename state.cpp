@@ -114,9 +114,9 @@ State::State(const unsigned int &cur_line, const std::string &file) { // copies 
 State::State(const unsigned int res[]) 
     :ar_land{res[0]}, coal{res[1]}, iron{res[2]}, lead{res[3]}, sulfur{res[4]}, log{res[5]}, fish{res[6]}, whale{res[7]}, oil{res[8]}, rubber{res[9]}, gold{res[10]}, disc_gold{res[11]} {}
 State::State(const std::string &name) :name{name} {} 
-State::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
+State::Country::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
     : culture{cult}, religion{rel}, type{t}, size{s} {}
-State::Building::Building(const std::string &type, const std::string &reg, const std::string &dlc, const std::string &pr, const int &lvl, const int &res) 
+State::Country::Building::Building(const std::string &type, const std::string &reg, const std::string &dlc, const std::string &pr, const int &lvl, const int &res) 
     : type{type}, region{reg}, dlc{dlc}, prod{pr}, level{lvl}, reserves{res} {}
 State::Country::Country(const std::string &name, const std::vector<std::string> &pr) :country{name}, provs{pr} {}
 
@@ -435,13 +435,14 @@ void State::setName(const std::string &n) {this->name = n;}
 void State::setId(const std::string &i) {this->id = i;}
 void State::setSub(const std::string &s){this->sub = s;}
 void State::setTraits(const std::vector<std::string> &t){this->traits = t;}
+void State::setHubs(const std::string h[5]){for(int i{}; i < 5; i++) {this->hubs[i] = h[i];} }
 void State::setLand(const int &l){this->ar_land = l;}
 void State::setArRes(const std::vector<std::string> &r) {this->ar_res = r;}
 void State::setRes(const int r[10]){ for(int i{}; i < 10; i++) {this->res[i] = r[i];} }
 void State::setProvs(const std::vector<std::string> &p) {this->provs = p;}
 void State::setProv(const int &i, const std::string &s) {this->provs[i] = s;}
-void State::setPopSize(const int &i, const int &size) {this->pops[i].setSize(size);}
-void State::Pop::setSize(const int &size) {this->size = size;}
+// void State::setPopSize(const int &i, const int &size) {this->pops[i].setSize(size);}
+void State::Country::Pop::setSize(const int &size) {this->size = size;}
 // void State::setTraits(const std::vector<std::string> &tr) {
 //     this->traits = tr;
 // }
