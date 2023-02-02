@@ -74,13 +74,15 @@ protected:
     public:
     // constructors
         Country(const std::string &, const std::vector<std::string> &);
+    // getters
+        std::string getName(){return this->country;}
+        std::vector<State::Country::Pop>& getPops(){return this->pops;}
     // setters
         void setCountryType(const std::string &);
     };
 
 //data 
     std::vector<State::Country> countries{};
-
     std::vector<std::string> provs, traits, ar_res, im_provs{}, homelands{}, claims{};
     std::string id, name, hubs[5]{}, file_name, sub, city, port{}, farm, mine{}, wood{};
     unsigned int ar_land, res[10]{}, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{};
@@ -97,7 +99,7 @@ public:
     void create_country(const std::string &, std::vector<std::string> &);
 
 // pops  
-    void create_pops(const std::string &/*, const std::string &, std::vector<State::Pop> &*/);
+    void create_pops(const std::string &, const std::string &, const std::string &, const std::string &, const int & /*std::vector<State::Pop> &*/);
     void add_pop(const std::string &, const std::string &, const std::string &, const int &);
 
 // buildings
@@ -147,10 +149,12 @@ public:
     inline std::vector<std::string> getTraits() {return traits;}
     inline std::vector<std::string> getResources() {return ar_res;}
     inline std::vector<std::string> getImProvs() {return im_provs;}            
-    inline std::vector<State::Pop> getPops() {return pops;}
+    // inline std::vector<State::Pop> getPops() {return pops;}
     // inline std::vector<State::Building> getBuildingvoid save_states
     inline std::vector<std::string> getHomelands() {return homelands;}
-    inline std::vector<State::Country>& getCountries() {return countries;} 
+    inline std::vector<State::Country>& getCountries() {return countries;}
+    inline State::Country& getCo(const int &i) {return countries[i];}
+    // inline std::string getCoName(const int &i) {return countries[i].country;} 
 
 // setters
    void setName(const std::string &);
