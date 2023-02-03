@@ -14,57 +14,39 @@ protected:
     // subclasses
         class Pop {
         // data
-        std::string culture, religion{}, type{};
-        int size;
+            int size;
+            std::string culture, religion{}, type{};
 
         public:
         // constructor
-        Pop(const std::string &, const std::string &, const std::string &, const int &);
+         Pop(const std::string &, const std::string &, const std::string &, const int &);
         // getters
-        inline std::string getCult() {
-            return culture;
-        }
-        inline std::string getRel() {
-            return religion;
-        }
-        inline std::string getType() {
-            return type;
-        }
-        inline int getSize() {
-            return size;
-        }
+            inline std::string getCult() {return culture;}
+            inline std::string getRel() {return religion;}
+            inline std::string getType() {return type;}
+            inline int getSize() {return size;}
         // setters
-        void setSize(const int &);
+            void setSize(const int &);
         };
 
         class Building {
         // data
-        std::string type, region, dlc{}, prod;
-        int level, reserves;
+            int level, reserves;
+            std::string type,/*region,*/ dlc{}; 
+            std::vector<std::string> prod;
         public:
         // constructor
-        Building(const std::string &, const std::string &, const std::string &, const std::string &, const int &, const int &);
+            Building(const std::string &, const int &, const int &, const std::vector<std::string> &);
         // getters
-        inline std::string getType() {
-            return type;
-        }
-        inline std::string getRegion() {
-            return region;
-        }
-        inline std::string getDlc() {
-            return dlc;
-        }
-        inline std::string getProd() {
-            return prod;
-        }
-        inline int getLvl() {
-            return level;
-        }
-        inline int getRes() {
-            return reserves;
-        }        
+            inline std::string getType() {return type;}
+            // inline std::string getRegion() {return region;}
+            inline std::string getDlc() {return dlc;}
+            inline std::vector<std::string> getProd() {return prod;}
+            inline int getLvl() {return level;}
+            inline int getRes() {return reserves;}        
         // setters
         };
+
     // data
         std::string country, type{};
         std::vector<std::string> provs;
@@ -77,6 +59,7 @@ protected:
     // getters
         std::string getName(){return this->country;}
         std::vector<State::Country::Pop>& getPops(){return this->pops;}
+        std::vector<State::Country::Building>& getBuilds(){return this->buildings;}
     // setters
         void setCountryType(const std::string &);
     };
@@ -103,7 +86,7 @@ public:
     void add_pop(const std::string &, const std::string &, const std::string &, const int &);
 
 // buildings
-    void create_buildings(const std::string &);
+    void create_buildings(const std::string &, const std::string &, const int &, const int &, const std::vector<std::string> &);
     void add_building(const std::string &, const std::string &, const std::string &, const std::string &, const int &, const int &);
 
 // data manipulation
@@ -149,12 +132,9 @@ public:
     inline std::vector<std::string> getTraits() {return traits;}
     inline std::vector<std::string> getResources() {return ar_res;}
     inline std::vector<std::string> getImProvs() {return im_provs;}            
-    // inline std::vector<State::Pop> getPops() {return pops;}
-    // inline std::vector<State::Building> getBuildingvoid save_states
     inline std::vector<std::string> getHomelands() {return homelands;}
     inline std::vector<State::Country>& getCountries() {return countries;}
     inline State::Country& getCo(const int &i) {return countries[i];}
-    // inline std::string getCoName(const int &i) {return countries[i].country;} 
 
 // setters
    void setName(const std::string &);

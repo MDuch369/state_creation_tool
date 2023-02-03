@@ -51,16 +51,17 @@ void variable_string_vector(std::vector<std::string> &t, std::string &line) {
     }
 }
 std::string data_name(std::string &line ) {
-    // std::string name = data(line, '_'); // TODO make this a separate function
     int pos{};
     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
     line.erase (std::remove(line.begin(), line.end(), '='), line.end()); 
     line.erase (std::remove(line.begin(), line.end(), '{'), line.end());
     line.erase (std::remove(line.begin(), line.end(), '\t'), line.end());
+    line.erase (std::remove(line.begin(), line.end(), '\"'), line.end());
     pos = line.find("_") + 1;
     std::string name{line.substr(pos, line.find ("\n") - pos)};
     return name;
 }
+
 // input/output paths
 void save_i_o_path(/*std::string &input, std::string &output*/) { // TODO refactor
     std::filesystem::path in{}, out{};
@@ -147,7 +148,6 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
         }
     }
 }
-
 void save_state_info(const std::filesystem::path &path, std::vector<State> &states, const std::filesystem::path *files) {
     // std::string line;
     // int id{};
@@ -228,19 +228,16 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
     }
 }
 void save_state_pops(const std::filesystem::path &path, std::vector<State> &states, const std::filesystem::path *files) {
-    // for(int i{}; i < 15; i++) {
-    //     files[i] = files[i].filename();
-    // }
     std::filesystem::path pops{"common/history/pops"};
     std::filesystem::path ps[15]{};
     for(int i {}; i < 15; i++){ps[i] = path / pops / files[i].filename();}
     
-    for(const auto &file : ps) { // directory loop
+    for(const auto &file : ps) { 
         std::ifstream  src(file, std::ios::binary);
         std::string line;
         std::string name{}, country{};
         getline(src, line);
-        while(getline(src, line)) { // file loop
+        while(getline(src, line)) { 
             int size{};
             std::string type{}, cult{}, rel{};
             if(line.find("s:", 0) != std::string::npos) { 
@@ -281,10 +278,55 @@ void save_state_pops(const std::filesystem::path &path, std::vector<State> &stat
     }
 }
 void save_state_builds(const std::filesystem::path &path, std::vector<State> &states, const std::filesystem::path *files) {
-    std::filesystem::path buildings{"common/history/buildings"};
-    //     for(const auto &file : builds) {
-
-    // }
+    std::filesystem::path builds{"common/history/buildings"};
+    std::filesystem::path blds[15]{};
+    for(int i {}; i < 15; i++){blds[i] = path / builds / files[i].filename();}
+    
+    for(const auto &file : blds) { 
+        std::ifstream  src(file, std::ios::binary);
+        std::string line;
+        std::string name{}, country{};
+        getline(src, line);
+        while(getline(src, line)) { 
+            int lvl{}, res{};
+            std::string type{};
+            std::vector<std::string> pm{};
+            if(line.find("s:", 0) != std::string::npos) { 
+                name = data_name(line);
+                getline(src, line);
+            }
+            if(line.find("region_state", 0) != std::string::npos) { 
+                country = data(line, ':');
+                getline(src, line);
+                getline(src, line);   
+            }
+            if(line.find("building", 0) != std::string::npos) {
+                type = data_name(line);
+                getline(src, line);
+            }
+            if(line.find("level", 0) != std::string::npos) {
+                lvl = data_int(line);
+                getline(src, line);
+            }
+            if(line.find("reserves", 0) != std::string::npos) {
+                res = data_int(line);
+                getline(src, line);
+            }
+            if(line.find("activate_production_methods", 0) != std::string::npos) {
+                variable_string_vector(pm, line);
+                for (State &st : states) {
+                    if(st.getName() == name) {
+                        st.create_buildings(country, type, lvl, res, pm);
+                    }
+                }
+                type = "";
+                lvl = 0;
+                res = 0;
+                pm.clear();
+                getline(src, line);
+            }
+        }
+    }
 }
 
 // state info input
@@ -620,6 +662,7 @@ int main() {
     save_states(input, states);
     save_state_info(input, states, files);
     save_state_pops(input, states, files);
+    save_state_builds(input, states, files);
     
     // std::sort(files[0], files[15]);
     // debug_print_file_list(files);

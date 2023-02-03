@@ -116,8 +116,8 @@ State::State(const unsigned int res[])
 State::State(const std::string &name) :name{name} {} 
 State::Country::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
     : culture{cult}, religion{rel}, type{t}, size{s} {}
-State::Country::Building::Building(const std::string &type, const std::string &reg, const std::string &dlc, const std::string &pr, const int &lvl, const int &res) 
-    : type{type}, region{reg}, dlc{dlc}, prod{pr}, level{lvl}, reserves{res} {}
+State::Country::Building::Building(const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pr) 
+    : type{type}, /*region{reg}, dlc{dlc}, */prod{pr}, level{lvl}, reserves{res} {}
 State::Country::Country(const std::string &name, const std::vector<std::string> &pr) :country{name}, provs{pr} {}
 
 // Countries
@@ -126,47 +126,6 @@ void State::create_country(const std::string &name, std::vector<std::string> &pr
 }
 
 // pops
-
-// void State::create_pops(const std::string &file/*, const std::string &name, std::vector<State::Pop> &vec*/) {
-//     std::string line, cul, rel{}, t{};
-//     int s;
-//     std::ifstream  src(file, std::ios::binary);
-//     // TODO implement handling of different region states
-//     while(getline(src, line)){
-//         if(line.find(this->name, 0) != std::string::npos) {
-//             getline(src, line);
-//             while(true) {
-//                 getline(src, line);
-//                 if(compare_string("s:STATE", line) == true) {
-//                     break;
-//                 }
-//                 if(compare_string("create_pop", line)) {
-//                     getline(src, line);
-//                     if(compare_string("pop_type", line)) {
-//                         t = data(line);
-//                         getline(src, line);
-//                     }
-//                     if(compare_string("culture", line)) {
-//                         cul = data(line);
-//                         getline(src, line);
-//                     }
-//                     if(compare_string("religion", line)) {
-//                         rel = data(line);
-//                         getline(src, line);
-//                     }
-//                     if(compare_string("size", line)) {
-//                         s = data_int(line);
-//                         getline(src, line);
-//                     }
-//                     if(compare_string("}", line)) {
-//                        this->pops.emplace_back(cul, rel, t, s);
-//                        rel = "";
-//                     }
-//                 }
-//             }
-//         }
-//     }
-// }
 void State::create_pops(const std::string &co, const std::string &cul, const std::string &rel, const std::string &type, const int &size){
     for (State::Country &c : countries) {
         if(c.getName() == co) {
@@ -179,54 +138,13 @@ void State::create_pops(const std::string &co, const std::string &cul, const std
 // }
 
 // buildings
-// void State::create_buildings(const std::string &file){
-//     std::string line, reg, pm, build, dlc{};
-//     int level, res;
-//     std::ifstream  src(file, std::ios::binary);
-    
-//     while(getline(src, line)) {
-//         if(line.find(this->name, 0) != std::string::npos) {
-//             getline(src, line);
-//             while(true) {
-//                 if(compare_string("region_state", line) == true){
-//                     int pos{line.find(":") + 1};
-//                     reg = line.substr(pos, line.find ("=") - pos);
-//                 }
-//                 getline(src, line);
-//                 if(compare_string("s:STATE", line) == true) {
-//                     break;
-//                 }
-//                 if(compare_string("create_building", line)) {
-//                     getline(src, line);
-//                     if(compare_string("building", line)) {
-//                         build = data(line);
-//                         getline(src, line);
-//                     }
-//                     if(compare_string("level", line)) {
-//                         level = data_int(line);
-//                         getline(src, line);
-//                     }
-//                     if(compare_string("reserves", line)) {
-//                         res = data_int(line);
-//                         getline(src, line);
-//                     }
-//                     if(compare_string("activate_production_methods", line)) {
-//                         pm = data(line);
-//                         getline(src, line);
-//                     }
-//                     if(compare_string("}", line)) {
-//                        this->buildings.emplace_back(build, reg, dlc, pm, level, res);
-//                        res = 0;
-//                        pm = "";
-//                     }
-//                 }
-//             }
-//         }
-//     }
-// }
-// void State::add_building(const std::string &type, const std::string &reg, const std::string &dlc, const std::string &pr, const int &res, const int &lvl) {
-//     this->buildings.emplace_back(type, reg, dlc, pr, lvl, res);
-// }
+void State::create_buildings(const std::string &co, const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pm) {
+    for (State::Country &c : countries) {
+        if(c.getName() == co) {
+            c.getBuilds().emplace_back(type, lvl, res, pm);
+        }
+    }
+}
 
 // data calculating/copying
 std::string State::data( std::string &line){
@@ -394,10 +312,8 @@ void State::print_state_region(){
 // void State::print_buildings(){
 //     std::ofstream  dst("output/common/history/buildings/to_buildings.txt", std::ios::binary | std::ios::app);
 //     int size{this->buildings.size()};
-   
 //     dst << "\ts:" << this->name << " = {" << std::endl;
 //     dst << "\t\tregion_state:" << this->buildings[0].getRegion() <<" = {" << std::endl;
-
 //     for(int i{}; i < size; i++){
 //         std::string reg{this->buildings[i].getRegion()};
 //         if(this->buildings[i].getLvl() > 0 ) {
