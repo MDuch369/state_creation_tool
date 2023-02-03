@@ -235,54 +235,47 @@ void save_state_pops(const std::filesystem::path &path, std::vector<State> &stat
     std::filesystem::path ps[15]{};
     for(int i {}; i < 15; i++){ps[i] = path / pops / files[i].filename();}
     
-    for(const auto &file : ps) {
-        std::string line;
+    for(const auto &file : ps) { // directory loop
         std::ifstream  src(file, std::ios::binary);
+        std::string line;
+        std::string name{}, country{};
         getline(src, line);
-        while(getline(src, line)) {
-            if(line.find("s:", 0) != std::string::npos) {
-                std::string name{data_name(line)}; 
+        while(getline(src, line)) { // file loop
+            int size{};
+            std::string type{}, cult{}, rel{};
+            if(line.find("s:", 0) != std::string::npos) { 
+                name = data_name(line);
+                getline(src, line);
+            }
+            if(line.find("region_state", 0) != std::string::npos) { 
+                country = data(line, ':');
+                getline(src, line);
+                getline(src, line);   
+            }
+            if(line.find("pop_type", 0) != std::string::npos) {
+                type = data(line);
+                getline(src, line);
+            }
+            if(line.find("culture", 0) != std::string::npos) {
+                cult = data(line);
+                getline(src, line);
+            }
+            if(line.find("religion", 0) != std::string::npos) {
+                rel = data(line);
+                getline(src, line);
+            }
+            if(line.find("size", 0) != std::string::npos) {
+                size = data_int(line);
                 for (State &st : states) {
                     if(st.getName() == name) {
-                        // getline(src, line);
-                        while(getline(src, line)) {
-                            if(line.find("\t}", 0) != std::string::npos) {break;} 
-                            if(line.find("region_state", 0) != std::string::npos) {
-                                std::string country{data(line, ':')};
-                                while(getline(src, line)) {
-                                    if(line.find("\t\t}", 0) != std::string::npos) {break;} 
-                                    std::string type{}, cult{}, rel{};
-                                    int size{};
-                                    if(line.find("pop_type", 0) != std::string::npos) {
-                                        type = data(line);
-                                        getline(src, line);
-                                    }
-                                    if(line.find("culture", 0) != std::string::npos) {
-                                        cult = data(line);
-                                        getline(src, line);
-                                    }
-                                    if(line.find("religion", 0) != std::string::npos) {
-                                        rel = data(line);
-                                        getline(src, line);
-                                    }
-                                    if(line.find("size", 0) != std::string::npos) {
-                                        size = data_int(line);
-                                        st.create_pops(country, cult, rel, type, size);
-                                        // break;
-                                        // for (State &st : states) {
-                                        //     if(st.getName() == name) {st.create_pops(country, cult, rel, type, size);}
-                                        // }
-                                        // getline(src, line);
-                                    }
-                                    // if(line.find("\t\t\t}", 0) != std::string::npos) {
-
-                                    // }
-                                }
-                            }
-                        }
+                        st.create_pops(country, cult, rel, type, size);
                     }
                 }
-                
+                size = 0;
+                type = "";
+                cult = "";
+                rel = "";
+                getline(src, line);
             }
         }
     }
