@@ -56,23 +56,26 @@ protected:
     public:
     // constructors
         Country(const std::string &, const std::vector<std::string> &);
+        Country(const std::string &);
     // getters
         std::string getName(){return this->country;}
         std::vector<State::Country::Pop>& getPops(){return this->pops;}
         std::vector<State::Country::Building>& getBuilds(){return this->buildings;}
+        std::vector<std::string> getProvs(){return this->provs;}
     // setters
         void setCountryType(const std::string &);
     };
 
 //data 
     std::vector<State::Country> countries{};
-    std::vector<std::string> provs, traits, ar_res, im_provs{}, homelands{}, claims{};
+    std::vector<std::string> /*provs, */traits, ar_res, im_provs{}, homelands{}, claims{};
     std::string id, name, hubs[5]{}, file_name, sub, city, port{}, farm, mine{}, wood{};
     unsigned int ar_land, res[10]{}, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{};
 // Functions:
 
 public:
 // constructors 
+    State();
     State(const std::filesystem::path &);
     State(const unsigned int &, const std::string &);
     State(const unsigned int[]);
@@ -128,7 +131,7 @@ public:
     inline unsigned int getGold() {return gold;}
     inline unsigned int getDiscGold() {return disc_gold;}
     inline unsigned int getNavalExit() {return naval_exit;}
-    inline std::vector<std::string> getProvs() {return provs;}
+    // inline std::vector<std::string> getProvs() {return provs;}
     inline std::vector<std::string> getTraits() {return traits;}
     inline std::vector<std::string> getResources() {return ar_res;}
     inline std::vector<std::string> getImProvs() {return im_provs;}            
@@ -151,20 +154,37 @@ public:
    // void setResources(const std::vector<std::string> &);
    void setHomeland(const std::string &);
    void setClaim(const std::string &);
+
+// debug functions
+    void debug_print_provs();
 };
 
-// class State_transfer : public State {
-// // data
-//     std::string origin{};
-//     double ratio; 
+/**** STATE TRANSFER CLASS ****/
 
-// // Functions:
-//     double calculate_ratio(const std::vector<std::string> &); 
-//     unsigned int find_states(const std::string &, std::vector<State_transfer> &);
-// public:
-// // constructors
-//     State_transfer(const std::string &, const int &, std::string &);
-//     // State_transfer(const std::string &, const int &, const std::vector<std::string> &);
-// };
+class State_transfer : public State {
+// data
+    double ratio; 
+    std::string origin{};
+    std::vector<std::string> provs;
+
+// Functions:
+    double calculate_ratio(const std::vector<std::string> &); 
+    unsigned int find_states(const std::string &, std::vector<State_transfer> &);
+public:
+
+// constructors
+    State_transfer(const std::string &, const std::string &, const std::string &); // TODO replace this constructor with the one below
+    State_transfer(const std::string &, const std::string &, const std::vector<std::string> &);  
+    // State_transfer(const std::string &, const int &, const std::vector<std::string> &);
+
+// getters
+    inline std::vector<std::string> getProvs() {return this->provs;}
+
+// transfer
+    void find_origin_states(const std::vector<State> &, std::vector<State_transfer> &);
+
+// debug functions
+    void debug_print_provs();
+};
 
 #endif

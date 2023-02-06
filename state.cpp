@@ -7,6 +7,7 @@
 #include "state.h"
 
 // constructors
+State::State() {}
 State::State(const std::filesystem::path &path) {
     std::string line{};
     std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);   
@@ -31,9 +32,9 @@ State::State(const unsigned int &cur_line, const std::string &file) { // copies 
             if(compare_string("subsistence_building", line)) {
                 this->sub = data(line);
             }
-            if(compare_string("provinces", line)) {
-                data_vector(this->provs, line, 6);
-            }
+            // if(compare_string("provinces", line)) {
+            //     data_vector(this->provs, line, 6);
+            // }
             if(compare_string("impassable", line)) {
                 data_vector(this->im_provs, line, 6);
             }
@@ -119,6 +120,7 @@ State::Country::Pop::Pop(const std::string &cult, const std::string &rel, const 
 State::Country::Building::Building(const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pr) 
     : type{type}, /*region{reg}, dlc{dlc}, */prod{pr}, level{lvl}, reserves{res} {}
 State::Country::Country(const std::string &name, const std::vector<std::string> &pr) :country{name}, provs{pr} {}
+State::Country::Country(const std::string &name):country{name} {}
 
 // Countries
 void State::create_country(const std::string &name, std::vector<std::string> &pr) {
@@ -193,15 +195,15 @@ void State::copy_state_info(State &st) {
     this->homelands = st.getHomelands();
 
 }
-void State::calculate_remaining_provs(State &st) {
-    for (std::string a : st.getProvs()) {
-        for(int i{}; i < provs.size(); i++) {
-            if (a == provs[i]) {
-                provs.erase(provs.begin() + i);
-            }
-        }
-    }
-}
+// void State::calculate_remaining_provs(State &st) {
+//     for (std::string a : st.getProvs()) {
+//         for(int i{}; i < provs.size(); i++) {
+//             if (a == provs[i]) {
+//                 provs.erase(provs.begin() + i);
+//             }
+//         }
+//     }
+// }
 void State::create_homelands(const std::string &file) {
     std::string line;
     std::ifstream  src(file, std::ios::binary);
@@ -229,9 +231,9 @@ void State::print_state_region(){
         << "\tid = " << this->id << std::endl
         << "\tsubsistence_building = " << this->sub << std::endl
         << "\tprovinces = { ";
-    for (std::string s : this->provs) {
-        dst << "\"x" << s << "\" ";
-    }
+    // for (std::string s : this->provs) {
+    //     dst << "\"x" << s << "\" ";
+    // }
     dst << "}" << std::endl 
         << "\ttraits = { "; 
     for (std::string s : this->traits) {
@@ -342,9 +344,9 @@ void State::print_state() {
     dst << "\t\tcreate_state = {" << std::endl
         << "\t\t\tcountry = c:" << placeholder << std::endl
         << "\t\t\towned_provinces = { ";
-    for(std::string s : this->provs) {
-        dst << s << " ";
-    }
+    // for(std::string s : this->provs) {
+    //     dst << s << " ";
+    // }
     dst << "}" << std::endl
         <<  "\t\t}" << std::endl;
     for(std::string t : this->homelands) {
@@ -362,8 +364,8 @@ void State::setHubs(const std::string h[5]){for(int i{}; i < 5; i++) {this->hubs
 void State::setLand(const int &l){this->ar_land = l;}
 void State::setArRes(const std::vector<std::string> &r) {this->ar_res = r;}
 void State::setRes(const int r[10]){ for(int i{}; i < 10; i++) {this->res[i] = r[i];} }
-void State::setProvs(const std::vector<std::string> &p) {this->provs = p;}
-void State::setProv(const int &i, const std::string &s) {this->provs[i] = s;}
+// void State::setProvs(const std::vector<std::string> &p) {this->provs = p;}
+// void State::setProv(const int &i, const std::string &s) {this->provs[i] = s;}
 // void State::setPopSize(const int &i, const int &size) {this->pops[i].setSize(size);}
 void State::Country::Pop::setSize(const int &size) {this->size = size;}
 // void State::setTraits(const std::vector<std::string> &tr) {
@@ -385,35 +387,93 @@ void State::setHomeland(const std::string &home) {this->homelands.push_back(home
 void State::setClaim(const std::string &claim) {this->claims.push_back(claim);}
 void State::Country::setCountryType(const std::string &type) {this->type = type;}
 
-// State_transfer class
+// debug functions
+void State::debug_print_provs(){
+    std::ofstream  dst("provs_debug", std::ios::binary | std::ios::app);
+    for(State::Country co : this->getCountries()){
+        int i{};
+        for (char c : co.getProvs()[0]) {
+            dst << c;
+            i++;
+        }
+    dst << " " << i << std::endl;    
+    }
+}
+
+/**** STATE TRANSFER CLASS ****/
 
 // constructor
-// State_transfer::State_transfer(const std::string &name, const int &id, std::string &provs) {
-//     std::string prov, tmp; 
-//     this->name = name;
-//     this->id = id;
+State_transfer::State_transfer(const std::string &name, const std::string &id, const std::string &provs) {
+    std::string prov, tmp; 
+    this->name = name;
+    this->id = id;
     
-//     std::getline(std::cin, prov);
-//     prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end());
-//     prov.erase (std::remove(prov.begin(), prov.end(), ' '), prov.end());
-//     transform(prov.begin(), prov.end(), prov.begin(), toupper);
+    std::getline(std::cin, prov);
+    prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end());
+    prov.erase (std::remove(prov.begin(), prov.end(), ' '), prov.end());
+    transform(prov.begin(), prov.end(), prov.begin(), toupper);
 
-//     std::stringstream ss(prov);
+    std::stringstream ss(prov);
 
-//     while(getline(ss, tmp, 'X')){
-//         if(tmp != "") {
-//         this->provs.push_back(tmp);
-//         }
-//     }
-// }
+    while(getline(ss, tmp, 'X')){
+        if(tmp != "") {
+        this->provs.push_back(tmp);
+        }
+    }
+}
+State_transfer::State_transfer(const std::string &name, const std::string &id, const std::vector<std::string> &provs) {
+    this->name = name;
+    this->id = id;
+    this->provs = provs;
+}
 
-// // data calculating/copying
-// double State_transfer::calculate_ratio(const std::vector<std::string> &pr) {
-//     // double i{pr.size()}, j{this->provs.size()};
-//     // double result{pr.size() / this->provs.size()};
-//     return pr.size() / this->provs.size();
-// }
-//     // ! TODO finish
+// data calculating/copying
+double State_transfer::calculate_ratio(const std::vector<std::string> &pr) {
+    // double i{pr.size()}, j{this->provs.size()};
+    // double result{pr.size() / this->provs.size()};
+    return pr.size() / this->provs.size();
+}
+void State_transfer::find_origin_states(const std::vector<State> &states, std::vector<State_transfer> &tr_st) {
+    std::vector<std::string> p{}, diff_ori{};
+    bool state_end{0};
+
+    for(std::string &pr : this->provs) {
+        for(State st : states) {
+            int c{};
+            for(State::Country co : st.getCountries()) {
+                int o{};
+                for(std::string or_pr : co.getProvs()) {
+                    if(pr == or_pr) {
+                        if(this->origin == ""){this->origin = st.getName();}
+                        p.push_back(pr);
+                        pr = ""; // find a better method to erase the entry
+                    } 
+                    o++;
+                    if(o == co.getProvs().size()){
+                        this->create_country(co.getName(), p);
+                        p.clear();
+                    }
+                }
+                c++;
+                if(c == st.getCountries().size()) {
+                    state_end = 1;
+                    break;
+                }
+            }
+            if(state_end) {break;}
+        }
+        if(state_end) {break;}
+    }
+    this->provs.erase(std::remove(this->provs.begin(), this->provs.end(), ""), this->provs.end());
+    if(this->provs.empty() != true) {
+        for(std::string pr : this->provs) {
+            diff_ori.push_back(pr);
+        }
+        tr_st.emplace_back(this->name, this->id, diff_ori);
+    }
+}    
+    
+    // ! TODO finish
 // unsigned int State_transfer::find_states(const std::string &path, std::vector<State_transfer> &states) {
 //     std::vector<std::string> diff_origin_st{};
 //     // std::string *pr = &this->provs[0]; 
@@ -422,7 +482,6 @@ void State::Country::setCountryType(const std::string &type) {this->type = type;
 //     std::string line{};
 //     // bool mult_donor_st{false};
 //     std::ifstream  src(path + "common/history/states/00_states.txt", std::ios::binary);
-
 //     while(getline(src, line)) {
 //         cur_line++;
 //         if (line.find(*pr, 0) != std::string::npos) {
@@ -440,3 +499,14 @@ void State::Country::setCountryType(const std::string &type) {this->type = type;
 //     src.close();
 //     return cur_line;
 // }
+
+// debug functions
+void State_transfer::debug_print_provs() {
+    std::ofstream  dst("provs_debug", std::ios::binary | std::ios::app);
+    int i{};
+    for (char c : this->getProvs()[0]) {
+        dst << c;
+        i++;
+    }
+    dst << " " << i << std::endl;
+}

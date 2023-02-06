@@ -329,41 +329,44 @@ void save_state_builds(const std::filesystem::path &path, std::vector<State> &st
     }
 }
 
-// state info input
-// std::vector<State_transfer> new_state_info() {
-//     int id{}, num{};
-//     std::string name{}, provs{};
-//     std::vector<State_transfer> states;
-//     std::cout << "Numbeer of states to be created: " << std::endl;
-//     std::cin >> num;
-//     for(int i{}; i < num; i++) {
-//         std::cout << "Name of the state to be created number" << i + 1 << ": " << std::endl;
-//         std::cin >> name;
-//         std::cout << std::endl;
-//         std::cout << "Id of the state to be created number" << i + 1 << ": " << std::endl;
-//         std::cin >> id;
-//         std::cout << std::endl;
-//         std::cout << "Provinces to transfer to state number" << i + 1 << ": " << std::endl;
-//         std::cin >> provs;
-//         std::cout << std::endl;
-//         states.emplace_back(name, id, provs);
-//     } 
-//     return states;
-// }
-// void save_provinces(std::vector<std::string> &provs) {
-//     std::string prov, tmp; 
-//     std::cout<<"Enter provinces to transfer: "<<std::endl;
-//     std::getline(std::cin, prov);
-//     prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end());
-//     prov.erase (std::remove(prov.begin(), prov.end(), ' '), prov.end());
-//     transform(prov.begin(), prov.end(), prov.begin(), toupper);
-//     std::stringstream ss(prov);
-//     while(getline(ss, tmp, 'X')){
-//         if(tmp != "") {
-//         provs.push_back(tmp);
-//         }
-//     }
-// }
+// transfer info input
+
+std::vector<State_transfer> new_state_info() {
+    int num{};
+    std::string name{}, provs{}, id{};
+    std::vector<State_transfer> states;
+    std::cout << "Number of states to be created: " << std::endl;
+    std::cin >> num;
+    for(int i{}; i < num; i++) {
+        std::cout << "Name of the state to be created number " << i + 1 << ": " << std::endl;
+        std::cin >> name;
+        std::cout << std::endl;
+        std::cout << "Id of the state to be created number " << i + 1 << ": " << std::endl;
+        std::cin >> id;
+        std::cout << std::endl;
+        std::cout << "Provinces to transfer to state number " << i + 1 << ": " << std::endl;
+        std::getline(std::cin, provs);
+        std::cout << std::endl;
+        states.emplace_back(name, id, provs);
+    } 
+    return states;
+}
+// TODO move inside Transfer_State class
+void save_provinces(std::vector<std::string> &provs) {
+    std::string prov, tmp; 
+    std::cout<<"Enter provinces to transfer: "<<std::endl;
+    std::getline(std::cin, prov);
+    prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end());
+    prov.erase (std::remove(prov.begin(), prov.end(), ' '), prov.end());
+    transform(prov.begin(), prov.end(), prov.begin(), toupper);
+    std::stringstream ss(prov);
+    while(getline(ss, tmp, 'X')){
+        if(tmp != "") {
+        provs.push_back(tmp);
+        }
+    }
+}
+
 // file browsing 
 unsigned int find_states(const std::string &path, const std::string &prov) {
     unsigned int cur_line{};
@@ -646,12 +649,14 @@ void debug_print_file_list(const std::filesystem::path *files) {
     }
 }
 
+
+
 int main() {
 // variables
     std::vector<State> states{};
     std::filesystem::path files[15], input{}, output{}, test[15];
     std::vector<std::string> provinces{};
-    // std::vector<State_transfer> tr_states{};
+    std::vector<State_transfer> tr_states{};
     std::string filename,/*path{"input/files"},*/ new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
     int new_state_id{/*666*/}; 
     double provs_ratio; // TODO for next version change this to be member of state class
@@ -664,12 +669,17 @@ int main() {
     save_state_pops(input, states, files);
     save_state_builds(input, states, files);
     
-    // std::sort(files[0], files[15]);
-    // debug_print_file_list(files);
-    
+    tr_states = new_state_info();
     // save_provinces(provinces); 
-    // tr_states = new_state_info();
     // filename = find_file(files, provinces[0]);
+
+    // states[0].debug_print_provs();
+    // tr_states[0].debug_print_provs();
+
+    for(State_transfer &trs : tr_states) {
+        trs.find_origin_states(states, tr_states);
+    }
+
     State Old_state(find_states(files[14], provinces[0]), files[14]);
     // provs_ratio = calculate_ratio(Old_state, provinces);
     // Old_state.create_pops("input/pops/" + filename);
