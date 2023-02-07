@@ -676,9 +676,13 @@ int main() {
     // save_provinces(provinces); 
     // filename = find_file(files, provinces[0]);
 
-    for(State_transfer &trs : tr_states) {
-        trs.find_origin_states(states, tr_states);
+    for(int i {}; i < tr_states.size(); i++){
+        tr_states[i].find_origin_states(states, tr_states);
     }
+    
+    // for(State_transfer &trs : tr_states) {
+        // trs.find_origin_states(states, tr_states);
+    // }
 
     State Old_state(find_states(files[14], provinces[0]), files[14]);
     // provs_ratio = calculate_ratio(Old_state, provinces);

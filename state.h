@@ -164,6 +164,7 @@ public:
 class State_transfer : public State {
 // data
     double ratio; 
+    // bool origin_found{0};
     std::string origin{};
     std::vector<std::string> provs;
 
