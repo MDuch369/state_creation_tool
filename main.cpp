@@ -123,11 +123,14 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
                 if(line.find("create_state", 0) != std::string::npos) {
                     getline(src, line);
                     country = data(line, ':');
-                    getline(src, line);
-                    data_vector(provs, line, 6);
+                    while(getline(src, line)) {
+                        data_vector(provs, line, 6);
+                        if(line.find("}", 0) != std::string::npos){break;}
+                    }
                     states[cur].create_country(country, provs);
                     provs.clear();
                     getline(src, line);
+                    if(line.find("#", 0) != std::string::npos) {continue;}
                     if(line.find("state_type", 0) != std::string::npos) {
                         int pres{states[cur].getCountries().size() - 1};
                         states[cur].getCountries()[pres].setCountryType(data(line));
@@ -340,11 +343,11 @@ std::vector<State_transfer> new_state_info() {
     for(int i{}; i < num; i++) {
         std::cout << "Name of the state to be created number " << i + 1 << ": " << std::endl;
         std::cin >> name;
-        std::cout << std::endl;
+        // std::cout << std::endl;
         std::cout << "Id of the state to be created number " << i + 1 << ": " << std::endl;
         std::cin >> id;
-        std::cout << std::endl;
-        std::cout << "Provinces to transfer to state number " << i + 1 << ": " << std::endl;
+        // std::cout << std::endl;
+        std::cout << "Provinces to transfer to state number " << i + 1 << ": "/* << std::endl*/;
         std::getline(std::cin, provs);
         std::cout << std::endl;
         states.emplace_back(name, id, provs);
@@ -672,9 +675,6 @@ int main() {
     tr_states = new_state_info();
     // save_provinces(provinces); 
     // filename = find_file(files, provinces[0]);
-
-    // states[0].debug_print_provs();
-    // tr_states[0].debug_print_provs();
 
     for(State_transfer &trs : tr_states) {
         trs.find_origin_states(states, tr_states);

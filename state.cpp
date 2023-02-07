@@ -433,36 +433,37 @@ double State_transfer::calculate_ratio(const std::vector<std::string> &pr) {
     // double result{pr.size() / this->provs.size()};
     return pr.size() / this->provs.size();
 }
-void State_transfer::find_origin_states(const std::vector<State> &states, std::vector<State_transfer> &tr_st) {
+void State_transfer::find_origin_states(const std::vector<State> &states, std::vector<State_transfer> &tr_st) { //TODO refactor
     std::vector<std::string> p{}, diff_ori{};
-    bool state_end{0};
+    bool or_found{0}, state_end{0};
 
-    for(std::string &pr : this->provs) {
-        for(State st : states) {
-            int c{};
-            for(State::Country co : st.getCountries()) {
-                int o{};
-                for(std::string or_pr : co.getProvs()) {
+    for(State st : states) {
+        // int c{};
+        for(State::Country co : st.getCountries()) {
+            // int o{};
+            for(std::string or_pr : co.getProvs()) {
+                for(std::string &pr : this->provs) {
                     if(pr == or_pr) {
                         if(this->origin == ""){this->origin = st.getName();}
+                        // or_found = 1;
                         p.push_back(pr);
                         pr = ""; // find a better method to erase the entry
                     } 
-                    o++;
-                    if(o == co.getProvs().size()){
-                        this->create_country(co.getName(), p);
-                        p.clear();
-                    }
                 }
-                c++;
-                if(c == st.getCountries().size()) {
-                    state_end = 1;
-                    break;
-                }
+                // o++;
             }
-            if(state_end) {break;}
+            // if(o == co.getProvs().size())
+            if(p.empty() != true){
+                this->create_country(co.getName(), p);
+                p.clear();
+            }
+            // c++;
         }
-        if(state_end) {break;}
+        // if(c == st.getCountries().size() && or_found) {
+        //     state_end = 1;
+        //     break;
+        // }
+        // if(state_end) {break;}
     }
     this->provs.erase(std::remove(this->provs.begin(), this->provs.end(), ""), this->provs.end());
     if(this->provs.empty() != true) {
