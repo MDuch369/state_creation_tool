@@ -19,7 +19,7 @@ protected:
 
         public:
         // constructor
-         Pop(const std::string &, const std::string &, const std::string &, const int &);
+            Pop(const std::string &, const std::string &, const std::string &, const int &);
         // getters
             inline std::string getCult() {return culture;}
             inline std::string getRel() {return religion;}
@@ -55,10 +55,12 @@ protected:
 
     public:
     // constructors
-        Country(const std::string &, const std::vector<std::string> &);
         Country(const std::string &);
+        Country(const std::string &, const std::vector<std::string> &);
+        Country(const std::string &, const std::string &, const std::vector<std::string> &);
     // getters
         std::string getName(){return this->country;}
+        std::string getType(){return this->type;}
         std::vector<State::Country::Pop>& getPops(){return this->pops;}
         std::vector<State::Country::Building>& getBuilds(){return this->buildings;}
         std::vector<std::string> getProvs(){return this->provs;}
@@ -156,14 +158,14 @@ public:
    void setClaim(const std::string &);
 
 // debug functions
-    void debug_print_provs();
+    // void debug_print_provs();
 };
 
 /**** STATE TRANSFER CLASS ****/
 
 class State_transfer : public State {
 // data
-    double ratio; 
+    std::vector<double> ratio; 
     // bool origin_found{0};
     std::string origin{};
     std::vector<std::string> provs;
@@ -171,12 +173,15 @@ class State_transfer : public State {
 // Functions:
     double calculate_ratio(const std::vector<std::string> &); 
     unsigned int find_states(const std::string &, std::vector<State_transfer> &);
-public:
 
+public:
 // constructors
     State_transfer(const std::string &, const std::string &, const std::string &); // TODO replace this constructor with the one below
     State_transfer(const std::string &, const std::string &, const std::vector<std::string> &);  
     // State_transfer(const std::string &, const int &, const std::vector<std::string> &);
+
+// countries
+    State::Country create_transfer_country(State::Country &, std::vector<std::string> &, const double &);
 
 // getters
     inline std::vector<std::string> getProvs() {return this->provs;}

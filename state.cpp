@@ -119,8 +119,9 @@ State::Country::Pop::Pop(const std::string &cult, const std::string &rel, const 
     : culture{cult}, religion{rel}, type{t}, size{s} {}
 State::Country::Building::Building(const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pr) 
     : type{type}, /*region{reg}, dlc{dlc}, */prod{pr}, level{lvl}, reserves{res} {}
-State::Country::Country(const std::string &name, const std::vector<std::string> &pr) :country{name}, provs{pr} {}
 State::Country::Country(const std::string &name):country{name} {}
+State::Country::Country(const std::string &name, const std::vector<std::string> &pr) :country{name}, provs{pr} {}
+State::Country::Country(const std::string &name, const std::string &type, const std::vector<std::string> &pr) :country{name}, type {type}, provs{pr} {}
 
 // Countries
 void State::create_country(const std::string &name, std::vector<std::string> &pr) {
@@ -388,17 +389,17 @@ void State::setClaim(const std::string &claim) {this->claims.push_back(claim);}
 void State::Country::setCountryType(const std::string &type) {this->type = type;}
 
 // debug functions
-void State::debug_print_provs(){
-    std::ofstream  dst("provs_debug", std::ios::binary | std::ios::app);
-    for(State::Country co : this->getCountries()){
-        int i{};
-        for (char c : co.getProvs()[0]) {
-            dst << c;
-            i++;
-        }
-    dst << " " << i << std::endl;    
-    }
-}
+// void State::debug_print_provs(){
+//     std::ofstream  dst("provs_debug", std::ios::binary | std::ios::app);
+//     for(State::Country co : this->getCountries()){
+//         int i{};
+//         for (char c : co.getProvs()[0]) {
+//             dst << c;
+//             i++;
+//         }
+//     dst << " " << i << std::endl;    
+//     }
+// }
 
 /**** STATE TRANSFER CLASS ****/
 
@@ -428,12 +429,18 @@ State_transfer::State_transfer(const std::string &name, const std::string &id, c
 }
 
 // data calculating/copying
-double State_transfer::calculate_ratio(const std::vector<std::string> &pr) {
-    // double i{pr.size()}, j{this->provs.size()};
-    // double result{pr.size() / this->provs.size()};
-    return pr.size() / this->provs.size();
+State::Country State_transfer::create_transfer_country(State::Country &country, std::vector<std::string> &provs, const double &ratio) {
+    State::Country new_country(country.getName(), country.getType(), provs);
+    for(auto pop : country.getPops()) {
+        new_country.getPops().emplace_back(pop.getCult(), pop.getRel(), pop.getType(), pop.getSize() * ratio);
+    }
+    for(auto build : country.getBuilds()) {
+
+    }
+    return new_country;
 }
-void State_transfer::find_origin_states(const std::vector<State> &states, std::vector<State_transfer> &tr_st) { //TODO refactor
+
+void State_transfer::find_origin_states(const std::vector<State> &states, std::vector<State_transfer> &tr_st) { // ? refactor
     std::vector<std::string> p{}, diff_ori{};
     bool or_found{0}, state_end{0};
 
@@ -444,22 +451,23 @@ void State_transfer::find_origin_states(const std::vector<State> &states, std::v
                     if(or_pr == pr) {
                         if(this->origin == ""){
                             this->origin = st.getName();
-                            // this->origin_found = 1;    
                         }
                         or_found = 1;
                         p.push_back(pr);
-                        pr = ""; // find a better method to erase the entry
+                        pr = ""; // ? find a better method to erase the entry
                     } 
                 }
             }
             if(p.empty() != true){
-                this->create_country(co.getName(), p);
+                double ps{p.size()}, cs{co.getProvs().size()};// ? find a better method of calculating this
+                this->countries.push_back(create_transfer_country(co, p, ps/cs));
                 p.clear();
+                // this->ratio.push_back(ps/cs);
+                // for(auto pop : co.getPops()) {}
+                // std::vector<State::Country::Pop> ;
             }
         }
-        if(/*c == st.getCountries().size() && */or_found) {break;}
-        //     state_end = 1;
-        // if(state_end) {break;}
+        if(or_found) {break;}
     }
     this->provs.erase(std::remove(this->provs.begin(), this->provs.end(), ""), this->provs.end());
     if(this->provs.empty() != true) {
@@ -467,10 +475,9 @@ void State_transfer::find_origin_states(const std::vector<State> &states, std::v
             diff_ori.push_back(pr);
         }
         tr_st.emplace_back(this->name, this->id, diff_ori);
-        // tr_st.back().find_origin_states(states, tr_st);
     }
 }    
-    
+
     // ! TODO finish
 // unsigned int State_transfer::find_states(const std::string &path, std::vector<State_transfer> &states) {
 //     std::vector<std::string> diff_origin_st{};
