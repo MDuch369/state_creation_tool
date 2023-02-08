@@ -133,11 +133,13 @@ public:
     inline unsigned int getGold() {return gold;}
     inline unsigned int getDiscGold() {return disc_gold;}
     inline unsigned int getNavalExit() {return naval_exit;}
+    inline const unsigned int* getRes() {return res;}
     // inline std::vector<std::string> getProvs() {return provs;}
     inline std::vector<std::string> getTraits() {return traits;}
     inline std::vector<std::string> getResources() {return ar_res;}
     inline std::vector<std::string> getImProvs() {return im_provs;}            
     inline std::vector<std::string> getHomelands() {return homelands;}
+    inline std::vector<std::string> getClaims() {return claims;}
     inline std::vector<State::Country>& getCountries() {return countries;}
     inline State::Country& getCo(const int &i) {return countries[i];}
 
@@ -165,13 +167,13 @@ public:
 
 class State_transfer : public State {
 // data
-    std::vector<double> ratio; 
     // bool origin_found{0};
+    int origin_pos{};
     std::string origin{};
     std::vector<std::string> provs;
 
 // Functions:
-    double calculate_ratio(const std::vector<std::string> &); 
+    // double calculate_ratio(const std::vector<std::string> &); 
     unsigned int find_states(const std::string &, std::vector<State_transfer> &);
 
 public:
@@ -188,6 +190,7 @@ public:
 
 // transfer
     void find_origin_states(const std::vector<State> &, std::vector<State_transfer> &);
+    void calculate_resources(std::vector<State> &);
 
 // debug functions
     void debug_print_provs();

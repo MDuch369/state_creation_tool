@@ -435,7 +435,7 @@ State::Country State_transfer::create_transfer_country(State::Country &country, 
         new_country.getPops().emplace_back(pop.getCult(), pop.getRel(), pop.getType(), pop.getSize() * ratio);
     }
     for(auto build : country.getBuilds()) {
-
+        new_country.getBuilds().emplace_back(build.getType(), build.getLvl() * ratio, build.getRes(), build.getProd());
     }
     return new_country;
 }
@@ -468,6 +468,7 @@ void State_transfer::find_origin_states(const std::vector<State> &states, std::v
             }
         }
         if(or_found) {break;}
+        this->origin_pos++;
     }
     this->provs.erase(std::remove(this->provs.begin(), this->provs.end(), ""), this->provs.end());
     if(this->provs.empty() != true) {
@@ -477,6 +478,27 @@ void State_transfer::find_origin_states(const std::vector<State> &states, std::v
         tr_st.emplace_back(this->name, this->id, diff_ori);
     }
 }    
+void State_transfer::calculate_resources(std::vector<State> &states) {
+    int origin_provs{}, provs{};
+    double ratio{};
+    State origin{states[this->origin_pos]};
+    this->homelands = origin.getHomelands();
+    this->claims = origin.getClaims();
+    this->traits = origin.getTraits();
+    this->ar_res = origin.getResources();
+    this->naval_exit = origin.getNavalExit();
+    for(State::Country co : origin.getCountries()) {
+        origin_provs += co.getProvs().size();
+    }
+    for(State::Country co : this->getCountries()) {
+        provs += co.getProvs().size();
+    }
+    ratio = provs/origin_provs;
+    this->ar_land = origin.getLand() * ratio;
+    for(int i{}; i < 10; i++) {
+        this->res[i] = origin.getRes()[i] * ratio;
+    }
+}
 
     // ! TODO finish
 // unsigned int State_transfer::find_states(const std::string &path, std::vector<State_transfer> &states) {

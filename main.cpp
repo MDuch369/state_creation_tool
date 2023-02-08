@@ -679,7 +679,9 @@ int main() {
     for(int i {}; i < tr_states.size(); i++){
         tr_states[i].find_origin_states(states, tr_states);
     }
-    
+    for(int i {}; i < tr_states.size(); i++){
+        tr_states[i].calculate_resources(states);
+    }
     // for(State_transfer &trs : tr_states) {
         // trs.find_origin_states(states, tr_states);
     // }
