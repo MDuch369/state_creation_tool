@@ -164,7 +164,7 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
         std::ifstream  src(file, std::ios::binary);
         while(getline(src, line)) {
             if(line.find("STATE", 0) != std::string::npos) {
-                int cap_res[10]{};
+                int cap_res[11]{};
                 std::string name{data_name(line)}; 
                 getline(src, line);
                 std::string id{data(line)};
@@ -180,32 +180,32 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
                 // ! TODO implement copying of hubs here
                 while(getline(src, line)) { if(line.find("arable_land", 0) != std::string::npos) {break;} }
                 int ar_land{};
-                ar_land = data_int(line);
+                cap_res[0] = data_int(line);
                 getline(src, line);
                 std::vector<std::string> ar_res{};
                 variable_string_vector(ar_res, line);
                 getline(src, line);
                 while(getline(src, line)){
-                    if(line.find("bg_coal_mining", 0) != std::string::npos){cap_res[0] = data_int(line);}
-                    if(line.find("bg_iron_mining", 0) != std::string::npos){cap_res[1] = data_int(line);}
-                    if(line.find("bg_sulfur_mining", 0) != std::string::npos){cap_res[2] = data_int(line);}
-                    if(line.find("bg_logging", 0) != std::string::npos){cap_res[3] = data_int(line);}
-                    if(line.find("bg_whaling", 0) != std::string::npos){cap_res[4] = data_int(line);}
-                    if(line.find("bg_fishing", 0) != std::string::npos){cap_res[5] = data_int(line);}
+                    if(line.find("bg_coal_mining", 0) != std::string::npos){cap_res[1] = data_int(line);}
+                    if(line.find("bg_iron_mining", 0) != std::string::npos){cap_res[2] = data_int(line);}
+                    if(line.find("bg_sulfur_mining", 0) != std::string::npos){cap_res[3] = data_int(line);}
+                    if(line.find("bg_logging", 0) != std::string::npos){cap_res[4] = data_int(line);}
+                    if(line.find("bg_whaling", 0) != std::string::npos){cap_res[5] = data_int(line);}
+                    if(line.find("bg_fishing", 0) != std::string::npos){cap_res[6] = data_int(line);}
                     if(line.find("bg_gold_fields", 0) != std::string::npos){
                         getline(src, line);
                         getline(src, line);
-                        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[6] = data_int(line);}
+                        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[7] = data_int(line);}
                         getline(src, line);
-                        if(line.find("discovered_amount", 0) != std::string::npos) {cap_res[7] = data_int(line);}
+                        if(line.find("discovered_amount", 0) != std::string::npos) {cap_res[8] = data_int(line);}
                     }
                     if(line.find("bg_rubber", 0) != std::string::npos){
                         getline(src, line);
-                        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[8] = data_int(line);}
+                        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[9] = data_int(line);}
                     }
                     if(line.find("bg_oil_extraction", 0) != std::string::npos) {
                         getline(src, line);
-                        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[9] = data_int(line);}
+                        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[10] = data_int(line);}
                     }
                     // getline(src, line);
                     if(line.find("naval_exit_id", 0) != std::string::npos) {std::string nav_ex{data(line)};}
@@ -678,10 +678,13 @@ int main() {
 
     for(int i {}; i < tr_states.size(); i++){tr_states[i].find_origin_states(states, tr_states);}
     for(int i {}; i < tr_states.size(); i++){tr_states[i].calculate_resources(states);}
-    for(int i {}; i < tr_states.size(); i++){tr_states[i].create_target_states(tar_states);}
-    for(int i {}; i < tr_states.size(); i++){}
-    
-    State Old_state(find_states(files[14], provinces[0]), files[14]);
+    for(int i {}; i < tr_states.size(); i++){
+        tr_states[i].create_target_states(tar_states);
+        }
+    for(int i {}; i < tr_states.size(); i++){tr_states[i].create_remaining_states(remaining_states, states);}
+    for(int i {}; i < tr_states.size(); i++){tr_states[i].calculate_remaining_resources(remaining_states);}
+
+    // State Old_state(find_states(files[14], provinces[0]), files[14]);
     // provs_ratio = calculate_ratio(Old_state, provinces);
     // Old_state.create_pops("input/pops/" + filename);
     // Old_state.create_buildings("input/buildings/" + filename);

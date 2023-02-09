@@ -363,7 +363,7 @@ void State::setTraits(const std::vector<std::string> &t){this->traits = t;}
 void State::setHubs(const std::string h[5]){for(int i{}; i < 5; i++) {this->hubs[i] = h[i];} }
 void State::setLand(const int &l){this->ar_land = l;}
 void State::setArRes(const std::vector<std::string> &r) {this->ar_res = r;}
-void State::setRes(const int r[10]){ for(int i{}; i < 10; i++) {this->res[i] = r[i];} }
+void State::setRes(const int r[11]){ for(int i{}; i < 11; i++) {this->res[i] = r[i];} }
 // void State::setProvs(const std::vector<std::string> &p) {this->provs = p;}
 // void State::setProv(const int &i, const std::string &s) {this->provs[i] = s;}
 // void State::setPopSize(const int &i, const int &size) {this->pops[i].setSize(size);}
@@ -497,8 +497,8 @@ void State_transfer::calculate_resources(std::vector<State> &states) {
         provs += co.getProvs().size();
     }
     ratio = provs/origin_provs;
-    this->ar_land = origin.getLand() * ratio;
-    for(int i{}; i < 10; i++) {
+    // this->ar_land = origin.getLand() * ratio;
+    for(int i{}; i < 11; i++) {
         this->res[i] = origin.getRes()[i] * ratio;
     }
 }
@@ -506,63 +506,111 @@ void State_transfer::create_target_states(std::vector<State_transfer> &target_st
     bool target{};
     // State_transfer trs{*this};
     if (target_st.empty()) {target_st.emplace_back(*this);} // ! TODO finish the constructor
-    for(State st : target_st) {
-        if(st.getName() == this->getName()) {
-            for(State::Country co : this->getCountries()) { // country copying
-                for(State::Country tar_co : st.getCountries()) {
-                    if(co.getName() == tar_co.getName()) {
-                        for(std::string prov : co.getProvs()) { // prov copying
-                            bool present{};
-                            for(std::string tar_prov : tar_co.getProvs()) {
-                                if(prov == tar_prov) {
-                                    present = 1;
-                                    break;
+    else {
+        for(State& st : target_st) {
+            if(st.getName() == this->getName()) {
+                for(State::Country co : this->getCountries()) { // country copying
+                    for(State::Country& tar_co : st.getCountries()) {
+                        if(co.getName() == tar_co.getName()) {
+                            for(std::string prov : co.getProvs()) { // prov copying
+                                bool present;
+                                present = 0;
+                                for(std::string tar_prov : tar_co.getProvs()) {
+                                    if(prov == tar_prov) {
+                                        present = 1;
+                                        break;
+                                    }
                                 }
+                                if(!present){
+                                    tar_co.getProvs().push_back(prov);
+                                } 
                             }
-                           if(!present){tar_co.getProvs().push_back(prov);} 
-                        }
-                        for(auto pop : co.getPops()) { // pop copying
-                            bool present{};
-                            for(auto tar_pop : tar_co.getPops()) {
-                                if(pop.getCult() == tar_pop.getCult() && pop.getRel() == tar_pop.getRel()) {
-                                    tar_pop.setSize(tar_pop.getSize() + pop.getSize()); // TODO refactor using operator overlading
-                                    present = 1;
-                                    break;
+                            for(auto pop : co.getPops()) { // pop copying
+                                bool present{};
+                                for(auto tar_pop : tar_co.getPops()) {
+                                    if(pop.getCult() == tar_pop.getCult() && pop.getRel() == tar_pop.getRel()) {
+                                        tar_pop.setSize(tar_pop.getSize() + pop.getSize()); // TODO refactor using operator overlading
+                                        present = 1;
+                                        break;
+                                    }
                                 }
+                                if(!present){tar_co.getPops().push_back(pop);}
                             }
-                            if(!present){tar_co.getPops().push_back(pop);}
-                        }
-                        for(auto build : co.getBuilds()) { // building copying
-                            bool present{};
-                            for(auto tar_build : tar_co.getBuilds()) {
-                                if(build.getType() == tar_build.getType()) {
-                                    tar_build.setLvl(tar_build.getLvl() + build.getLvl()); // TODO refactor using operator overlading
-                                    present = 1;
-                                    break;
+                            for(auto build : co.getBuilds()) { // building copying
+                                bool present{};
+                                for(auto tar_build : tar_co.getBuilds()) {
+                                    if(build.getType() == tar_build.getType()) {
+                                        tar_build.setLvl(tar_build.getLvl() + build.getLvl()); // TODO refactor using operator overlading
+                                        present = 1;
+                                        break;
+                                    }
                                 }
+                                if(!present){tar_co.getBuilds().push_back(build);}
                             }
-                            if(!present){tar_co.getBuilds().push_back(build);}
                         }
                     }
-                }
+                } 
+                // st.setArable(st.getLand() + this->getLand()); // TODO refactor using operator overloading
+                int res[11]{};
+                for(int i{}; i < 11; i++) {res[i] = st.getRes()[i] + this->getRes()[i];}
+                st.setRes(res);
+                target = 1;
+                break;
             }
-            st.setArable(st.getLand() + this->getLand()); // TODO refactor using operator overloading
-            int res[10]{};
-            for(int i{}; i < 10; i++) {res[i] = st.getRes()[i] + this->getRes()[i];}
-            st.setRes(res);
-            target = 1;
-            break;
         }
     }
     if (!target) {target_st.emplace_back(*this);} // ! TODO finish the constructor
 }
-void State_transfer::calculate_remaining_resources(std::vector<State> &rem_st, std::vector<State> &ori_st) {
-    if (rem_st.empty()) {rem_st.emplace_back(ori_st[this->origin_pos]);}
+void State_transfer::create_remaining_states(std::vector<State> &rem_st, std::vector<State> &ori_st){ // ? merge with calculate_remaining_resources
+    bool found{};
     for(State st : rem_st) {
-        if(this->origin == st.getName()) {
-            // TODO subtract transfer state from origin
+        if (st.getName() == this->getName()) {
+            found = 1;
+            break;
         }
-        
+    }
+    if(!found) {rem_st.emplace_back(ori_st[this->origin_pos]);}
+}
+void State_transfer::calculate_remaining_resources(std::vector<State> &rem_st/*, std::vector<State> &ori_st*/) {
+    for(State& st : rem_st) {
+        if(this->origin == st.getName()) {
+            for(State::Country& co : st.getCountries()) { // country subtracting
+                for(State::Country tr_co : this->getCountries()) {
+                    if(co.getName() == tr_co.getName()) {
+                        for(std::string& prov : co.getProvs()) { // prov subtracting
+                            for(std::string tr_prov : tr_co.getProvs()) {
+                                if(prov == tr_prov) { // ? TODO refactor using operator overlading
+                                    prov = ""; // TODO erase empty provinces
+                                    break;
+                                }
+                            }
+                        }
+
+                        for(auto pop : co.getPops()) { // pop subtracting
+                            for(auto tr_pop : tr_co.getPops()) {
+                                if(pop.getCult() == tr_pop.getCult() && pop.getRel() == tr_pop.getRel()) {
+                                    pop.setSize(pop.getSize() - tr_pop.getSize()); // TODO refactor using operator overlading
+                                    break;
+                                }    
+                            }
+                        }
+                        for(auto build : co.getBuilds()) { // building subtracting
+                            bool present{};
+                            for(auto tr_build : tr_co.getBuilds()) {
+                                if(build.getType() == tr_build.getType()) {
+                                    build.setLvl(build.getLvl() - tr_build.getLvl()); // TODO refactor using operator overlading
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            int res[11]{};
+            for(int i{}; i < 11; i++) {res[i] = st.getRes()[i] - this->getRes()[i];}
+            st.setRes(res);
+            break;
+        }
     }
 }
 
@@ -597,12 +645,12 @@ void State_transfer::calculate_remaining_resources(std::vector<State> &rem_st, s
 // State::State(State_transfer &trs) :name{trs.getName()}, id{trs.getId()}, traits{trs.getTraits()}, ar_res{trs.getResources()}, homelands{trs.getHomelands()},  claims{trs.getClaims()}, sub{trs.getSub()}, ar_land{trs.getLand()}, res{*trs.getRes()}, countries{trs.getCountries()} {}
 
 // debug functions
-void State_transfer::debug_print_provs() {
-    std::ofstream  dst("provs_debug", std::ios::binary | std::ios::app);
-    int i{};
-    for (char c : this->getProvs()[0]) {
-        dst << c;
-        i++;
-    }
-    dst << " " << i << std::endl;
-}
+// void State_transfer::debug_print_provs() {
+//     std::ofstream  dst("provs_debug", std::ios::binary | std::ios::app);
+//     int i{};
+//     for (char c : this->getProvs()[0]) {
+//         dst << c;
+//         i++;
+//     }
+//     dst << " " << i << std::endl;
+// }

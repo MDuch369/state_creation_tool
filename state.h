@@ -63,7 +63,7 @@ protected:
         std::string getType(){return this->type;}
         std::vector<State::Country::Pop>& getPops(){return this->pops;}
         std::vector<State::Country::Building>& getBuilds(){return this->buildings;}
-        std::vector<std::string> getProvs(){return this->provs;}
+        std::vector<std::string> &getProvs(){return this->provs;}
     // setters
         void setCountryType(const std::string &);
     };
@@ -71,8 +71,9 @@ protected:
 //data 
     std::vector<State::Country> countries{};
     std::vector<std::string> /*provs, */traits, ar_res, im_provs{}, homelands{}, claims{};
-    std::string id, name, hubs[5]{}, file_name, sub, city, port{}, farm, mine{}, wood{};
-    unsigned int ar_land, res[10]{}/*, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}*/, naval_exit{};
+    std::string id, name, hubs[5]{}, file_name, sub, /*city, port{}, farm, mine{}, wood{}, */naval_exit{};
+    unsigned int ar_land, res[11]{}/*, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{}*/;
+    // res = 0-arable land, 1-coal, 2-iron, 3-sulfur, 4-logging, 5-whaling, 6-fishing, 7-gold, 8-disc. gold, 9-rubber, 10-oil
 // Functions:
 
 public:
@@ -115,11 +116,11 @@ public:
 // getters
     inline std::string getName() {return name;}
     inline std::string getSub() {return sub;}
-    inline std::string getCity() {return city;}
+    /*inline std::string getCity() {return city;}
     inline std::string getPort() {return port;}
     inline std::string getFarm() {return farm;}
     inline std::string getMine() {return mine;}
-    inline std::string getWood() {return wood;}
+    inline std::string getWood() {return wood;}*/
     inline std::string getId() {return id;}
     inline unsigned int getLand() {return ar_land;}
     /*inline unsigned int getCoal() {return coal;}
@@ -133,7 +134,7 @@ public:
     inline unsigned int getRubber() {return rubber;}
     inline unsigned int getGold() {return gold;}
     inline unsigned int getDiscGold() {return disc_gold;} */
-    inline unsigned int getNavalExit() {return naval_exit;}
+    inline std::string getNavalExit() {return naval_exit;}
     inline const unsigned int* getRes() {return res;}
     // inline std::vector<std::string> getProvs() {return provs;}
     inline std::vector<std::string> getTraits() {return traits;}
@@ -152,7 +153,7 @@ public:
    void setHubs(const std::string [5]);
    void setLand(const int &);
    void setArRes(const std::vector<std::string> &);
-   void setRes(const int [10]);
+   void setRes(const int [11]);
    void setProvs(const std::vector<std::string> &);
    void setProv(const int &, const std::string &);
    void setPopSize(const int &, const int &);
@@ -194,7 +195,8 @@ public:
     void find_origin_states(const std::vector<State> &, std::vector<State_transfer> &);
     void calculate_resources(std::vector<State> &);
     void create_target_states(std::vector<State_transfer> &/*, std::vector<State> &*/);
-    void calculate_remaining_resources(std::vector<State> &, std::vector<State> &);
+    void create_remaining_states(std::vector<State> &, std::vector<State> &);
+    void calculate_remaining_resources(std::vector<State> &/*, std::vector<State> &*/);
 
 // debug functions
     void debug_print_provs();
