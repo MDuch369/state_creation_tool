@@ -678,9 +678,7 @@ int main() {
 
     for(int i {}; i < tr_states.size(); i++){tr_states[i].find_origin_states(states, tr_states);}
     for(int i {}; i < tr_states.size(); i++){tr_states[i].calculate_resources(states);}
-    for(int i {}; i < tr_states.size(); i++){
-        tr_states[i].create_target_states(tar_states);
-        }
+    for(int i {}; i < tr_states.size(); i++){tr_states[i].create_target_states(tar_states);}
     for(int i {}; i < tr_states.size(); i++){tr_states[i].create_remaining_states(remaining_states, states);}
     for(int i {}; i < tr_states.size(); i++){tr_states[i].calculate_remaining_resources(remaining_states);}
 
