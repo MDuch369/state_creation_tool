@@ -6,7 +6,6 @@
 #include <sstream>
 #include <fstream>
 #include <filesystem> 
-
 class State {
 //sublcasses
 protected:
@@ -45,6 +44,7 @@ protected:
             inline int getLvl() {return level;}
             inline int getRes() {return reserves;}        
         // setters
+            void setLvl(const int &);
         };
 
     // data
@@ -72,7 +72,7 @@ protected:
     std::vector<State::Country> countries{};
     std::vector<std::string> /*provs, */traits, ar_res, im_provs{}, homelands{}, claims{};
     std::string id, name, hubs[5]{}, file_name, sub, city, port{}, farm, mine{}, wood{};
-    unsigned int ar_land, res[10]{}, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{};
+    unsigned int ar_land, res[10]{}/*, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}*/, naval_exit{};
 // Functions:
 
 public:
@@ -82,6 +82,7 @@ public:
     State(const unsigned int &, const std::string &);
     State(const unsigned int[]);
     State(const std::string &);
+    // State(State_transfer &);
 
 // countries
     void create_country(const std::string &, std::vector<std::string> &);
@@ -121,7 +122,7 @@ public:
     inline std::string getWood() {return wood;}
     inline std::string getId() {return id;}
     inline unsigned int getLand() {return ar_land;}
-    inline unsigned int getCoal() {return coal;}
+    /*inline unsigned int getCoal() {return coal;}
     inline unsigned int getIron() {return iron;}
     inline unsigned int getLead() {return lead;}
     inline unsigned int getSulfur() {return sulfur;}
@@ -131,7 +132,7 @@ public:
     inline unsigned int getOil() {return oil;}
     inline unsigned int getRubber() {return rubber;}
     inline unsigned int getGold() {return gold;}
-    inline unsigned int getDiscGold() {return disc_gold;}
+    inline unsigned int getDiscGold() {return disc_gold;} */
     inline unsigned int getNavalExit() {return naval_exit;}
     inline const unsigned int* getRes() {return res;}
     // inline std::vector<std::string> getProvs() {return provs;}
@@ -158,6 +159,7 @@ public:
    // void setResources(const std::vector<std::string> &);
    void setHomeland(const std::string &);
    void setClaim(const std::string &);
+   void setArable(const int &);
 
 // debug functions
     // void debug_print_provs();
@@ -191,6 +193,8 @@ public:
 // transfer
     void find_origin_states(const std::vector<State> &, std::vector<State_transfer> &);
     void calculate_resources(std::vector<State> &);
+    void create_target_states(std::vector<State_transfer> &/*, std::vector<State> &*/);
+    void calculate_remaining_resources(std::vector<State> &, std::vector<State> &);
 
 // debug functions
     void debug_print_provs();

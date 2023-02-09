@@ -656,10 +656,10 @@ void debug_print_file_list(const std::filesystem::path *files) {
 
 int main() {
 // variables
-    std::vector<State> states{};
+    std::vector<State> states{}, remaining_states{};
     std::filesystem::path files[15], input{}, output{}, test[15];
     std::vector<std::string> provinces{};
-    std::vector<State_transfer> tr_states{};
+    std::vector<State_transfer> tr_states{}, tar_states{};
     std::string filename,/*path{"input/files"},*/ new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
     int new_state_id{/*666*/}; 
     double provs_ratio; // TODO for next version change this to be member of state class
@@ -676,16 +676,11 @@ int main() {
     // save_provinces(provinces); 
     // filename = find_file(files, provinces[0]);
 
-    for(int i {}; i < tr_states.size(); i++){
-        tr_states[i].find_origin_states(states, tr_states);
-    }
-    for(int i {}; i < tr_states.size(); i++){
-        tr_states[i].calculate_resources(states);
-    }
-    // for(State_transfer &trs : tr_states) {
-        // trs.find_origin_states(states, tr_states);
-    // }
-
+    for(int i {}; i < tr_states.size(); i++){tr_states[i].find_origin_states(states, tr_states);}
+    for(int i {}; i < tr_states.size(); i++){tr_states[i].calculate_resources(states);}
+    for(int i {}; i < tr_states.size(); i++){tr_states[i].create_target_states(tar_states);}
+    for(int i {}; i < tr_states.size(); i++){}
+    
     State Old_state(find_states(files[14], provinces[0]), files[14]);
     // provs_ratio = calculate_ratio(Old_state, provinces);
     // Old_state.create_pops("input/pops/" + filename);
