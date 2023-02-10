@@ -360,7 +360,7 @@ void State::setTraits(const std::vector<std::string> &t){this->traits = t;}
 void State::setHubs(const std::string h[5]){for(int i{}; i < 5; i++) {this->hubs[i] = h[i];} }
 // void State::setLand(const int &l){this->ar_land = l;}
 void State::setArRes(const std::vector<std::string> &r) {this->ar_res = r;}
-void State::setRes(const int r[11]){ for(int i{}; i < 11; i++) {this->res[i] = r[i];} }
+void State::setRes(const int r[/*12*/]){ for(int i{}; i < 12; i++) {this->res[i] = r[i];} }
 // void State::setProvs(const std::vector<std::string> &p) {this->provs = p;}
 // void State::setProv(const int &i, const std::string &s) {this->provs[i] = s;}
 // void State::setPopSize(const int &i, const int &size) {this->pops[i].setSize(size);}
@@ -385,6 +385,7 @@ void State::setHomeland(const std::string &home) {this->homelands.push_back(home
 void State::setClaim(const std::string &claim) {this->claims.push_back(claim);}
 // void State::setArable(const int &ar) { this->ar_land = ar;}
 void State::Country::setCountryType(const std::string &type) {this->type = type;}
+void State::setNavEx(const std::string &nx){this->naval_exit = nx;}
 
 // debug functions
 // void State::debug_print_provs(){
@@ -541,7 +542,7 @@ void State_transfer::create_target_states(std::vector<State_transfer> &target_st
                         }
                     }
                 } 
-                int res[11]{};
+                int res[12]{};
                 for(int i{}; i < 11; i++) {res[i] = st.getRes()[i] + this->getRes()[i];}
                 st.setRes(res);
                 target = 1;
@@ -598,7 +599,7 @@ void State_transfer::calculate_remaining_resources(std::vector<State> &rem_st/*,
                 }
                 co.getProvs().erase(std::remove(co.getProvs().begin(), co.getProvs().end(), ""), co.getProvs().end());
             }
-            int res[11]{};
+            int res[/*st.getRes().size()*/12]{};
             for(int i{}; i < 11; i++) {res[i] = st.getRes()[i] - this->getRes()[i];}
             st.setRes(res);
             break;

@@ -161,6 +161,7 @@ public:
    void setHomeland(const std::string &);
    void setClaim(const std::string &);
    void setArable(const int &);
+   void setNavEx(const std::string &);
 
 // debug functions
     // void debug_print_provs();
