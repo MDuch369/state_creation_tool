@@ -234,32 +234,49 @@ void State::print_state_region(){ // DONE
     for (State::Country co : this->getCountries()) {
         for (std::string prov : co.getProvs()) {dst << "\"x" << prov << "\" ";}
     }
-    dst << "}" << std::endl 
-        << "\ttraits = { "; 
-    for (std::string s : this->traits) {dst << "\"" << s << "\" ";}
-    dst << "}" << std::endl 
-        << "\tcity = " << this->hubs[0] << std::endl;
+    dst << "}" << std::endl; 
+    if (this->traits.empty() != true) {
+        dst << "\ttraits = { "; 
+        for (std::string s : this->traits) {dst << "\"" << s << "\" ";}
+        dst << "}" << std::endl; 
+    }
+    dst << "\tcity = " << this->hubs[0] << std::endl;
     if(this->hubs[1] != "") {dst<< "\tport = " << this->hubs[1] << std::endl;}
     dst << "\tfarm = " << this->hubs[2] << std::endl
         << "\tmine = " << this->hubs[3] << std::endl
         << "\twood = " << this->hubs[4] << std::endl
-        << "\tarable_land = " << this->res << std::endl
+        << "\tarable_land = " << this->res[0] << std::endl
         << "\tarable_resources = { ";
     for (std::string s : this->ar_res) {dst << "\"" << s << "\" ";} 
     dst << "}" << std::endl
-        << "\tcapped = {" << std::endl;
-    if(this->res[1] != 0) {dst << "\t\tbg_iron_mining = " << this->res[1] << std::endl; }
-    if(this->res[2] != 0) {dst << "\t\tbg_coal_mining = " << this->res[2] << std::endl; }
+        << "\tcapped_resources = {" << std::endl;
+    if(this->res[1] != 0) {dst << "\t\tbg_coal_mining = " << this->res[1] << std::endl; }
+    if(this->res[2] != 0) {dst << "\t\tbg_iron_mining = " << this->res[2] << std::endl; }
     if(this->res[3] != 0) {dst << "\t\tbg_lead_mining = " << this->res[3] << std::endl; }
     if(this->res[4] != 0) {dst << "\t\tbg_sulfur_mining = " << this->res[4] << std::endl; }
     if(this->res[5] != 0) {dst << "\t\tbg_logging = " << this->res[5] << std::endl; }
     if(this->res[6] != 0) {dst << "\t\tbg_fishing = " << this->res[6] << std::endl; }
     if(this->res[7] != 0) {dst << "\t\tbg_whaling = " << this->res[7] << std::endl; }
-    if(this->res[8] != 0) {dst << "\t\tbg_oil_extraction = " << this->res[8] << std::endl; }
-    if(this->res[9] != 0) {dst << "\t\tbg_logging = " << this->res[9] << std::endl; }
-    if(this->res[10] != 0) {dst << "\t\tbg_gold_mining = " << this->res[10] << std::endl; }
-    if(this->res[11] != 0) {dst << "\t\tbg_whaling = " << this->res[11] << std::endl; }
     dst << "\t}" << std::endl;
+    if(this->res[8] != 0) {
+        dst << "\tresource = {" << std::endl << "depleted_type = \"bg_gold_mining\"" << std::endl
+            << "\t\ttype = \"bg_gold_fields\"" << std::endl
+            << "\t\tundiscovered_amount =" << this->res[8] << std::endl;
+        if(this->res[9] != 0) {dst << "\t\tdiscovered_amount = " << this->res[9] << std::endl;}
+        dst << "\t}" << std::endl;
+    }
+    if(this->res[10] != 0) {
+        dst << "\tresource = {" << std::endl
+            << "\t\ttype = \"bg_rubber\"" << std::endl
+            << "\t\tundiscovered_amount =" << this->res[10] << std::endl;
+        dst << "\t}" << std::endl;
+    }
+    if(this->res[11] != 0) {
+        dst << "\tresource = {" << std::endl
+            << "\t\ttype = \"bg_oil_extraction\"" << std::endl
+            << "\t\tundiscovered_amount =" << this->res[11] << std::endl;
+        dst << "\t}" << std::endl;
+    }
     if(this->naval_exit != "") {dst << "\tnaval_exit_id = " << this->naval_exit << std::endl;}
     dst << "}" << std::endl << std::endl;
 }
@@ -285,14 +302,16 @@ void State::print_buildings(){ // DONE
     // int size{this->buildings.size()};
     dst << "\ts:" << this->name << " = {" << std::endl;
     for(State::Country co : this->getCountries()) {
+        if(co.getBuilds().empty()) {continue;}
         dst << "\t\tregion_state:" << co.getName() << " = {" << std::endl;
         for(auto build : co.getBuilds()) {
+            if(build.getLvl() == 0) {continue;}
             dst << "\t\t\tcreate_building = {" << std::endl;
             dst << "\t\t\t\tbuilding = " << build.getType() << std::endl;
             dst << "\t\t\t\tlevel = " << build.getLvl() << std::endl;
             dst << "\t\t\t\treserves = " << build.getRes() << std::endl;
             dst << "\t\t\t\tactivate_production_methods = { ";
-            for(std::string prod : build.getProd()) {dst << prod << " ";}
+            for(std::string prod : build.getProd()) {dst << "\"" << prod << "\" ";}
             dst << "} " << std::endl << "\t\t\t}" << std::endl;
         }
         dst << "\t\t}" << std::endl;
@@ -322,10 +341,8 @@ void State::print_state() { // DONE
             << "\t\t\tcountry = c:" << co.getName() << std::endl
             << "\t\t\towned_provinces = { ";
         for(std::string s : co.getProvs()) {dst << s << " ";}
-        dst << "\t\t\t}" << std::endl;
+        dst << "}" << std::endl << "\t\t}" << std::endl;
     }
-    dst << "}" << std::endl
-        <<  "\t\t}" << std::endl;
     for(std::string t : this->homelands) {
         dst << "\t\tadd_homeland = " << t << std::endl;
     }
@@ -341,7 +358,7 @@ void State::setId(const std::string &i) {this->id = i;}
 void State::setSub(const std::string &s){this->sub = s;}
 void State::setTraits(const std::vector<std::string> &t){this->traits = t;}
 void State::setHubs(const std::string h[5]){for(int i{}; i < 5; i++) {this->hubs[i] = h[i];} }
-void State::setLand(const int &l){this->ar_land = l;}
+// void State::setLand(const int &l){this->ar_land = l;}
 void State::setArRes(const std::vector<std::string> &r) {this->ar_res = r;}
 void State::setRes(const int r[11]){ for(int i{}; i < 11; i++) {this->res[i] = r[i];} }
 // void State::setProvs(const std::vector<std::string> &p) {this->provs = p;}
@@ -366,7 +383,7 @@ void State::Country::Building::setLvl(const int &level) {this->level = level;}
 // }
 void State::setHomeland(const std::string &home) {this->homelands.push_back(home);}
 void State::setClaim(const std::string &claim) {this->claims.push_back(claim);}
-void State::setArable(const int &ar) { this->ar_land = ar;}
+// void State::setArable(const int &ar) { this->ar_land = ar;}
 void State::Country::setCountryType(const std::string &type) {this->type = type;}
 
 // debug functions
@@ -396,14 +413,14 @@ State_transfer::State_transfer(const std::string &name, const std::string &id, c
     std::stringstream ss(prov);
     while(getline(ss, tmp, 'X')){
         if(tmp != "") {
-        this->provs.push_back(tmp);
+        this->transfer_provs.push_back(tmp);
         }
     }
 }
 State_transfer::State_transfer(const std::string &name, const std::string &id, const std::vector<std::string> &provs) {
     this->name = name;
     this->id = id;
-    this->provs = provs;
+    this->transfer_provs = provs;
 }
 
 // data calculating/copying
@@ -424,8 +441,8 @@ void State_transfer::find_origin_states(const std::vector<State> &states, std::v
     for(State st : states) {
         for(State::Country co : st.getCountries()) {
             for(std::string or_pr : co.getProvs()) {
-                for(std::string &pr : this->provs) {
-                    if(or_pr == pr) {
+                for(std::string &pr : this->transfer_provs) { 
+                    if(or_pr == pr) { // moves found provs into [p]rovince vector
                         if(this->origin == ""){
                             this->origin = st.getName();
                         }
@@ -435,7 +452,7 @@ void State_transfer::find_origin_states(const std::vector<State> &states, std::v
                     } 
                 }
             }
-            if(p.empty() != true){
+            if(p.empty() != true){ // creates new transfer country from [p]rovince vector
                 double ps{p.size()}, cs{co.getProvs().size()};// ? find a better method of calculating this
                 this->countries.push_back(create_transfer_country(co, p, ps/cs));
                 p.clear();
@@ -447,9 +464,9 @@ void State_transfer::find_origin_states(const std::vector<State> &states, std::v
         if(or_found) {break;}
         this->origin_pos++;
     }
-    this->provs.erase(std::remove(this->provs.begin(), this->provs.end(), ""), this->provs.end());
-    if(this->provs.empty() != true) {
-        for(std::string pr : this->provs) {
+    this->transfer_provs.erase(std::remove(this->transfer_provs.begin(), this->transfer_provs.end(), ""), this->transfer_provs.end());
+    if(this->transfer_provs.empty() != true) { // creates another transfer state if this one still has provs left
+        for(std::string pr : this->transfer_provs) {
             diff_ori.push_back(pr);
         }
         tr_st.emplace_back(this->name, this->id, diff_ori);
@@ -462,6 +479,7 @@ void State_transfer::calculate_resources(std::vector<State> &states) {
     this->homelands = origin.getHomelands();
     this->claims = origin.getClaims();
     this->traits = origin.getTraits();
+    this->sub = origin.getSub();
     this->ar_res = origin.getResources();
     this->naval_exit = origin.getNavalExit();
     for(State::Country co : origin.getCountries()) {
@@ -471,7 +489,6 @@ void State_transfer::calculate_resources(std::vector<State> &states) {
         provs += co.getProvs().size();
     }
     ratio = provs/origin_provs;
-    // this->ar_land = origin.getLand() * ratio;
     for(int i{}; i < 11; i++) {
         this->res[i] = origin.getRes()[i] * ratio;
     }
@@ -479,8 +496,8 @@ void State_transfer::calculate_resources(std::vector<State> &states) {
 void State_transfer::create_target_states(std::vector<State_transfer> &target_st/*, std::vector<State> &origin_st*/) {
     bool target{};
     // State_transfer trs{*this};
-    if (target_st.empty()) {target_st.emplace_back(*this);} // ! TODO finish the constructor
-    else {
+    // if (target_st.empty()) {target_st.emplace_back(*this);} 
+    // else {
         for(State& st : target_st) {
             if(st.getName() == this->getName()) {
                 for(State::Country co : this->getCountries()) { // country copying
@@ -524,7 +541,6 @@ void State_transfer::create_target_states(std::vector<State_transfer> &target_st
                         }
                     }
                 } 
-                // st.setArable(st.getLand() + this->getLand()); // TODO refactor using operator overloading
                 int res[11]{};
                 for(int i{}; i < 11; i++) {res[i] = st.getRes()[i] + this->getRes()[i];}
                 st.setRes(res);
@@ -532,8 +548,8 @@ void State_transfer::create_target_states(std::vector<State_transfer> &target_st
                 break;
             }
         }
-    }
-    if (!target) {target_st.emplace_back(*this);} // ! TODO finish the constructor
+    // }
+    if (!target) {target_st.emplace_back(*this);} 
 }
 void State_transfer::create_remaining_states(std::vector<State> &rem_st, std::vector<State> &ori_st){ // ? merge with calculate_remaining_resources
     bool found{};
@@ -559,9 +575,9 @@ void State_transfer::calculate_remaining_resources(std::vector<State> &rem_st/*,
                                 }
                             }
                         }
-                        std::vector<std::string> provs{co.getProvs()};
-                        provs.erase(std::remove(provs.begin(), provs.end(), "")), provs.end();
-                        for(auto pop : co.getPops()) { // pop subtracting
+                        // std::vector<std::string> provs{co.getProvs()};
+                        
+                        for(auto& pop : co.getPops()) { // pop subtracting
                             for(auto tr_pop : tr_co.getPops()) {
                                 if(pop.getCult() == tr_pop.getCult() && pop.getRel() == tr_pop.getRel()) {
                                     pop.setSize(pop.getSize() - tr_pop.getSize()); // TODO refactor using operator overlading
@@ -569,7 +585,7 @@ void State_transfer::calculate_remaining_resources(std::vector<State> &rem_st/*,
                                 }    
                             }
                         }
-                        for(auto build : co.getBuilds()) { // building subtracting
+                        for(auto& build : co.getBuilds()) { // building subtracting
                             bool present{};
                             for(auto tr_build : tr_co.getBuilds()) {
                                 if(build.getType() == tr_build.getType()) {
@@ -580,6 +596,7 @@ void State_transfer::calculate_remaining_resources(std::vector<State> &rem_st/*,
                         }
                     }
                 }
+                co.getProvs().erase(std::remove(co.getProvs().begin(), co.getProvs().end(), ""), co.getProvs().end());
             }
             int res[11]{};
             for(int i{}; i < 11; i++) {res[i] = st.getRes()[i] - this->getRes()[i];}

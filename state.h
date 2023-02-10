@@ -31,14 +31,13 @@ protected:
         class Building {
         // data
             int level, reserves;
-            std::string type,/*region,*/ dlc{}; 
+            std::string type, dlc{}; 
             std::vector<std::string> prod;
         public:
         // constructor
             Building(const std::string &, const int &, const int &, const std::vector<std::string> &);
         // getters
             inline std::string getType() {return type;}
-            // inline std::string getRegion() {return region;}
             inline std::string getDlc() {return dlc;}
             inline std::vector<std::string> getProd() {return prod;}
             inline int getLvl() {return level;}
@@ -70,10 +69,11 @@ protected:
 
 //data 
     std::vector<State::Country> countries{};
-    std::vector<std::string> /*provs, */traits, ar_res, im_provs{}, homelands{}, claims{};
-    std::string id, name, hubs[5]{}, file_name, sub, /*city, port{}, farm, mine{}, wood{}, */naval_exit{};
-    unsigned int ar_land, res[11]{}/*, coal{}, iron{}, lead{}, sulfur{}, log{}, fish{}, whale{}, oil{}, rubber{}, gold{}, disc_gold{}, naval_exit{}*/;
-    // res = 0-arable land, 1-coal, 2-iron, 3-sulfur, 4-logging, 5-whaling, 6-fishing, 7-gold, 8-disc. gold, 9-rubber, 10-oil
+    std::vector<std::string> traits, ar_res, im_provs{}, homelands{}, claims{};
+    std::string id, name, hubs[5]{}, file_name, sub, naval_exit{};
+    unsigned int res[12]{};
+    // hubs = 0-city, 1-port, 2-farm, 3-mine, 4-wood
+    // res = 0-arable land, 1-coal, 2-iron, 3-lead, 4-sulfur, 5-logging, 6-fishing, 7-whaling, 8-gold, 9-disc. gold, 10-rubber, 11-oil
 // Functions:
 
 public:
@@ -122,7 +122,7 @@ public:
     inline std::string getMine() {return mine;}
     inline std::string getWood() {return wood;}*/
     inline std::string getId() {return id;}
-    inline unsigned int getLand() {return ar_land;}
+    // inline unsigned int getLand() {return ar_land;}
     /*inline unsigned int getCoal() {return coal;}
     inline unsigned int getIron() {return iron;}
     inline unsigned int getLead() {return lead;}
@@ -150,10 +150,10 @@ public:
    void setId(const std::string &);
    void setSub(const std::string &);
    void setTraits(const std::vector<std::string> &);
-   void setHubs(const std::string [5]);
+   void setHubs(const std::string [/*5*/]);
    void setLand(const int &);
    void setArRes(const std::vector<std::string> &);
-   void setRes(const int [11]);
+   void setRes(const int [/*12*/]);
    void setProvs(const std::vector<std::string> &);
    void setProv(const int &, const std::string &);
    void setPopSize(const int &, const int &);
@@ -173,7 +173,7 @@ class State_transfer : public State {
     // bool origin_found{0};
     int origin_pos{};
     std::string origin{};
-    std::vector<std::string> provs;
+    std::vector<std::string> transfer_provs;
 
 // Functions:
     // double calculate_ratio(const std::vector<std::string> &); 
@@ -189,7 +189,7 @@ public:
     State::Country create_transfer_country(State::Country &, std::vector<std::string> &, const double &);
 
 // getters
-    inline std::vector<std::string> getProvs() {return this->provs;}
+    inline std::vector<std::string> getProvs() {return this->transfer_provs;}
 
 // transfer
     void find_origin_states(const std::vector<State> &, std::vector<State_transfer> &);
