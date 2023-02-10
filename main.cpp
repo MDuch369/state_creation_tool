@@ -681,6 +681,18 @@ int main() {
     for(int i {}; i < tr_states.size(); i++){tr_states[i].create_target_states(tar_states);}
     for(int i {}; i < tr_states.size(); i++){tr_states[i].create_remaining_states(remaining_states, states);}
     for(int i {}; i < tr_states.size(); i++){tr_states[i].calculate_remaining_resources(remaining_states);}
+    for(int i {}; i < tar_states.size(); i++){
+        tar_states[i].print_state_region();
+        tar_states[i].print_pops();
+        tar_states[i].print_buildings();
+        tar_states[i].print_state();
+    }
+    for(int i {}; i < remaining_states.size(); i++) {
+        remaining_states[i].print_state_region();
+        remaining_states[i].print_pops();
+        remaining_states[i].print_buildings();
+        remaining_states[i].print_state();
+    }
 
     // State Old_state(find_states(files[14], provinces[0]), files[14]);
     // provs_ratio = calculate_ratio(Old_state, provinces);

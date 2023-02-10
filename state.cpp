@@ -276,8 +276,9 @@ void State::print_pops() { // DONE
             dst << "\t\t\t\tsize = " << pop.getSize() << std::endl
                 << "\t\t\t}" << std::endl;
         }
-        dst << "\t\t}" << std::endl << "\t}" << std::endl;
+        dst << "\t\t}" << std::endl; 
     }
+    dst << "\t}" << std::endl;
 }
 void State::print_buildings(){ // DONE
     std::ofstream  dst("output/common/history/buildings/to_buildings.txt", std::ios::binary | std::ios::app);
@@ -321,6 +322,7 @@ void State::print_state() { // DONE
             << "\t\t\tcountry = c:" << co.getName() << std::endl
             << "\t\t\towned_provinces = { ";
         for(std::string s : co.getProvs()) {dst << s << " ";}
+        dst << "\t\t\t}" << std::endl;
     }
     dst << "}" << std::endl
         <<  "\t\t}" << std::endl;
@@ -557,7 +559,8 @@ void State_transfer::calculate_remaining_resources(std::vector<State> &rem_st/*,
                                 }
                             }
                         }
-
+                        std::vector<std::string> provs{co.getProvs()};
+                        provs.erase(std::remove(provs.begin(), provs.end(), "")), provs.end();
                         for(auto pop : co.getPops()) { // pop subtracting
                             for(auto tr_pop : tr_co.getPops()) {
                                 if(pop.getCult() == tr_pop.getCult() && pop.getRel() == tr_pop.getRel()) {
