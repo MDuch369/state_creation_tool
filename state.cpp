@@ -259,8 +259,9 @@ void State::print_state_region(){ // DONE
     if(this->res[7] != 0) {dst << "\t\tbg_whaling = " << this->res[7] << std::endl; }
     dst << "\t}" << std::endl;
     if(this->res[8] != 0) {
-        dst << "\tresource = {" << std::endl << "depleted_type = \"bg_gold_mining\"" << std::endl
+        dst << "\tresource = {" << std::endl 
             << "\t\ttype = \"bg_gold_fields\"" << std::endl
+            << "\t\tdepleted_type = \"bg_gold_mining\"" << std::endl
             << "\t\tundiscovered_amount =" << this->res[8] << std::endl;
         if(this->res[9] != 0) {dst << "\t\tdiscovered_amount = " << this->res[9] << std::endl;}
         dst << "\t}" << std::endl;
