@@ -227,7 +227,7 @@ void State::create_homelands(const std::string &file) {
 // data printing
 void State::print_state_region(){ // DONE
     std::ofstream  dst("output/map_data/state_regions/to.txt", std::ios::binary | std::ios::app);
-    dst << this->name << "= {" << std::endl
+    dst << this->name << " = {" << std::endl
         << "\tid = " << this->id << std::endl
         << "\tsubsistence_building = " << this->sub << std::endl
         << "\tprovinces = { ";
@@ -475,7 +475,7 @@ void State_transfer::find_origin_states(const std::vector<State> &states, std::v
     }
 }    
 void State_transfer::calculate_resources(std::vector<State> &states) {
-    int origin_provs{}, provs{};
+    double origin_provs{}, provs{};
     double ratio{};
     State origin{states[this->origin_pos]};
     this->homelands = origin.getHomelands();
@@ -491,7 +491,7 @@ void State_transfer::calculate_resources(std::vector<State> &states) {
         provs += co.getProvs().size();
     }
     ratio = provs/origin_provs;
-    for(int i{}; i < 11; i++) {
+    for(int i{}; i < 12; i++) {
         this->res[i] = origin.getRes()[i] * ratio;
     }
 }
@@ -556,7 +556,7 @@ void State_transfer::create_target_states(std::vector<State_transfer> &target_st
 void State_transfer::create_remaining_states(std::vector<State> &rem_st, std::vector<State> &ori_st){ // ? merge with calculate_remaining_resources
     bool found{};
     for(State st : rem_st) {
-        if (st.getName() == this->getName()) {
+        if (st.getName() == this->getOrigin()) {
             found = 1;
             break;
         }

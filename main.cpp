@@ -177,15 +177,24 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
                             if(line.find("subsistence_building", 0) != std::string::npos) {
                                 subsist = data(line);
                                 st.setSub(subsist);
-                                getline(src, line);
-                                getline(src, line);
+                                while(getline(src, line)){
+                                    if(line.find("}", 0) != std::string::npos) {
+                                        getline(src, line); 
+                                        if(line.find("impassable", 0) != std::string::npos) { // TODO implement impassable provs handling
+                                            getline(src, line); 
+                                            break;
+                                        }
+                                        break;
+                                    }
+                                }
                             }
                             if(line.find("traits", 0) != std::string::npos) {
+                                if(traits.empty() != true) {traits.clear();}
                                 variable_string_vector(traits, line);
                                 st.setTraits(traits);
                                 getline(src, line);
                             }
-                            //  TODO implement copying of hubs here
+                            // ? TODO implement copying of hubs here
                             // TEMP CODE
                             if(line.find("city", 0) != std::string::npos) {getline(src, line);}
                             if(line.find("port", 0) != std::string::npos) {getline(src, line);}
@@ -198,6 +207,7 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
                                 getline(src, line);
                             } 
                             if(line.find("arable_resources", 0) != std::string::npos) {
+                                if(ar_res.empty() != true) {ar_res.clear();}
                                 variable_string_vector(ar_res, line);
                                 st.setArRes(ar_res);
                                 getline(src, line);
@@ -258,23 +268,6 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
             }
         }
     }
-                    // if(line.size() == 1) {
-                    //     for (State &st : states) {
-                    //         if(st.getName() == name) {
-                    //             st.setId(id);
-                    //             st.setSub(subsist);
-                    //             st.setTraits(traits);
-                    //             st.setArRes(ar_res);
-                    //             st.setRes(cap_res);
-                    //             st.setNavEx(nav_ex);
-                    //             traits.clear();
-                    //             ar_res.clear();
-                    //             exit = 1;
-                    //             break;
-                    //         }
-                    //     }
-                    // }
-                    // if(exit) {break;}
 }   
 void save_state_pops(const std::filesystem::path &path, std::vector<State> &states, const std::filesystem::path *files) {
     std::filesystem::path pops{"common/history/pops"};
@@ -388,13 +381,12 @@ std::vector<State_transfer> new_state_info() {
     std::cout << "Number of states to be created: " << std::endl;
     std::cin >> num;
     for(int i{}; i < num; i++) {
+        std::cout << std::endl;
         std::cout << "Name of the state to be created number " << i + 1 << ": " << std::endl;
         std::cin >> name;
-        // std::cout << std::endl;
         std::cout << "Id of the state to be created number " << i + 1 << ": " << std::endl;
         std::cin >> id;
-        // std::cout << std::endl;
-        std::cout << "Provinces to transfer to state number " << i + 1 << ": "/* << std::endl*/;
+        std::cout << "Provinces to transfer to state number " << i + 1 << ": ";
         std::getline(std::cin, provs);
         std::cout << std::endl;
         states.emplace_back(name, id, provs);
@@ -418,20 +410,19 @@ void save_provinces(std::vector<std::string> &provs) {
 }
 
 // file browsing 
-unsigned int find_states(const std::string &path, const std::string &prov) {
-    unsigned int cur_line{};
-    std::string line{};
-    std::ifstream  src(path + "common/history/states/00_states.txt", std::ios::binary);
-
-    while(getline(src, line)) {
-        cur_line++;
-        if (line.find(prov, 0) != std::string::npos) {
-            break;
-        }
-    }
-    src.close();
-    return cur_line;
-}
+// unsigned int find_states(const std::string &path, const std::string &prov) {
+//     unsigned int cur_line{};
+//     std::string line{};
+//     std::ifstream  src(path + "common/history/states/00_states.txt", std::ios::binary);
+//     while(getline(src, line)) {
+//         cur_line++;
+//         if (line.find(prov, 0) != std::string::npos) {
+//             break;
+//         }
+//     }
+//     src.close();
+//     return cur_line;
+// }
 //  move inside class
 // std::string find_file(std::filesystem::path *files, const std::string &prov ) {
 //     std::string line{};

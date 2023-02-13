@@ -191,6 +191,7 @@ public:
 
 // getters
     inline std::vector<std::string> getProvs() {return this->transfer_provs;}
+    inline std::string getOrigin() {return this->origin;}
 
 // transfer
     void find_origin_states(const std::vector<State> &, std::vector<State_transfer> &);
