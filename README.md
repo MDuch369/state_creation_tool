@@ -7,6 +7,7 @@ The user inputs number of states to be creates folowed by information about them
 current limitations:
 - no ability to transfer provinces to existing states 
 - the program doesn't handle strategic regions
+- the amount of resources/pops/buildings transfered to new states is calculated based on the ratio of provinces transferred, with no way to influence it
 
 future plans:
 - ability to transfer provinces into existing stats
@@ -14,4 +15,5 @@ future plans:
 - printing into existing files, so the state entry don't need to be copied manually
 - keeping track of the hitory of tranfers
 - printing localization for the states
+- adding ways to influence amount of transfered resources
 - graphical UI
