@@ -108,7 +108,7 @@ void file_list(const std::filesystem::path &path, std::filesystem::path *files) 
     }
 }
 
-// creating an array of states info
+// creating an array of states info //? TODO refactor using regex
 void save_states(const std::filesystem::path &path, std::vector<State> &states) { // TODO tidy up (remove unnecesary strings in entries)
     std::string line{}, country{}, type{};
     std::vector<std::string> provs{}, homelands{}, claims{};
@@ -433,12 +433,11 @@ void debug_print_state_pos(std::vector<State> &states) {
 int main() {
 // variables
     std::vector<State> states{}, remaining_states{};
-    std::filesystem::path files[15], input{}, output{}, test[15];
+    std::filesystem::path files[15], input{}, output{}/*, test[15]*/;
     std::vector<std::string> provinces{};
     std::vector<State_transfer> tr_states{}, tar_states{};
     std::string filename,/*path{"input/files"},*/ new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
     int new_state_id{/*666*/}; 
-    double provs_ratio; // TODO for next version change this to be member of state class
     
     check_i_o_file(input, output);
     file_list(input, files);
@@ -471,7 +470,7 @@ int main() {
         remaining_states[i].print_buildings();
         remaining_states[i].print_state();
     }
-    
+
     // debug( provinces );
     
     return 0;
