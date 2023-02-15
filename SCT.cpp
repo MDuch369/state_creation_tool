@@ -14,7 +14,7 @@ std::string data(std::string &line){
     int pos{line.find("=") + 1};
     return line.substr(pos, line.find ("\n") - pos);
 }
-std::string data(std::string &line, const char &delim){
+std::string data(std::string &line, const char &delim){ //? TODO refactor using regex
     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
     line.erase (std::remove(line.begin(), line.end(), '='), line.end()); 
     line.erase (std::remove(line.begin(), line.end(), '{'), line.end());
@@ -63,7 +63,7 @@ std::string data_name(std::string &line ) {
 }
 
 // input/output paths
-void save_i_o_path(/*std::string &input, std::string &output*/) { // TODO refactor
+void save_i_o_path() { // TODO refactor
     std::filesystem::path in{}, out{};
     std::string line{};
     std::ofstream  dst("inoutpath.txt", std::ios::binary | std::ios::app);
@@ -81,11 +81,11 @@ void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) { // T
     std::ifstream  src("inoutpath.txt", std::ios::binary);
     while(getline(src, line)){
         if(line.find("input: ") != std::string::npos) {
-            // TODO find a better way to do this
+            // TODO find a better way to do this (regex maybe)
             in = line.substr(8, line.length() - 10);
         }
         if(line.find("output: ") != std::string::npos) {
-            // TODO find a better way to do this
+            // TODO find a better way to do this (regex maybe)
             out = line.substr(9, line.length() - 11);
         }
     }
@@ -149,7 +149,7 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
         }
     }
 }
-void save_state_info(const std::filesystem::path &path, std::vector<State> &states, const std::filesystem::path *files) {
+void save_state_info(const std::filesystem::path &path, std::vector<State> &states, const std::filesystem::path *files) { 
     std::filesystem::path regions{"map_data/state_regions"};
 
     std::filesystem::path regs[15]{};
@@ -253,11 +253,8 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
                             if(line.find("naval_exit_id", 0) != std::string::npos) {
                                 nav_ex = data(line);
                                 st.setNavEx(nav_ex);
-                                // getline(src, line);
                             }
-                            // if(line.size() == 1);
                             if(line.find("}", 0) != std::string::npos){
-                                // getline(src, line);
                                 exit = 1;
                                 break;
                             }
@@ -340,7 +337,6 @@ void save_state_builds(const std::filesystem::path &path, std::vector<State> &st
             if(line.find("region_state", 0) != std::string::npos) { 
                 country = data(line, ':');
                 getline(src, line);
-                // getline(src, line);
             }
             if(line.find("create_building", 0) != std::string::npos){getline(src, line);}   
             if(line.find("building", 0) != std::string::npos) {
@@ -408,12 +404,6 @@ void save_provinces(std::vector<std::string> &provs) {
     }
 }
 
-// debug functions 
-// void debug(const std::vector<std::string> &provs) {
-//     for(std::string s : provs) {
-//         std::cout<< s << std::endl;
-//     }
-// }
 void debug_print_file_list(const std::filesystem::path *files) {
     for (int i{}; i < 16; i++){
         std::cout << i << " " << files[i] << std::endl;
@@ -433,11 +423,11 @@ void debug_print_state_pos(std::vector<State> &states) {
 int main() {
 // variables
     std::vector<State> states{}, remaining_states{};
-    std::filesystem::path files[15], input{}, output{}/*, test[15]*/;
+    std::filesystem::path files[15], input{}, output{};
     std::vector<std::string> provinces{};
     std::vector<State_transfer> tr_states{}, tar_states{};
-    std::string filename,/*path{"input/files"},*/ new_state_name{/*"NEW_STATE"*/}/*, strat_reg{}*/;
-    int new_state_id{/*666*/}; 
+    std::string filename, new_state_name{}/*, strat_reg{}*/;
+    int new_state_id{}; 
     
     check_i_o_file(input, output);
     file_list(input, files);
@@ -447,11 +437,8 @@ int main() {
     save_state_pops(input, states, files);
     save_state_builds(input, states, files);
     
-    // debug_print_state_pos(states);
 
     tr_states = new_state_info();
-    // save_provinces(provinces); 
-    // filename = find_file(files, provinces[0]);
 
     for(int i {}; i < tr_states.size(); i++){tr_states[i].find_origin_states(states, tr_states);}
     for(int i {}; i < tr_states.size(); i++){tr_states[i].calculate_resources(states);}
@@ -471,7 +458,5 @@ int main() {
         remaining_states[i].print_state();
     }
 
-    // debug( provinces );
-    
     return 0;
 }
