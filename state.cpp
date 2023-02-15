@@ -225,8 +225,9 @@ void State::create_homelands(const std::string &file) {
 }
 
 // data printing
-void State::print_state_region(){ // DONE
-    std::ofstream  dst("output/map_data/state_regions/to.txt", std::ios::binary | std::ios::app);
+void State::print_state_region(){ 
+    // std::ofstream  dst("output/map_data/state_regions/to.txt", std::ios::binary | std::ios::app);
+    std::ofstream  dst("new.txt", std::ios::binary | std::ios::app);
     dst << this->name << " = {" << std::endl
         << "\tid = " << this->id << std::endl
         << "\tsubsistence_building = " << this->sub << std::endl
@@ -281,8 +282,9 @@ void State::print_state_region(){ // DONE
     if(this->naval_exit != "") {dst << "\tnaval_exit_id = " << this->naval_exit << std::endl;}
     dst << "}" << std::endl << std::endl;
 }
-void State::print_pops() { // DONE
-    std::ofstream  dst("output/common/history/pops/to_pops.txt", std::ios::binary | std::ios::app);
+void State::print_pops() { 
+    // std::ofstream  dst("output/common/history/pops/new_pops.txt", std::ios::binary | std::ios::app);
+    std::ofstream  dst("new_pops.txt", std::ios::binary | std::ios::app);
     dst << "\ts:" << this->name << " = {" << std::endl;
     for(State::Country co : this->getCountries()) {
         dst << "\t\tregion_state:" << co.getName() << " = {" << std::endl;
@@ -298,8 +300,9 @@ void State::print_pops() { // DONE
     }
     dst << "\t}" << std::endl;
 }
-void State::print_buildings(){ // DONE
-    std::ofstream  dst("output/common/history/buildings/to_buildings.txt", std::ios::binary | std::ios::app);
+void State::print_buildings(){ 
+    // std::ofstream  dst("output/common/history/buildings/new_buildings.txt", std::ios::binary | std::ios::app);
+    std::ofstream  dst("new_buildings.txt", std::ios::binary | std::ios::app);
     // int size{this->buildings.size()};
     dst << "\ts:" << this->name << " = {" << std::endl;
     for(State::Country co : this->getCountries()) {
@@ -334,8 +337,9 @@ void State::print_buildings(){ // DONE
     // }
     // dst << "\t}" << std::endl;
 }
-void State::print_state() { // DONE
-    std::ofstream  dst("output/common/history/states/to_states.txt", std::ios::binary | std::ios::app);
+void State::print_state() {
+    // std::ofstream  dst("output/common/history/states/new_states.txt", std::ios::binary | std::ios::app);
+    std::ofstream  dst("new_states.txt", std::ios::binary | std::ios::app);
     dst << "\ts:" << this->name << " = {" << std::endl;
     for(State::Country co : this->countries) {
         dst << "\t\tcreate_state = {" << std::endl
