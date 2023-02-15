@@ -335,7 +335,7 @@ void State::print_buildings(){ // DONE
     // dst << "\t}" << std::endl;
 }
 void State::print_state() { // DONE
-    std::ofstream  dst("output/common/history/to_states.txt", std::ios::binary | std::ios::app);
+    std::ofstream  dst("output/common/history/states/to_states.txt", std::ios::binary | std::ios::app);
     dst << "\ts:" << this->name << " = {" << std::endl;
     for(State::Country co : this->countries) {
         dst << "\t\tcreate_state = {" << std::endl

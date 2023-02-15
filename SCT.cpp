@@ -1,9 +1,9 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
 #include <sstream>
 #include <fstream>
 #include <filesystem>
+#include <vector>
+#include <algorithm>
 #include "state.h"
 
 
@@ -66,32 +66,38 @@ std::string data_name(std::string &line ) {
 void save_i_o_path() { // TODO refactor
     std::filesystem::path in{}, out{};
     std::string line{};
-    std::ofstream  dst("inoutpath.txt", std::ios::binary | std::ios::app);
+    std::ofstream  in_dst("inputpath.txt", std::ios::binary | std::ios::app);
+    // std::ofstream  out_dst("outputpath.txt", std::ios::binary | std::ios::app);
     std::cout << "Enter the game path: " << std::endl;
     std::getline(std::cin, line);
-    in = line;
-    dst << "input: " << in << std::endl;
+    in = line/*.erase(std::remove(line.begin(), line.end(), '"'), line.end())*/; //! TODO find a way to erase quotation marks from strings
+    in_dst /*<< "input: "*/ << in << std::endl;
+/*
     std::cout << "Enter path to the mod: " << std::endl;
     std::getline(std::cin, line);
-    out = line;
-    dst << "output: " << out << std::endl;
+    out = line.erase (std::remove(line.begin(), line.end(), '\"'), line.end());
+    out_dst << "output: " << out << std::endl;
+*/
 }
 void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) { // TODO refactor
     std::string line{};
-    std::ifstream  src("inoutpath.txt", std::ios::binary);
-    while(getline(src, line)){
-        if(line.find("input: ") != std::string::npos) {
+    std::ifstream  in_src("inputpath.txt", std::ios::binary);
+    std::ifstream  out_src("outputpath.txt", std::ios::binary);
+    while(getline(in_src, line)){
+        // if(line.find("input: ") != std::string::npos) {
             // TODO find a better way to do this (regex maybe)
-            in = line.substr(8, line.length() - 10);
-        }
-        if(line.find("output: ") != std::string::npos) {
+            in = line.substr(1, line.length() - 3);
+        // }
+    }
+    while(getline(out_src, line)){
+        // if(line.find("output: ") != std::string::npos) {
             // TODO find a better way to do this (regex maybe)
-            out = line.substr(9, line.length() - 11);
-        }
+            out = line/*.substr(9, line.length() - 11)*/;
+        // }
     }
 }
 void check_i_o_file(std::filesystem::path &in, std::filesystem::path &out) {
-    if (std::filesystem::exists("inoutpath.txt")){
+    if (std::filesystem::exists("inputpath.txt") /*&& std::filesystem::exists("outputpath.txt")*/){
         load_i_o_path(in, out);
     } else {
         save_i_o_path();
