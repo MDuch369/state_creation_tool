@@ -64,14 +64,12 @@ std::string data_name(std::string &line ) {
 
 // input/output paths
 void save_i_o_path() { // TODO refactor
-    std::filesystem::path in{}, out{};
     std::string line{};
     std::ofstream  in_dst("inputpath.txt", std::ios::binary | std::ios::app);
     // std::ofstream  out_dst("outputpath.txt", std::ios::binary | std::ios::app);
     std::cout << "Enter the game path: " << std::endl;
     std::getline(std::cin, line);
-    in = line/*.erase(std::remove(line.begin(), line.end(), '"'), line.end())*/; //! TODO find a way to erase quotation marks from strings
-    in_dst /*<< "input: "*/ << in << std::endl;
+    in_dst << line << std::endl;
 /*
     std::cout << "Enter path to the mod: " << std::endl;
     std::getline(std::cin, line);
@@ -86,7 +84,7 @@ void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) { // T
     while(getline(in_src, line)){
         // if(line.find("input: ") != std::string::npos) {
             // TODO find a better way to do this (regex maybe)
-            in = line.substr(1, line.length() - 3);
+            in = line/*.substr(1, line.length() - 3)*/;
         // }
     }
     while(getline(out_src, line)){
@@ -104,14 +102,25 @@ void check_i_o_file(std::filesystem::path &in, std::filesystem::path &out) {
         load_i_o_path(in, out);
     }
 }
-void add_input_path() {
-    std::filesystem::path in{};
+bool add_i_o_path(const char &io) {
     std::string line{};
+    std::filesystem::path path{};
     std::ofstream  in_dst("inputpath.txt", std::ios::binary | std::ios::app);
+    std::ofstream  out_dst("ouputpath.txt", std::ios::binary | std::ios::app);
     std::cout << "Enter path to save: " << std::endl;
-    std::getline(std::cin, line);
-    in = line/*.erase(std::remove(line.begin(), line.end(), '"'), line.end())*/; //! TODO find a way to erase quotation marks from strings
-    in_dst /*<< "input: "*/ << in << std::endl;
+    std::cin >> line;
+    switch (io)
+    {
+    case 'i':
+        in_dst << line << std::endl;
+        break;
+    case 'o':
+        out_dst << line << std::endl;
+        break;
+    default:
+        break;
+    }
+    return 1;
 }
 void list_i_o_paths(const char &io) {
     std::string line{};
@@ -142,7 +151,7 @@ void list_i_o_paths(const char &io) {
     }
      
 }
-std::filesystem::path change_path(const char &io) {
+std::filesystem::path change_path(const char &io) { // TODO make this work
     int path_num{};
     std::string line{};
     std::ifstream  in_src("inputpath.txt", std::ios::binary);
@@ -151,9 +160,12 @@ std::filesystem::path change_path(const char &io) {
 
     list_i_o_paths(io);
     std::cin >> path_num;
-    for (int i = 0; i < path_num; i++)
+    // for (int i = 0; i < path_num; i++)
+    int i{};
+    while (getline(in_src, line))
     {
-        getline(in_src, line);
+        if (i = path_num) {break;}
+        i++;
     }
     
     return line;
@@ -181,7 +193,7 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
     std::cout << "2 - list current input and output path" << std::endl;
     std::cout << "3 - list saved input and output paths" << std::endl;
     std::cout << "4 - add new input path" << std::endl;
-    std::cout << "[CURRENTLY DISABLED]5 - add new output path " << std::endl;
+    std::cout << "5 - add new output path " << std::endl;
     std::cout << "6 - change current input path" << std::endl;
     std::cout << "7 - change current output path" << std::endl;
     // std::cout << "[e]xit" << std::endl;
@@ -191,36 +203,29 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
     {
     case '1':
         return 0;
-        // break;
     case '2':
         list_current_i_o_paths(in, out);
         return 1;
-        // break;
     case '3':
         list_i_o_paths('i');
         list_i_o_paths('o');
         return 1;
-        // break;
     case '4':
-        add_input_path();
-        return 1;
-        // break;
+        // add_i_o_path('i');
+        return add_i_o_path('i');
     case '5':
-        return 1;
-        // break;
+        // add_i_o_path('o');
+        return add_i_o_path('o');
     case '6':
         (in = change_path('i'));
         return 1;
-        // break;
     case '7':
         (out = change_path('o'));
         return 1;
-        // break;
     // case 'e':
     //     exit();
     default:
         return 1;
-        // break;
     }
 }
 
