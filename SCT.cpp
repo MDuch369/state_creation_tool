@@ -104,6 +104,64 @@ void check_i_o_file(std::filesystem::path &in, std::filesystem::path &out) {
         load_i_o_path(in, out);
     }
 }
+void add_input_path() {
+    std::filesystem::path in{};
+    std::string line{};
+    std::ofstream  in_dst("inputpath.txt", std::ios::binary | std::ios::app);
+    std::cout << "Enter path to save: " << std::endl;
+    std::getline(std::cin, line);
+    in = line/*.erase(std::remove(line.begin(), line.end(), '"'), line.end())*/; //! TODO find a way to erase quotation marks from strings
+    in_dst /*<< "input: "*/ << in << std::endl;
+}
+void list_i_o_paths(const char &io) {
+    std::string line{};
+    std::ifstream  in_src("inputpath.txt", std::ios::binary);
+    std::ifstream  out_src("outputpath.txt", std::ios::binary);
+    int in{}, out{};
+    
+    switch (io)
+    {
+    case 'i':
+        std::cout << "input paths: " << std::endl;
+        while (getline(in_src, line))
+        {
+            std::cout << in <<  " " << line << std::endl;
+            in++;
+        } 
+        break;
+    case 'o':
+        std::cout << "output paths: " << std::endl;
+        while (getline(out_src, line))
+        {
+            std::cout << out << " " <<  line << std::endl;
+            out++;
+        }
+        break;
+    default:
+        break;
+    }
+     
+}
+std::filesystem::path change_path(const char &io) {
+    int path_num{};
+    std::string line{};
+    std::ifstream  in_src("inputpath.txt", std::ios::binary);
+    std::ifstream  out_src("outputpath.txt", std::ios::binary);
+    std::cout << "select new path" << std::endl;
+
+    list_i_o_paths(io);
+    std::cin >> path_num;
+    for (int i = 0; i < path_num; i++)
+    {
+        getline(in_src, line);
+    }
+    
+    return line;
+}
+void list_current_i_o_paths(std::filesystem::path &in, std::filesystem::path &out) {
+    std::cout << "current input path: " << in << std::endl;
+    std::cout << "current output path: " <<  out << std::endl;
+}
 void file_list(const std::filesystem::path &path, std::filesystem::path *files) { // TODO sort the list of files
     std::vector<std::filesystem::path>f;
     int i{};
@@ -114,7 +172,59 @@ void file_list(const std::filesystem::path &path, std::filesystem::path *files) 
     }
 }
 
-// creating an array of states info //? TODO refactor using regex
+// menu options
+bool menu(std::filesystem::path &in, std::filesystem::path &out) {
+    char action{};
+    std::cout << std::endl;
+    std::cout << "Select an action: " << std::endl;
+    std::cout << "1 - create states" << std::endl;
+    std::cout << "2 - list current input and output path" << std::endl;
+    std::cout << "3 - list saved input and output paths" << std::endl;
+    std::cout << "4 - add new input path" << std::endl;
+    std::cout << "[CURRENTLY DISABLED]5 - add new output path " << std::endl;
+    std::cout << "6 - change current input path" << std::endl;
+    std::cout << "7 - change current output path" << std::endl;
+    // std::cout << "[e]xit" << std::endl;
+    std::cin >> action; 
+    std::cout << std::endl;
+    switch (action)
+    {
+    case '1':
+        return 0;
+        // break;
+    case '2':
+        list_current_i_o_paths(in, out);
+        return 1;
+        // break;
+    case '3':
+        list_i_o_paths('i');
+        list_i_o_paths('o');
+        return 1;
+        // break;
+    case '4':
+        add_input_path();
+        return 1;
+        // break;
+    case '5':
+        return 1;
+        // break;
+    case '6':
+        (in = change_path('i'));
+        return 1;
+        // break;
+    case '7':
+        (out = change_path('o'));
+        return 1;
+        // break;
+    // case 'e':
+    //     exit();
+    default:
+        return 1;
+        // break;
+    }
+}
+
+// creating an array of states info //? TODO refactor using regex, denest the functions
 void save_states(const std::filesystem::path &path, std::vector<State> &states) { // TODO tidy up (remove unnecesary strings in entries)
     std::string line{}, country{}, type{};
     std::vector<std::string> provs{}, homelands{}, claims{};
@@ -437,6 +547,8 @@ int main() {
     
     check_i_o_file(input, output);
     file_list(input, files);
+
+    while(menu(input, output)) {continue;} 
 
     save_states(input, states);
     save_state_info(input, states, files);
