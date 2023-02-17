@@ -63,7 +63,7 @@ std::string data_name(std::string &line ) {
 }
 
 // input/output paths
-void save_i_o_path() { // TODO refactor
+void save_i_o_path() { // TODO add output path handling
     std::string line{};
     std::ofstream  in_dst("inputpath.txt", std::ios::binary | std::ios::app);
     // std::ofstream  out_dst("outputpath.txt", std::ios::binary | std::ios::app);
@@ -77,24 +77,18 @@ void save_i_o_path() { // TODO refactor
     out_dst << "output: " << out << std::endl;
 */
 }
-void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) { // TODO refactor
+void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) {
     std::string line{};
     std::ifstream  in_src("inputpath.txt", std::ios::binary);
     std::ifstream  out_src("outputpath.txt", std::ios::binary);
     while(getline(in_src, line)){
-        // if(line.find("input: ") != std::string::npos) {
-            // TODO find a better way to do this (regex maybe)
-            in = line/*.substr(1, line.length() - 3)*/;
-        // }
+            in = line;
     }
     while(getline(out_src, line)){
-        // if(line.find("output: ") != std::string::npos) {
-            // TODO find a better way to do this (regex maybe)
-            out = line/*.substr(9, line.length() - 11)*/;
-        // }
+            out = line;
     }
 }
-void check_i_o_file(std::filesystem::path &in, std::filesystem::path &out) {
+void check_i_o_file(std::filesystem::path &in, std::filesystem::path &out) { // TODO add output path handling
     if (std::filesystem::exists("inputpath.txt") /*&& std::filesystem::exists("outputpath.txt")*/){
         load_i_o_path(in, out);
     } else {
@@ -128,20 +122,17 @@ void list_i_o_paths(const char &io) {
     std::ifstream  out_src("outputpath.txt", std::ios::binary);
     int in{}, out{};
     
-    switch (io)
-    {
+    switch (io){
     case 'i':
         std::cout << "input paths: " << std::endl;
-        while (getline(in_src, line))
-        {
+        while (getline(in_src, line)){
             std::cout << in <<  " " << line << std::endl;
             in++;
         } 
         break;
     case 'o':
         std::cout << "output paths: " << std::endl;
-        while (getline(out_src, line))
-        {
+        while (getline(out_src, line)){
             std::cout << out << " " <<  line << std::endl;
             out++;
         }
@@ -151,7 +142,7 @@ void list_i_o_paths(const char &io) {
     }
      
 }
-std::filesystem::path change_path(const char &io) { // TODO make this work
+std::filesystem::path change_path(const char &io) { 
     int path_num{};
     std::string line{};
     std::ifstream  in_src("inputpath.txt", std::ios::binary);
@@ -160,10 +151,8 @@ std::filesystem::path change_path(const char &io) { // TODO make this work
 
     list_i_o_paths(io);
     std::cin >> path_num;
-    // for (int i = 0; i < path_num; i++)
     int i{};
-    while (getline(in_src, line))
-    {
+    while (getline(in_src, line)) {
         if (i == path_num) {break;}
         i++;
     }
@@ -199,8 +188,7 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
     // std::cout << "[e]xit" << std::endl;
     std::cin >> action; 
     std::cout << std::endl;
-    switch (action)
-    {
+    switch (action) {
     case '1':
         return 0;
     case '2':
@@ -211,10 +199,8 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
         list_i_o_paths('o');
         return 1;
     case '4':
-        // add_i_o_path('i');
         return add_i_o_path('i');
     case '5':
-        // add_i_o_path('o');
         return add_i_o_path('o');
     case '6':
         (in = change_path('i'));
@@ -509,8 +495,8 @@ std::vector<State_transfer> new_state_info() {
     } 
     return states;
 }
-// TODO move inside Transfer_State class
-void save_provinces(std::vector<std::string> &provs) {
+
+void save_provinces(std::vector<std::string> &provs) { // TODO move inside Transfer_State class
     std::string prov, tmp; 
     std::cout<<"Enter provinces to transfer: "<<std::endl;
     std::getline(std::cin, prov);
@@ -525,6 +511,7 @@ void save_provinces(std::vector<std::string> &provs) {
     }
 }
 
+// debug functions
 void debug_print_file_list(const std::filesystem::path *files) {
     for (int i{}; i < 16; i++){
         std::cout << i << " " << files[i] << std::endl;
