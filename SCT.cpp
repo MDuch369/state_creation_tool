@@ -164,7 +164,7 @@ std::filesystem::path change_path(const char &io) { // TODO make this work
     int i{};
     while (getline(in_src, line))
     {
-        if (i = path_num) {break;}
+        if (i == path_num) {break;}
         i++;
     }
     
