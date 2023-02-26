@@ -96,25 +96,28 @@ void check_i_o_file(std::filesystem::path &in, std::filesystem::path &out) { // 
         load_i_o_path(in, out);
     }
 }
-bool add_i_o_path(const char &io) {
+void add_i_o_path(const char &io) {
     std::string line{};
-    std::filesystem::path path{};
+    // std::filesystem::path path{};
     std::ofstream  in_dst("inputpath.txt", std::ios::binary | std::ios::app);
     std::ofstream  out_dst("ouputpath.txt", std::ios::binary | std::ios::app);
     std::cout << "Enter path to save: " << std::endl;
-    std::cin >> line;
-    switch (io)
-    {
-    case 'i':
-        in_dst << line << std::endl;
-        break;
-    case 'o':
-        out_dst << line << std::endl;
-        break;
-    default:
-        break;
-    }
-    return 1;
+    // std::cin >> line;
+    // std::getline(std::cin, line);
+    std::getline(std::cin, line);
+    in_dst << line << std::endl;
+    // switch (io)
+    // {
+    // case 'i':
+    //     in_dst << line << std::endl;
+    //     break;
+    // case 'o':
+    //     out_dst << line << std::endl;
+    //     break;
+    // default:
+    //     break;
+    // }
+    // return 1;
 }
 void list_i_o_paths(const char &io) {
     std::string line{};
@@ -163,12 +166,21 @@ void list_current_i_o_paths(std::filesystem::path &in, std::filesystem::path &ou
     std::cout << "current input path: " << in << std::endl;
     std::cout << "current output path: " <<  out << std::endl;
 }
-void file_list(const std::filesystem::path &path, std::filesystem::path *files) { // TODO sort the list of files
+// void file_list(const std::filesystem::path &path, std::filesystem::path *files) { // TODO sort the list of files
+//     std::vector<std::filesystem::path>f;
+//     int i{};
+//     for (const std::filesystem::path& entry : std::filesystem::directory_iterator(path / "map_data/state_regions/")){
+//         if(entry.filename() == "99_seas.txt") {continue;}
+//         files[i] = entry;
+//         i++;
+//     }
+// }
+void /*change_*/file_list(const std::filesystem::path &path, std::filesystem::path *files) { // TODO sort the list of files
     std::vector<std::filesystem::path>f;
     int i{};
     for (const std::filesystem::path& entry : std::filesystem::directory_iterator(path / "map_data/state_regions/")){
         if(entry.filename() == "99_seas.txt") {continue;}
-        files[i] = entry;
+        files[i].assign(entry);
         i++;
     }
 }
@@ -199,9 +211,14 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
         list_i_o_paths('o');
         return 1;
     case '4':
-        return add_i_o_path('i');
+        add_i_o_path('i');
+        // return add_i_o_path('i');
+        return 1;
+
     case '5':
-        return add_i_o_path('o');
+        add_i_o_path('o');
+        // return add_i_o_path('o');
+        return 1;
     case '6':
         (in = change_path('i'));
         return 1;
