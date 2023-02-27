@@ -273,6 +273,142 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
         }
     }
 }
+
+void save_gold_fields(std::ifstream &src, int *cap_res) {
+    std::string line;
+    while(getline(src, line)) {
+        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[8] = data_int(line);}
+        if(line.find("discovered_amount", 0) != std::string::npos) {cap_res[9] = data_int(line);}
+        if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
+    }
+}
+void save_rubber(std::ifstream &src, int *cap_res) {
+    std::string line;
+    while(getline(src, line)) {
+        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[10] = data_int(line);}
+        if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
+    }
+}
+void save_oil(std::ifstream &src, int *cap_res) {
+    std::string line;
+    while(getline(src, line)) {
+        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[11] = data_int(line);}
+        if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
+    }
+}
+void save_resources(std::ifstream &src, int *cap_res) {
+    std::string line;
+    while(getline(src, line)){
+        if(line.find("bg_gold_fields", 0) != std::string::npos) {
+            save_gold_fields(src, cap_res);
+        }    
+        if(line.find("bg_rubber", 0) != std::string::npos) {
+            save_rubber(src, cap_res);
+        }
+        if(line.find("bg_oil_extraction", 0) != std::string::npos) {
+            save_oil(src, cap_res);
+        }
+        if(line.find("}", 0) != std::string::npos){break;}
+    }
+}
+void save_capped_resources(std::ifstream &src, int *cap_res) {
+    std::string line;
+    while(getline(src, line)) {
+        if(line.find("bg_coal_mining", 0) != std::string::npos){cap_res[1] = data_int(line); getline(src, line);}
+        if(line.find("bg_iron_mining", 0) != std::string::npos){cap_res[2] = data_int(line); getline(src, line);}
+        if(line.find("bg_lead_mining", 0) != std::string::npos){cap_res[3] = data_int(line); getline(src, line);}
+        if(line.find("bg_sulfur_mining", 0) != std::string::npos){cap_res[4] = data_int(line); getline(src, line);}
+        if(line.find("bg_logging", 0) != std::string::npos){cap_res[5] = data_int(line); getline(src, line);}
+        if(line.find("bg_fishing", 0) != std::string::npos){cap_res[6] = data_int(line); getline(src, line);}
+        if(line.find("bg_whaling", 0) != std::string::npos){cap_res[7] = data_int(line); getline(src, line);}
+        if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
+    }
+}
+std::string save_subsistence_building(std::ifstream &src) {
+    std::string line;
+    std::string subsist = data(line);
+    while(getline(src, line)){
+        if(line.find("}", 0) != std::string::npos) {
+            getline(src, line); 
+            if(line.find("impassable", 0) != std::string::npos) { // TODO implement impassable provs handling
+                getline(src, line); 
+                break;
+            }
+            break;
+        }
+    } 
+    return subsist;
+}
+bool save_state(std::ifstream &src, State &st){
+    bool exit{};
+    int cap_res[12]{};
+    std::string line, nav_ex{}, name{}, id{}, subsist{};
+    std::vector<std::string> traits{}, ar_res{};
+    while(getline(src, line)) {
+        if(line.find("id", 0) != std::string::npos) {
+            id = data(line);
+            st.setId(id);
+            getline(src, line);
+        }
+        if(line.find("subsistence_building", 0) != std::string::npos) {
+            st.setSub(save_subsistence_building(src));
+        }
+        if(line.find("traits", 0) != std::string::npos) {
+            if(traits.empty() != true) {traits.clear();}
+            variable_string_vector(traits, line);
+            st.setTraits(traits);
+            getline(src, line);
+        }
+        // ? TODO implement copying of hubs here
+        // TEMP CODE
+        if(line.find("city", 0) != std::string::npos) {getline(src, line);}
+        if(line.find("port", 0) != std::string::npos) {getline(src, line);}
+        if(line.find("farm", 0) != std::string::npos) {getline(src, line);}
+        if(line.find("mine", 0) != std::string::npos) {getline(src, line);}
+        if(line.find("wood", 0) != std::string::npos) {getline(src, line);}
+        // END OF TEMP CODE
+        if(line.find("arable_land", 0) != std::string::npos) {
+            cap_res[0] = data_int(line);
+            getline(src, line);
+        } 
+        if(line.find("arable_resources", 0) != std::string::npos) {
+            if(ar_res.empty() != true) {ar_res.clear();}
+            variable_string_vector(ar_res, line);
+            st.setArRes(ar_res);
+            getline(src, line);
+        }
+        if(line.find("capped_resources", 0) != std::string::npos) {
+            save_capped_resources(src, cap_res);
+        }
+        if(line.find("resource ", 0) != std::string::npos) {
+            save_resources(src, cap_res);
+        }
+        st.setRes(cap_res);
+        
+        if(line.find("naval_exit_id", 0) != std::string::npos) {
+            nav_ex = data(line);
+            st.setNavEx(nav_ex);
+        }
+        if(line.find("}", 0) != std::string::npos){
+            return exit = 1;
+        }
+    }
+}
+void browse_file(std::ifstream &src, std::vector<State> &states) {
+    std::string line, name{};
+    
+    while(getline(src, line)) {
+        if(line.find("STATE") != std::string::npos) {
+            name = data_name(line);
+            for (State &st : states) {
+                if(st.getName() == name) {
+                    bool exit{save_state(src, st)};
+                }
+                if(exit) {break;}
+            }  
+        }
+    }
+}
 void save_state_info(const std::filesystem::path &path, std::vector<State> &states, const std::filesystem::path *files) { 
     std::filesystem::path regions{"map_data/state_regions"};
 
@@ -280,116 +416,13 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
     for(int i {}; i < 15; i++){regs[i] = path / regions / files[i].filename();}
 
     for(const auto &file : regs) {
-        std::string line;
         std::ifstream  src(file, std::ios::binary);
-        // int cap_res[12]{};
-        std::string nav_ex{}, name{}, id{}, subsist{};
-        std::vector<std::string> traits{}, ar_res{};
-        while(getline(src, line)) {
-            if(line.find("STATE") != std::string::npos) {
-                name = data_name(line);
-                for (State &st : states) {
-                    int cap_res[12]{};
-                    bool exit{};
-                    if(st.getName() == name) {
-                        while(getline(src, line)) {
-                            if(line.find("id", 0) != std::string::npos) {
-                                id = data(line);
-                                st.setId(id);
-                                getline(src, line);
-                            }
-                            if(line.find("subsistence_building", 0) != std::string::npos) {
-                                subsist = data(line);
-                                st.setSub(subsist);
-                                while(getline(src, line)){
-                                    if(line.find("}", 0) != std::string::npos) {
-                                        getline(src, line); 
-                                        if(line.find("impassable", 0) != std::string::npos) { // TODO implement impassable provs handling
-                                            getline(src, line); 
-                                            break;
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-                            if(line.find("traits", 0) != std::string::npos) {
-                                if(traits.empty() != true) {traits.clear();}
-                                variable_string_vector(traits, line);
-                                st.setTraits(traits);
-                                getline(src, line);
-                            }
-                            // ? TODO implement copying of hubs here
-                            // TEMP CODE
-                            if(line.find("city", 0) != std::string::npos) {getline(src, line);}
-                            if(line.find("port", 0) != std::string::npos) {getline(src, line);}
-                            if(line.find("farm", 0) != std::string::npos) {getline(src, line);}
-                            if(line.find("mine", 0) != std::string::npos) {getline(src, line);}
-                            if(line.find("wood", 0) != std::string::npos) {getline(src, line);}
-                            // END OF TEMP CODE
-                            if(line.find("arable_land", 0) != std::string::npos) {
-                                cap_res[0] = data_int(line);
-                                getline(src, line);
-                            } 
-                            if(line.find("arable_resources", 0) != std::string::npos) {
-                                if(ar_res.empty() != true) {ar_res.clear();}
-                                variable_string_vector(ar_res, line);
-                                st.setArRes(ar_res);
-                                getline(src, line);
-                            }
-                            if(line.find("capped_resources", 0) != std::string::npos) {
-                                while(getline(src, line)) {
-                                    if(line.find("bg_coal_mining", 0) != std::string::npos){cap_res[1] = data_int(line); getline(src, line);}
-                                    if(line.find("bg_iron_mining", 0) != std::string::npos){cap_res[2] = data_int(line); getline(src, line);}
-                                    if(line.find("bg_lead_mining", 0) != std::string::npos){cap_res[3] = data_int(line); getline(src, line);}
-                                    if(line.find("bg_sulfur_mining", 0) != std::string::npos){cap_res[4] = data_int(line); getline(src, line);}
-                                    if(line.find("bg_logging", 0) != std::string::npos){cap_res[5] = data_int(line); getline(src, line);}
-                                    if(line.find("bg_fishing", 0) != std::string::npos){cap_res[6] = data_int(line); getline(src, line);}
-                                    if(line.find("bg_whaling", 0) != std::string::npos){cap_res[7] = data_int(line); getline(src, line);}
-                                    if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
-                                }
-                            }
-                            if(line.find("resource ", 0) != std::string::npos) {
-                                while(getline(src, line)){
-                                    if(line.find("bg_gold_fields", 0) != std::string::npos) {
-                                        while(getline(src, line)) {
-                                            if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[8] = data_int(line);}
-                                            if(line.find("discovered_amount", 0) != std::string::npos) {cap_res[9] = data_int(line);}
-                                            if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
-                                        }
-                                    }    
-                                    if(line.find("bg_rubber", 0) != std::string::npos) {
-                                        while(getline(src, line)) {
-                                            if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[10] = data_int(line);}
-                                            if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
-                                        }
-                                    }
-                                    if(line.find("bg_oil_extraction", 0) != std::string::npos) {
-                                        while(getline(src, line)) {
-                                            if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[11] = data_int(line);}
-                                            if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
-                                        }
-                                    }
-                                    if(line.find("}", 0) != std::string::npos){break;}
-                                }
-                            }
-                            st.setRes(cap_res);
-                            
-                            if(line.find("naval_exit_id", 0) != std::string::npos) {
-                                nav_ex = data(line);
-                                st.setNavEx(nav_ex);
-                            }
-                            if(line.find("}", 0) != std::string::npos){
-                                exit = 1;
-                                break;
-                            }
-                        }
-                    }
-                    if(exit) {break;}
-                }  
-            }
-        }
+        // std::string nav_ex{}, name{}, id{}, subsist{};
+        // std::vector<std::string> traits{}, ar_res{};
+        browse_file(src, states);
     }
-}   
+} 
+  
 void save_state_pops(const std::filesystem::path &path, std::vector<State> &states, const std::filesystem::path *files) {
     std::filesystem::path pops{"common/history/pops"};
     std::filesystem::path ps[15]{};
