@@ -186,6 +186,7 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
                                 while(getline(src, line)){
                                     if(line.find("}", 0) != std::string::npos) {
                                         getline(src, line); 
+                                        if(line.find("prime_land", 0) != std::string::npos) {getline(src, line);}
                                         if(line.find("impassable", 0) != std::string::npos) { // TODO implement impassable provs handling
                                             getline(src, line); 
                                             break;
