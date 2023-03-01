@@ -344,6 +344,7 @@ void State::print_state() {
     std::ofstream  dst("new_states.txt", std::ios::binary | std::ios::app);
     dst << "\ts:STATE_" << this->name << " = {" << std::endl;
     for(State::Country co : this->countries) {
+        if(co.getProvs().empty()) {continue;}
         dst << "\t\tcreate_state = {" << std::endl
             << "\t\t\tcountry = c:" << co.getName() << std::endl
             << "\t\t\towned_provinces = { ";
