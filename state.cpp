@@ -347,7 +347,7 @@ void State::print_state() {
         dst << "\t\tcreate_state = {" << std::endl
             << "\t\t\tcountry = c:" << co.getName() << std::endl
             << "\t\t\towned_provinces = { ";
-        for(std::string s : co.getProvs()) {dst << s << " ";}
+        for(std::string s : co.getProvs()) {dst << "x" << s << " ";}
         dst << "}" << std::endl << "\t\t}" << std::endl;
     }
     for(std::string t : this->homelands) {
