@@ -233,6 +233,44 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
 }
 
 // creating an array of states info //? TODO refactor using regex, denest the functions
+void create_state(std::ifstream &src, std::vector<State> &states, const int &cur){
+    std::string line, country{};
+    std::vector<std::string> provs{};
+    
+    while(getline(src, line)) {
+        if(line.find("create_state", 0) != std::string::npos) {
+            getline(src, line);
+            country = data(line, ':');
+            while(getline(src, line)) {
+                data_vector(provs, line, 6);
+                if(line.find("}", 0) != std::string::npos){break;}
+            }
+            states[cur].create_country(country, provs);
+            provs.clear();
+            getline(src, line);
+            if(line.find("#", 0) != std::string::npos) {continue;}
+            if(line.find("state_type", 0) != std::string::npos) {
+                int pres{states[cur].getCountries().size() - 1};
+                states[cur].getCountries()[pres].setCountryType(data(line));
+            }
+        }
+        if(line.find("add_homeland", 0) != std::string::npos) {break;}
+    }
+}
+void add_homelands(std::ifstream &src, std::vector<State> &states, const int &cur) {
+    std::string line;
+    while(line.find("add_homeland", 0) != std::string::npos) {
+        states[cur].setHomeland(data(line));
+        getline(src, line);
+    }
+}
+void add_claims(std::ifstream &src, std::vector<State> &states, const int &cur) {
+    std::string line;
+    while(line.find("add_claim", 0) != std::string::npos) {
+        states[cur].setClaim(data(line));
+        getline(src, line);
+    } 
+}
 void save_states(const std::filesystem::path &path, std::vector<State> &states) { // TODO tidy up (remove unnecesary strings in entries)
     std::string line{}, country{}, type{};
     std::vector<std::string> provs{}, homelands{}, claims{};
@@ -243,37 +281,40 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
             std::string name{data_name(line)};
             states.emplace_back(name);
             int cur{states.size() - 1};
-            while(getline(src, line)) {
-                if(line.find("create_state", 0) != std::string::npos) {
-                    getline(src, line);
-                    country = data(line, ':');
-                    while(getline(src, line)) {
-                        data_vector(provs, line, 6);
-                        if(line.find("}", 0) != std::string::npos){break;}
-                    }
-                    states[cur].create_country(country, provs);
-                    provs.clear();
-                    getline(src, line);
-                    if(line.find("#", 0) != std::string::npos) {continue;}
-                    if(line.find("state_type", 0) != std::string::npos) {
-                        int pres{states[cur].getCountries().size() - 1};
-                        states[cur].getCountries()[pres].setCountryType(data(line));
-                    }
-                }
-                if(line.find("add_homeland", 0) != std::string::npos) {break;}
-            }
-            while(line.find("add_homeland", 0) != std::string::npos) {
-                states[cur].setHomeland(data(line));
-                getline(src, line);
-            }
-            while(line.find("add_claim", 0) != std::string::npos) {
-                states[cur].setClaim(data(line));
-                getline(src, line);
-            }
+            create_state(src, states, cur);
+            add_homelands(src, states, cur);
+            add_claims(src, states, cur);
+            // while(getline(src, line)) {
+            //     if(line.find("create_state", 0) != std::string::npos) {
+            //         getline(src, line);
+            //         country = data(line, ':');
+            //         while(getline(src, line)) {
+            //             data_vector(provs, line, 6);
+            //             if(line.find("}", 0) != std::string::npos){break;}
+            //         }
+            //         states[cur].create_country(country, provs);
+            //         provs.clear();
+            //         getline(src, line);
+            //         if(line.find("#", 0) != std::string::npos) {continue;}
+            //         if(line.find("state_type", 0) != std::string::npos) {
+            //             int pres{states[cur].getCountries().size() - 1};
+            //             states[cur].getCountries()[pres].setCountryType(data(line));
+            //         }
+            //     }
+            //     if(line.find("add_homeland", 0) != std::string::npos) {break;}
+            // }
+            // while(line.find("add_homeland", 0) != std::string::npos) {
+            //     states[cur].setHomeland(data(line));
+            //     getline(src, line);
+            // }
+            // while(line.find("add_claim", 0) != std::string::npos) {
+            //     states[cur].setClaim(data(line));
+            //     getline(src, line);
+            // }
         }
     }
 }
-
+// state info saving
 void save_gold_fields(std::ifstream &src, int *cap_res) {
     std::string line;
     while(getline(src, line)) {
