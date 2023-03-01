@@ -287,8 +287,10 @@ void State::print_pops() {
     std::ofstream  dst("new_pops.txt", std::ios::binary | std::ios::app);
     dst << "\ts:STATE_" << this->name << " = {" << std::endl;
     for(State::Country co : this->getCountries()) {
+        if(co.getPops().empty()) {continue;}
         dst << "\t\tregion_state:" << co.getName() << " = {" << std::endl;
         for(auto pop : co.getPops()) {
+            if(pop.getSize() == 0) {continue;}
             dst << "\t\t\tcreate_pop = {" << std::endl;
             if (pop.getType() != "") {dst << "\t\t\t\tpop_type = " << pop.getType() << std::endl;}
             dst << "\t\t\t\tculture = " << pop.getCult() << std::endl;
