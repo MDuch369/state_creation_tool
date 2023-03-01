@@ -86,7 +86,7 @@ void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) { // T
     while(getline(in_src, line)){
         // if(line.find("input: ") != std::string::npos) {
             // TODO find a better way to do this (regex maybe)
-            in = line.substr(1, line.length() - 3);
+            in = line/*.substr(1, line.length() - 3)*/;
         // }
     }
     while(getline(out_src, line)){
