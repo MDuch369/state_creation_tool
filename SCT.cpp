@@ -61,7 +61,32 @@ std::string data_name(std::string &line ) {
     std::string name{line.substr(pos, line.find ("\n") - pos)};
     return name;
 }
-
+/*bool find_line(const std::string &str, const std::string &line) {
+    if(line.find(str, 0) != std::string::npos) {
+        return true;
+    }
+    return false
+} */
+std::string find_name(std::ifstream &src, std::string &line, const std::string &str) { // ? use this function for other stuff
+    if(line.find(str, 0) != std::string::npos) { 
+        return data_name(line);
+    }
+}
+std::string find_data(std::ifstream &src, std::string &line, const std::string &str) { // ? use this function for other stuff
+    if(line.find(str, 0) != std::string::npos) { 
+        return data(line);
+    }
+}
+std::string find_data(std::ifstream &src, std::string &line, const std::string &str, const char &delim) { // ? use this function for other stuff
+    if(line.find(str, 0) != std::string::npos) { 
+        return data(line, delim);
+    }
+}
+int find_data_int(std::ifstream &src, std::string &line, const std::string &str) { // ? use this function for other stuff
+    if(line.find(str, 0) != std::string::npos) { 
+        return data_int(line);
+    }
+}
 // input/output paths
 void save_i_o_path() { // TODO add output path handling
     std::string line{};
@@ -232,7 +257,7 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
     }
 }
 
-// creating an array of states info //? TODO refactor using regex, denest the functions
+// creating an array of states info //? TODO refactor using regex, denest the functions, create a class for the functions
 void create_state(std::ifstream &src, std::vector<State> &states, const int &cur){
     std::string line, country{};
     std::vector<std::string> provs{};
@@ -271,7 +296,7 @@ void add_claims(std::ifstream &src, std::vector<State> &states, const int &cur) 
         getline(src, line);
     } 
 }
-void save_states(const std::filesystem::path &path, std::vector<State> &states) { // TODO tidy up (remove unnecesary strings in entries)
+void save_states(const std::filesystem::path &path, std::vector<State> &states) { 
     std::string line{}, country{}, type{};
     std::vector<std::string> provs{}, homelands{}, claims{};
     std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);  
@@ -284,33 +309,6 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
             create_state(src, states, cur);
             add_homelands(src, states, cur);
             add_claims(src, states, cur);
-            // while(getline(src, line)) {
-            //     if(line.find("create_state", 0) != std::string::npos) {
-            //         getline(src, line);
-            //         country = data(line, ':');
-            //         while(getline(src, line)) {
-            //             data_vector(provs, line, 6);
-            //             if(line.find("}", 0) != std::string::npos){break;}
-            //         }
-            //         states[cur].create_country(country, provs);
-            //         provs.clear();
-            //         getline(src, line);
-            //         if(line.find("#", 0) != std::string::npos) {continue;}
-            //         if(line.find("state_type", 0) != std::string::npos) {
-            //             int pres{states[cur].getCountries().size() - 1};
-            //             states[cur].getCountries()[pres].setCountryType(data(line));
-            //         }
-            //     }
-            //     if(line.find("add_homeland", 0) != std::string::npos) {break;}
-            // }
-            // while(line.find("add_homeland", 0) != std::string::npos) {
-            //     states[cur].setHomeland(data(line));
-            //     getline(src, line);
-            // }
-            // while(line.find("add_claim", 0) != std::string::npos) {
-            //     states[cur].setClaim(data(line));
-            //     getline(src, line);
-            // }
         }
     }
 }
@@ -318,22 +316,22 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
 void save_gold_fields(std::ifstream &src, int *cap_res) {
     std::string line;
     while(getline(src, line)) {
-        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[8] = data_int(line);}
-        if(line.find("discovered_amount", 0) != std::string::npos) {cap_res[9] = data_int(line);}
+        cap_res[8] = find_data_int(src, line, "undiscovered_amount");
+        cap_res[9] = find_data_int(src, line, "discovered_amount");
         if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
     }
 }
 void save_rubber(std::ifstream &src, int *cap_res) {
     std::string line;
     while(getline(src, line)) {
-        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[10] = data_int(line);}
+        cap_res[10] = find_data_int(src, line, "undiscovered_amount");
         if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
     }
 }
 void save_oil(std::ifstream &src, int *cap_res) {
     std::string line;
     while(getline(src, line)) {
-        if(line.find("undiscovered_amount", 0) != std::string::npos) {cap_res[11] = data_int(line);}
+        cap_res[11] = find_data_int(src, line, "undiscovered_amount");
         if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
     }
 }
@@ -355,13 +353,13 @@ void save_resources(std::ifstream &src, int *cap_res) {
 void save_capped_resources(std::ifstream &src, int *cap_res) {
     std::string line;
     while(getline(src, line)) {
-        if(line.find("bg_coal_mining", 0) != std::string::npos){cap_res[1] = data_int(line); getline(src, line);}
-        if(line.find("bg_iron_mining", 0) != std::string::npos){cap_res[2] = data_int(line); getline(src, line);}
-        if(line.find("bg_lead_mining", 0) != std::string::npos){cap_res[3] = data_int(line); getline(src, line);}
-        if(line.find("bg_sulfur_mining", 0) != std::string::npos){cap_res[4] = data_int(line); getline(src, line);}
-        if(line.find("bg_logging", 0) != std::string::npos){cap_res[5] = data_int(line); getline(src, line);}
-        if(line.find("bg_fishing", 0) != std::string::npos){cap_res[6] = data_int(line); getline(src, line);}
-        if(line.find("bg_whaling", 0) != std::string::npos){cap_res[7] = data_int(line); getline(src, line);}
+        cap_res[1] = find_data_int(src, line, "bg_coal_mining");
+        cap_res[2] = find_data_int(src, line, "bg_iron_mining");
+        cap_res[3] = find_data_int(src, line, "bg_lead_mining");
+        cap_res[4] = find_data_int(src, line, "bg_sulfur_mining");
+        cap_res[5] = find_data_int(src, line, "bg_logging");
+        cap_res[6] = find_data_int(src, line, "bg_fishing");
+        cap_res[7] = find_data_int(src, line, "bg_whaling");
         if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
     }
 }
@@ -435,7 +433,7 @@ bool save_state(std::ifstream &src, State &st){
         }
     }
 }
-void browse_file(std::ifstream &src, std::vector<State> &states) {
+void browse_file(std::ifstream &src, std::vector<State> &states) { // TODO denest
     std::string line, name{};
     
     while(getline(src, line)) {
@@ -458,12 +456,17 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
 
     for(const auto &file : regs) {
         std::ifstream  src(file, std::ios::binary);
-        // std::string nav_ex{}, name{}, id{}, subsist{};
-        // std::vector<std::string> traits{}, ar_res{};
         browse_file(src, states);
     }
 } 
-  
+//   pops saving
+void save_pop(std::vector<State> &states, const std::string &name, const std::string &co, const std::string &cu, const std::string &r, const std::string &t, const int &s) { // ! TODO create a separate class for the parameters 
+    for (State &st : states) {
+        if(st.getName() == name) {
+            st.create_pops(co, cu, r, t, s);
+        }
+    }
+}
 void save_state_pops(const std::filesystem::path &path, std::vector<State> &states, const std::filesystem::path *files) {
     std::filesystem::path pops{"common/history/pops"};
     std::filesystem::path ps[15]{};
@@ -477,40 +480,35 @@ void save_state_pops(const std::filesystem::path &path, std::vector<State> &stat
         while(getline(src, line)) { 
             int size{};
             std::string type{}, cult{}, rel{};
-            if(line.find("s:", 0) != std::string::npos) { 
-                name = data_name(line);
-                getline(src, line);
-            }
-            if(line.find("region_state", 0) != std::string::npos) { 
-                country = data(line, ':');
-                getline(src, line);
-                getline(src, line);   
-            }
-            if(line.find("pop_type", 0) != std::string::npos) {
-                type = data(line);
-                getline(src, line);
-            }
-            if(line.find("culture", 0) != std::string::npos) {
-                cult = data(line);
-                getline(src, line);
-            }
-            if(line.find("religion", 0) != std::string::npos) {
-                rel = data(line);
-                getline(src, line);
-            }
-            if(line.find("size", 0) != std::string::npos) {
+            name = find_name(src, line, "s:");
+            getline(src, line);
+            country = find_data(src, line, "region_state", ':');
+            getline(src, line);
+            getline(src, line);   
+            type = find_data(src, line,"pop_type");
+            getline(src, line);
+            cult = find_data(src, line, "cultre");
+            getline(src, line);
+            rel = find_data(src, line, "religion");
+            getline(src, line);
+            if(line.find("size", 0) != std::string::npos) { // ! TODO extract this as a function
                 size = data_int(line);
-                for (State &st : states) {
-                    if(st.getName() == name) {
-                        st.create_pops(country, cult, rel, type, size);
-                    }
-                }
+                save_pop(states, name, country, cult, rel, type, size);
                 size = 0;
                 type = "";
                 cult = "";
                 rel = "";
                 getline(src, line);
             }
+        }
+    }
+}
+// building saving
+void save_building(std::vector<State> &states, const std::string &name, const std::string &co, const std::string &t, const int &l, const int &r, std::vector<std::string> &pm) { // ! TODO create a separate class for the parameters 
+
+    for (State &st : states) {
+        if(st.getName() == name) {
+            st.create_buildings(co, t, l, r, pm);
         }
     }
 }
@@ -528,34 +526,20 @@ void save_state_builds(const std::filesystem::path &path, std::vector<State> &st
             int lvl{}, res{};
             std::string type{};
             std::vector<std::string> pm{};
-            if(line.find("s:", 0) != std::string::npos) { 
-                name = data_name(line);
-                getline(src, line);
-            }
-            if(line.find("region_state", 0) != std::string::npos) { 
-                country = data(line, ':');
-                getline(src, line);
-            }
-            if(line.find("create_building", 0) != std::string::npos){getline(src, line);}   
-            if(line.find("building", 0) != std::string::npos) {
-                type = data(line);
-                getline(src, line);
-            }
-            if(line.find("level", 0) != std::string::npos) {
-                lvl = data_int(line);
-                getline(src, line);
-            }
-            if(line.find("reserves", 0) != std::string::npos) {
-                res = data_int(line);
-                getline(src, line);
-            }
-            if(line.find("activate_production_methods", 0) != std::string::npos) {
+            name = find_name(src, line, "s:");
+            getline(src, line);
+            country = find_data(src, line, "region_state", ':');
+            getline(src, line);
+            if(line.find("create_building", 0) != std::string::npos){getline(src, line);}   // ? TODO make this a function
+            type = find_data(src, line,"building");
+            getline(src, line);
+            lvl = find_data_int(src, line, "level");
+            getline(src, line);
+            res = find_data_int(src, line, "reserves");
+            getline(src, line);
+            if(line.find("activate_production_methods", 0) != std::string::npos) { // ! TODO extract this as a function
                 variable_string_vector(pm, line);
-                for (State &st : states) {
-                    if(st.getName() == name) {
-                        st.create_buildings(country, type, lvl, res, pm);
-                    }
-                }
+                save_building(states, name, country, type, lvl, res, pm);
                 type = "";
                 lvl = 0;
                 res = 0;
