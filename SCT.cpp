@@ -68,24 +68,32 @@ std::string data_name(std::string &line ) {
     return false
 } */
 std::string find_name(std::ifstream &src, std::string &line, const std::string &str) { // ? use this function for other stuff
+    std::string ret{};
     if(line.find(str, 0) != std::string::npos) { 
-        return data_name(line);
+        ret = data_name(line);
     }
+    return ret;
 }
 std::string find_data(std::ifstream &src, std::string &line, const std::string &str) { // ? use this function for other stuff
+    std::string ret{};
     if(line.find(str, 0) != std::string::npos) { 
-        return data(line);
+        ret = data(line);
     }
+    return ret;
 }
 std::string find_data(std::ifstream &src, std::string &line, const std::string &str, const char &delim) { // ? use this function for other stuff
+    std::string ret{};
     if(line.find(str, 0) != std::string::npos) { 
-        return data(line, delim);
+        ret = data(line, delim);
     }
+    return ret;
 }
 int find_data_int(std::ifstream &src, std::string &line, const std::string &str) { // ? use this function for other stuff
+    int ret{};
     if(line.find(str, 0) != std::string::npos) { 
-        return data_int(line);
+        ret = data_int(line);
     }
+    return ret;
 }
 // input/output paths
 void save_i_o_path() { // TODO add output path handling
@@ -257,7 +265,7 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
     }
 }
 
-// creating an array of states info //? TODO refactor using regex, denest the functions, create a class for the functions
+// creating an array of states info //? TODO refactor using regex, create a class for the functions
 void create_state(std::ifstream &src, std::vector<State> &states, const int &cur){
     std::string line, country{};
     std::vector<std::string> provs{};
@@ -429,9 +437,10 @@ bool save_state(std::ifstream &src, State &st){
             st.setNavEx(nav_ex);
         }
         if(line.find("}", 0) != std::string::npos){
-            return exit = 1;
+            exit = 1;
         }
     }
+    return exit;
 }
 void browse_file(std::ifstream &src, std::vector<State> &states) { // TODO denest
     std::string line, name{};
