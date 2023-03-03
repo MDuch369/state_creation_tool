@@ -67,6 +67,20 @@ std::string data_name(std::string &line ) {
     }
     return false
 } */
+
+// text parsing
+bool find_string(std::string &line, const std::string &str) {
+    if(line.find(str, 0) != std::string::npos) { 
+        return true; 
+    }
+    return false;
+}
+bool find_string(std::string &line, const std::string &str, const int &pos) {
+    if(line.find(str, pos) != std::string::npos) { 
+        return true; 
+    }
+    return false;
+}
 std::string find_name(std::ifstream &src, std::string &line, const std::string &str) { // ? use this function for other stuff
     std::string ret{};
     if(line.find(str, 0) != std::string::npos) { 
@@ -88,13 +102,19 @@ std::string find_data(std::ifstream &src, std::string &line, const std::string &
     }
     return ret;
 }
-int find_data_int(std::ifstream &src, std::string &line, const std::string &str) { // ? use this function for other stuff
-    int ret{};
+// int find_data_int(std::ifstream &src, std::string &line, const std::string &str) { // ? use this function for other stuff
+//     int ret{};
+//     if(line.find(str, 0) != std::string::npos) { 
+//         ret = data_int(line);
+//     }
+//     return ret;
+// }
+void find_data_int(std::ifstream &src, std::string &line, const std::string &str, int &res) { // ? use this function for other stuff
     if(line.find(str, 0) != std::string::npos) { 
-        ret = data_int(line);
+        res = data_int(line);
     }
-    return ret;
 }
+
 // input/output paths
 void save_i_o_path() { // TODO add output path handling
     std::string line{};
@@ -235,33 +255,33 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
     std::cout << std::endl;
     switch (action) {
     case '1':
-        return 0;
+        return false;
     case '2':
         list_current_i_o_paths(in, out);
-        return 1;
+        return true;
     case '3':
         list_i_o_paths('i');
         list_i_o_paths('o');
-        return 1;
+        return true;
     case '4':
         add_i_o_path('i');
         // return add_i_o_path('i');
-        return 1;
+        return true;
 
     case '5':
         add_i_o_path('o');
         // return add_i_o_path('o');
-        return 1;
+        return true;
     case '6':
         (in = change_path('i'));
-        return 1;
+        return true;
     case '7':
         (out = change_path('o'));
-        return 1;
+        return true;
     // case 'e':
     //     exit();
     default:
-        return 1;
+        return true;
     }
 }
 
@@ -271,35 +291,41 @@ void create_state(std::ifstream &src, std::vector<State> &states, const int &cur
     std::vector<std::string> provs{};
     
     while(getline(src, line)) {
-        if(line.find("create_state", 0) != std::string::npos) {
+        if(find_string(line, "create_state")) {
             getline(src, line);
             country = data(line, ':');
             while(getline(src, line)) {
                 data_vector(provs, line, 6);
-                if(line.find("}", 0) != std::string::npos){break;}
+                if(find_string(line, "}")){
+                    break;
+                }
             }
             states[cur].create_country(country, provs);
             provs.clear();
             getline(src, line);
-            if(line.find("#", 0) != std::string::npos) {continue;}
-            if(line.find("state_type", 0) != std::string::npos) {
+            if(find_string(line, "#")) {
+                continue;
+            }
+            if(find_string(line, "state_type")) {
                 int pres{states[cur].getCountries().size() - 1};
                 states[cur].getCountries()[pres].setCountryType(data(line));
             }
         }
-        if(line.find("add_homeland", 0) != std::string::npos) {break;}
+        if(find_string(line, "add_homeland")) {
+            break;
+        }
     }
 }
 void add_homelands(std::ifstream &src, std::vector<State> &states, const int &cur) {
     std::string line;
-    while(line.find("add_homeland", 0) != std::string::npos) {
+    while(find_string(line, "add_homeland")) {
         states[cur].setHomeland(data(line));
         getline(src, line);
     }
 }
 void add_claims(std::ifstream &src, std::vector<State> &states, const int &cur) {
     std::string line;
-    while(line.find("add_claim", 0) != std::string::npos) {
+    while(find_string(line, "add_claim")) {
         states[cur].setClaim(data(line));
         getline(src, line);
     } 
@@ -310,7 +336,7 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
     std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);  
 
     while(getline(src, line)) {
-        if(line.find("s:", 0) != std::string::npos) {
+        if(find_string(line, "s:")) {
             std::string name{data_name(line)};
             states.emplace_back(name);
             int cur{states.size() - 1};
@@ -324,60 +350,74 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
 void save_gold_fields(std::ifstream &src, int *cap_res) {
     std::string line;
     while(getline(src, line)) {
-        cap_res[8] = find_data_int(src, line, "undiscovered_amount");
-        cap_res[9] = find_data_int(src, line, "discovered_amount");
-        if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
+        find_data_int(src, line, "undiscovered_amount", cap_res[8]);
+        find_data_int(src, line, "discovered_amount", cap_res[9]);
+        if(find_string(line, "}", 1)){
+            getline(src, line);
+            break;
+        }
     }
 }
 void save_rubber(std::ifstream &src, int *cap_res) {
     std::string line;
     while(getline(src, line)) {
-        cap_res[10] = find_data_int(src, line, "undiscovered_amount");
-        if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
+        find_data_int(src, line, "undiscovered_amount", cap_res[10]);
+        if(find_string(line, "}", 1)){
+            getline(src, line);
+            break;
+        }
     }
 }
 void save_oil(std::ifstream &src, int *cap_res) {
     std::string line;
     while(getline(src, line)) {
-        cap_res[11] = find_data_int(src, line, "undiscovered_amount");
-        if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
+        find_data_int(src, line, "undiscovered_amount", cap_res[11]);
+        if(find_string(line, "}")){
+            getline(src, line); break;
+        }
     }
 }
 void save_resources(std::ifstream &src, int *cap_res) {
     std::string line;
     while(getline(src, line)){
-        if(line.find("bg_gold_fields", 0) != std::string::npos) {
+        if(find_string(line, "bg_gold_fields")) {
             save_gold_fields(src, cap_res);
         }    
-        if(line.find("bg_rubber", 0) != std::string::npos) {
+        if(find_string(line, "bg_rubber")) {
             save_rubber(src, cap_res);
         }
-        if(line.find("bg_oil_extraction", 0) != std::string::npos) {
+        if(find_string(line, "bg_oil_extraction")) {
             save_oil(src, cap_res);
         }
-        if(line.find("}", 0) != std::string::npos){break;}
+        if(find_string(line, "}")){
+            break;
+        }
     }
 }
 void save_capped_resources(std::ifstream &src, int *cap_res) {
     std::string line;
+    // for(int i = 1; i < 8; i++) 
     while(getline(src, line)) {
-        cap_res[1] = find_data_int(src, line, "bg_coal_mining");
-        cap_res[2] = find_data_int(src, line, "bg_iron_mining");
-        cap_res[3] = find_data_int(src, line, "bg_lead_mining");
-        cap_res[4] = find_data_int(src, line, "bg_sulfur_mining");
-        cap_res[5] = find_data_int(src, line, "bg_logging");
-        cap_res[6] = find_data_int(src, line, "bg_fishing");
-        cap_res[7] = find_data_int(src, line, "bg_whaling");
-        if(line.find("}", 1) != std::string::npos){getline(src, line); break;}
+        find_data_int(src, line, "bg_coal_mining", cap_res[1]);
+        find_data_int(src, line, "bg_iron_mining", cap_res[2]);
+        find_data_int(src, line, "bg_lead_mining", cap_res[3]);
+        find_data_int(src, line, "bg_sulfur_mining", cap_res[4]);
+        find_data_int(src, line, "bg_logging", cap_res[5]);
+        find_data_int(src, line, "bg_fishing", cap_res[6]);
+        find_data_int(src, line, "bg_whaling", cap_res[7]);
+        if(find_string(line, "}", 1)){
+            getline(src, line);
+            break;
+        }
     }
 }
 std::string save_subsistence_building(std::ifstream &src) {
     std::string line;
     std::string subsist = data(line);
     while(getline(src, line)){
-        if(line.find("}", 0) != std::string::npos) {
+        if(find_string(line, "}")) {
             getline(src, line); 
-            if(line.find("impassable", 0) != std::string::npos) { // TODO implement impassable provs handling
+            if(find_string(line, "impassable")) { // TODO implement impassable provs handling
                 getline(src, line); 
                 break;
             }
@@ -387,57 +427,70 @@ std::string save_subsistence_building(std::ifstream &src) {
     return subsist;
 }
 bool save_state(std::ifstream &src, State &st){
-    bool exit{};
+    bool exit{false};
     int cap_res[12]{};
     std::string line, nav_ex{}, name{}, id{}, subsist{};
     std::vector<std::string> traits{}, ar_res{};
     while(getline(src, line)) {
-        if(line.find("id", 0) != std::string::npos) {
+        if(find_string(line, "id")) {
             id = data(line);
             st.setId(id);
             getline(src, line);
         }
-        if(line.find("subsistence_building", 0) != std::string::npos) {
+        if(find_string(line, "subsistence_building")) {
             st.setSub(save_subsistence_building(src));
         }
-        if(line.find("traits", 0) != std::string::npos) {
-            if(traits.empty() != true) {traits.clear();}
+        if(find_string(line, "traits")) {
+            if(traits.empty() != true) {
+                traits.clear();
+            }
             variable_string_vector(traits, line);
             st.setTraits(traits);
             getline(src, line);
         }
         // ? TODO implement copying of hubs here
         // TEMP CODE
-        if(line.find("city", 0) != std::string::npos) {getline(src, line);}
-        if(line.find("port", 0) != std::string::npos) {getline(src, line);}
-        if(line.find("farm", 0) != std::string::npos) {getline(src, line);}
-        if(line.find("mine", 0) != std::string::npos) {getline(src, line);}
-        if(line.find("wood", 0) != std::string::npos) {getline(src, line);}
+        if(find_string(line, "city")) {
+            getline(src, line);
+        }
+        if(find_string(line, "port")) {
+            getline(src, line);
+        }
+        if(find_string(line, "farm")) {
+            getline(src, line);
+        }
+        if(find_string(line, "mine")) {
+            getline(src, line);
+        }
+        if(find_string(line, "wood")) {
+            getline(src, line);
+        }
         // END OF TEMP CODE
-        if(line.find("arable_land", 0) != std::string::npos) {
+        if(find_string(line, "arable_land")) {
             cap_res[0] = data_int(line);
             getline(src, line);
         } 
-        if(line.find("arable_resources", 0) != std::string::npos) {
-            if(ar_res.empty() != true) {ar_res.clear();}
+        if(find_string(line, "arable_resources")) {
+            if(ar_res.empty() != true) {
+                ar_res.clear();
+            }
             variable_string_vector(ar_res, line);
             st.setArRes(ar_res);
             getline(src, line);
         }
-        if(line.find("capped_resources", 0) != std::string::npos) {
+        if(find_string(line, "capped_resources")) {
             save_capped_resources(src, cap_res);
         }
-        if(line.find("resource ", 0) != std::string::npos) {
+        if(find_string(line, "resource ")) {
             save_resources(src, cap_res);
         }
         st.setRes(cap_res);
-        
-        if(line.find("naval_exit_id", 0) != std::string::npos) {
+        if(find_string(line, "naval_exit_id")) {
             nav_ex = data(line);
             st.setNavEx(nav_ex);
         }
-        if(line.find("}", 0) != std::string::npos){
-            exit = 1;
+        if(find_string(line, "}")){
+            exit = true;
         }
     }
     return exit;
@@ -446,7 +499,7 @@ void browse_file(std::ifstream &src, std::vector<State> &states) { // TODO denes
     std::string line, name{};
     
     while(getline(src, line)) {
-        if(line.find("STATE") != std::string::npos) {
+        if(find_string(line, "STATE")) {
             name = data_name(line);
             for (State &st : states) {
                 if(st.getName() == name) {
@@ -500,7 +553,7 @@ void save_state_pops(const std::filesystem::path &path, std::vector<State> &stat
             getline(src, line);
             rel = find_data(src, line, "religion");
             getline(src, line);
-            if(line.find("size", 0) != std::string::npos) { // ! TODO extract this as a function
+            if(find_string(line, "size")) { // ! TODO extract this as a function
                 size = data_int(line);
                 save_pop(states, name, country, cult, rel, type, size);
                 size = 0;
@@ -539,14 +592,16 @@ void save_state_builds(const std::filesystem::path &path, std::vector<State> &st
             getline(src, line);
             country = find_data(src, line, "region_state", ':');
             getline(src, line);
-            if(line.find("create_building", 0) != std::string::npos){getline(src, line);}   // ? TODO make this a function
+            if(find_string(line, "create_building")){ // ? TODO make this a function
+                getline(src, line);
+            }   
             type = find_data(src, line,"building");
             getline(src, line);
-            lvl = find_data_int(src, line, "level");
+            find_data_int(src, line, "level", lvl);
             getline(src, line);
-            res = find_data_int(src, line, "reserves");
+            find_data_int(src, line, "reserves", res);
             getline(src, line);
-            if(line.find("activate_production_methods", 0) != std::string::npos) { // ! TODO extract this as a function
+            if(find_string(line, "activate_production_methods")) { // ! TODO extract this as a function
                 variable_string_vector(pm, line);
                 save_building(states, name, country, type, lvl, res, pm);
                 type = "";
