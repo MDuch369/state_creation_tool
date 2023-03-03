@@ -82,25 +82,19 @@ bool find_string(std::string &line, const std::string &str, const int &pos) {
     return false;
 }
 void find_name(std::ifstream &src, std::string &line, const std::string &str, std::string &result) { // ? use this function for other stuff
-    // std::string ret{};
     if(line.find(str, 0) != std::string::npos) { 
         result = data_name(line);
     }
-    // return ret;
 }
 void find_data(std::ifstream &src, std::string &line, const std::string &str, std::string &result) { // ? use this function for other stuff
-    // std::string ret{};
     if(line.find(str, 0) != std::string::npos) { 
         result = data(line);
     }
-    // return ret;
 }
 void find_data(std::ifstream &src, std::string &line, const std::string &str, const char &delim, std::string &result) { // ? use this function for other stuff
-    // std::string ret{};
     if(line.find(str, 0) != std::string::npos) { 
         result = data(line, delim);
     }
-    // return ret;
 }
 // int find_data_int(std::ifstream &src, std::string &line, const std::string &str) { // ? use this function for other stuff
 //     int ret{};
@@ -287,7 +281,7 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
 
 // creating an array of states info //? TODO refactor using regex, create a class for the functions
 std::ifstream::pos_type create_state(std::ifstream &src, std::vector<State> &states, std::string &line, const int &cur){
-    std::string /*line, */country{};
+    std::string country{};
     std::vector<std::string> provs{};
     
     while(getline(src, line)) {
@@ -318,7 +312,6 @@ std::ifstream::pos_type create_state(std::ifstream &src, std::vector<State> &sta
     return src.tellg();
 }
 std::ifstream::pos_type add_homelands(std::ifstream &src, std::vector<State> &states, std::string &line, const int &cur) {
-    // std::string line;
     while(find_string(line, "add_homeland")) {
         states[cur].setHomeland(data(line));
         getline(src, line);
@@ -326,7 +319,6 @@ std::ifstream::pos_type add_homelands(std::ifstream &src, std::vector<State> &st
     return src.tellg();
 }
 std::ifstream::pos_type add_claims(std::ifstream &src, std::vector<State> &states, std::string &line, const int &cur) {
-    // std::string line;
     while(find_string(line, "add_claim")) {
         states[cur].setClaim(data(line));
         getline(src, line);
@@ -432,7 +424,6 @@ std::ifstream::pos_type save_subsistence_building(std::ifstream &src, std::strin
     return src.tellg();
 }
 std::ifstream::pos_type save_state(std::ifstream &src, State &st, std::string &line){
-    // bool exit{false};
     int cap_res[12]{};
     std::string nav_ex{}, name{}, id{}, subsist{};
     std::vector<std::string> traits{}, ar_res{};
@@ -550,16 +541,10 @@ void save_state_pops(const std::filesystem::path &path, std::vector<State> &stat
         std::string type{}, cult{}, rel{};
         while(getline(src, line)) { 
             find_name(src, line, "s:", name);
-            // getline(src, line);
             find_data(src, line, "region_state", ':', country);
-            // getline(src, line);
-            // getline(src, line);   
             find_data(src, line, "pop_type", type);
-            // getline(src, line);
             find_data(src, line, "culture", cult);
-            // getline(src, line);
             find_data(src, line, "religion", rel);
-            // getline(src, line);
             if(find_string(line, "size")) { // ! TODO extract this as a function
                 size = data_int(line);
                 src.seekg(save_pop(src, states, name, country, cult, rel, type, size));
@@ -597,18 +582,13 @@ void save_state_builds(const std::filesystem::path &path, std::vector<State> &st
         std::vector<std::string> pm{};
         while(getline(src, line)) { 
             find_name(src, line, "s:", name);
-            // getline(src, line);
             find_data(src, line, "region_state", ':', country);
-            // getline(src, line);
             if(find_string(line, "create_building")){ // ? TODO make this a function
                 getline(src, line);
             }   
             find_data(src, line,"building", type);
-            // getline(src, line);
             find_data_int(src, line, "level", lvl);
-            // getline(src, line);
             find_data_int(src, line, "reserves", res);
-            // getline(src, line);
             if(find_string(line, "activate_production_methods")) { // ! TODO extract this as a function
                 variable_string_vector(pm, line);
                 src.seekg(save_building(src, states, name, country, type, lvl, res, pm));
@@ -658,7 +638,7 @@ void save_provinces(std::vector<std::string> &provs) { // TODO move inside Trans
     }
 }
 
-// debug functions
+// debug functions //TODO create a class for this functions
 void debug_print_file_list(const std::filesystem::path *files) {
     for (int i{}; i < 16; i++){
         std::cout << i << " " << files[i] << std::endl;
@@ -702,13 +682,13 @@ int main() {
     for(int i {}; i < tr_states.size(); i++){tr_states[i].create_target_states(tar_states);}
     for(int i {}; i < tr_states.size(); i++){tr_states[i].create_remaining_states(remaining_states, states);}
     for(int i {}; i < tr_states.size(); i++){tr_states[i].calculate_remaining_resources(remaining_states);}
-    for(int i {}; i < tar_states.size(); i++){ // target state printing
+    for(int i {}; i < tar_states.size(); i++){  // target state printing // TODO create a single function calling the other ones
         tar_states[i].print_state_region();
         tar_states[i].print_pops();
         tar_states[i].print_buildings();
         tar_states[i].print_state();
     }
-    for(int i {}; i < remaining_states.size(); i++) { // state remains printing
+    for(int i {}; i < remaining_states.size(); i++) { // state remains printing // TODO create a single function calling the other ones
         remaining_states[i].print_state_region();
         remaining_states[i].print_pops();
         remaining_states[i].print_buildings();
