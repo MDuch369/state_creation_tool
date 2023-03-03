@@ -350,8 +350,7 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
     }
 }
 // state info saving
-void save_gold_fields(std::ifstream &src, int *cap_res) {
-    std::string line;
+std::ifstream::pos_type save_gold_fields(std::ifstream &src, int *cap_res, std::string &line) {
     while(getline(src, line)) {
         find_data_int(src, line, "undiscovered_amount", cap_res[8]);
         find_data_int(src, line, "discovered_amount", cap_res[9]);
@@ -360,9 +359,9 @@ void save_gold_fields(std::ifstream &src, int *cap_res) {
             break;
         }
     }
+    return src.tellg();
 }
-void save_rubber(std::ifstream &src, int *cap_res) {
-    std::string line;
+std::ifstream::pos_type save_rubber(std::ifstream &src, int *cap_res, std::string &line) {
     while(getline(src, line)) {
         find_data_int(src, line, "undiscovered_amount", cap_res[10]);
         if(find_string(line, "}", 1)){
@@ -370,35 +369,37 @@ void save_rubber(std::ifstream &src, int *cap_res) {
             break;
         }
     }
+    return src.tellg();
 }
-void save_oil(std::ifstream &src, int *cap_res) {
-    std::string line;
+std::ifstream::pos_type save_oil(std::ifstream &src, int *cap_res, std::string &line) {
     while(getline(src, line)) {
         find_data_int(src, line, "undiscovered_amount", cap_res[11]);
         if(find_string(line, "}")){
             getline(src, line); break;
         }
     }
+    return src.tellg();
 }
-void save_resources(std::ifstream &src, int *cap_res) {
-    std::string line;
+std::ifstream::pos_type save_resources(std::ifstream &src, int *cap_res, std::string &line) {
+    // std::string line;
     while(getline(src, line)){
         if(find_string(line, "bg_gold_fields")) {
-            save_gold_fields(src, cap_res);
+            src.seekg(save_gold_fields(src, cap_res, line));
         }    
         if(find_string(line, "bg_rubber")) {
-            save_rubber(src, cap_res);
+            src.seekg(save_rubber(src, cap_res, line));
         }
         if(find_string(line, "bg_oil_extraction")) {
-            save_oil(src, cap_res);
+            src.seekg(save_oil(src, cap_res, line));
         }
         if(find_string(line, "}")){
             break;
         }
     }
+    return src.tellg();
 }
-void save_capped_resources(std::ifstream &src, int *cap_res) {
-    std::string line;
+std::ifstream::pos_type save_capped_resources(std::ifstream &src, int *cap_res, std::string &line) {
+    // std::string line;
     // for(int i = 1; i < 8; i++) 
     while(getline(src, line)) {
         find_data_int(src, line, "bg_coal_mining", cap_res[1]);
@@ -413,10 +414,11 @@ void save_capped_resources(std::ifstream &src, int *cap_res) {
             break;
         }
     }
+    return src.tellg();
 }
-std::string save_subsistence_building(std::ifstream &src) {
-    std::string line;
-    std::string subsist = data(line);
+std::ifstream::pos_type save_subsistence_building(std::ifstream &src, std::string &line, std::string &subsist) {
+    // std::string line;
+    subsist = data(line);
     while(getline(src, line)){
         if(find_string(line, "}")) {
             getline(src, line); 
@@ -427,12 +429,12 @@ std::string save_subsistence_building(std::ifstream &src) {
             break;
         }
     } 
-    return subsist;
+    return src.tellg();
 }
-bool save_state(std::ifstream &src, State &st){
-    bool exit{false};
+std::ifstream::pos_type save_state(std::ifstream &src, State &st, std::string &line){
+    // bool exit{false};
     int cap_res[12]{};
-    std::string line, nav_ex{}, name{}, id{}, subsist{};
+    std::string nav_ex{}, name{}, id{}, subsist{};
     std::vector<std::string> traits{}, ar_res{};
     while(getline(src, line)) {
         if(find_string(line, "id")) {
@@ -441,7 +443,9 @@ bool save_state(std::ifstream &src, State &st){
             getline(src, line);
         }
         if(find_string(line, "subsistence_building")) {
-            st.setSub(save_subsistence_building(src));
+            
+            src.seekg(save_subsistence_building(src, line, subsist));
+            st.setSub(subsist);
         }
         if(find_string(line, "traits")) {
             if(traits.empty() != true) {
@@ -482,10 +486,10 @@ bool save_state(std::ifstream &src, State &st){
             getline(src, line);
         }
         if(find_string(line, "capped_resources")) {
-            save_capped_resources(src, cap_res);
+            src.seekg(save_capped_resources(src, cap_res, line));
         }
         if(find_string(line, "resource ")) {
-            save_resources(src, cap_res);
+            src.seekg(save_resources(src, cap_res, line));
         }
         st.setRes(cap_res);
         if(find_string(line, "naval_exit_id")) {
@@ -493,10 +497,10 @@ bool save_state(std::ifstream &src, State &st){
             st.setNavEx(nav_ex);
         }
         if(find_string(line, "}")){
-            exit = true;
+            break;
         }
     }
-    return exit;
+    return src.tellg();
 }
 void browse_file(std::ifstream &src, std::vector<State> &states) { // TODO denest
     std::string line, name{};
@@ -506,9 +510,8 @@ void browse_file(std::ifstream &src, std::vector<State> &states) { // TODO denes
             name = data_name(line);
             for (State &st : states) {
                 if(st.getName() == name) {
-                    bool exit{save_state(src, st)};
+                    src.seekg(save_state(src, st, line));
                 }
-                if(exit) {break;}
             }  
         }
     }
