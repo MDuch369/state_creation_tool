@@ -286,15 +286,15 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
 }
 
 // creating an array of states info //? TODO refactor using regex, create a class for the functions
-void create_state(std::ifstream &src, std::vector<State> &states, const int &cur){
-    std::string line, country{};
+std::ifstream::pos_type create_state(std::ifstream &src, std::vector<State> &states, std::string &line, const int &cur){
+    std::string /*line, */country{};
     std::vector<std::string> provs{};
     
     while(getline(src, line)) {
         if(find_string(line, "create_state")) {
             getline(src, line);
             country = data(line, ':');
-            while(getline(src, line)) {
+            while(getline(src, line)) { // ? extract function
                 data_vector(provs, line, 6);
                 if(find_string(line, "}")){
                     break;
@@ -315,20 +315,23 @@ void create_state(std::ifstream &src, std::vector<State> &states, const int &cur
             break;
         }
     }
+    return src.tellg();
 }
-void add_homelands(std::ifstream &src, std::vector<State> &states, const int &cur) {
-    std::string line;
+std::ifstream::pos_type add_homelands(std::ifstream &src, std::vector<State> &states, std::string &line, const int &cur) {
+    // std::string line;
     while(find_string(line, "add_homeland")) {
         states[cur].setHomeland(data(line));
         getline(src, line);
     }
+    return src.tellg();
 }
-void add_claims(std::ifstream &src, std::vector<State> &states, const int &cur) {
-    std::string line;
+std::ifstream::pos_type add_claims(std::ifstream &src, std::vector<State> &states, std::string &line, const int &cur) {
+    // std::string line;
     while(find_string(line, "add_claim")) {
         states[cur].setClaim(data(line));
         getline(src, line);
     } 
+    return src.tellg();
 }
 void save_states(const std::filesystem::path &path, std::vector<State> &states) { 
     std::string line{}, country{}, type{};
@@ -340,9 +343,9 @@ void save_states(const std::filesystem::path &path, std::vector<State> &states) 
             std::string name{data_name(line)};
             states.emplace_back(name);
             int cur{states.size() - 1};
-            create_state(src, states, cur);
-            add_homelands(src, states, cur);
-            add_claims(src, states, cur);
+            src.seekg(create_state(src, states, line, cur));
+            src.seekg(add_homelands(src, states, line, cur));
+            src.seekg(add_claims(src, states, line, cur));
         }
     }
 }
