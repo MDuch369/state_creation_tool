@@ -81,26 +81,26 @@ bool find_string(std::string &line, const std::string &str, const int &pos) {
     }
     return false;
 }
-std::string find_name(std::ifstream &src, std::string &line, const std::string &str) { // ? use this function for other stuff
-    std::string ret{};
+void find_name(std::ifstream &src, std::string &line, const std::string &str, std::string &result) { // ? use this function for other stuff
+    // std::string ret{};
     if(line.find(str, 0) != std::string::npos) { 
-        ret = data_name(line);
+        result = data_name(line);
     }
-    return ret;
+    // return ret;
 }
-std::string find_data(std::ifstream &src, std::string &line, const std::string &str) { // ? use this function for other stuff
-    std::string ret{};
+void find_data(std::ifstream &src, std::string &line, const std::string &str, std::string &result) { // ? use this function for other stuff
+    // std::string ret{};
     if(line.find(str, 0) != std::string::npos) { 
-        ret = data(line);
+        result = data(line);
     }
-    return ret;
+    // return ret;
 }
-std::string find_data(std::ifstream &src, std::string &line, const std::string &str, const char &delim) { // ? use this function for other stuff
-    std::string ret{};
+void find_data(std::ifstream &src, std::string &line, const std::string &str, const char &delim, std::string &result) { // ? use this function for other stuff
+    // std::string ret{};
     if(line.find(str, 0) != std::string::npos) { 
-        ret = data(line, delim);
+        result = data(line, delim);
     }
-    return ret;
+    // return ret;
 }
 // int find_data_int(std::ifstream &src, std::string &line, const std::string &str) { // ? use this function for other stuff
 //     int ret{};
@@ -109,9 +109,9 @@ std::string find_data(std::ifstream &src, std::string &line, const std::string &
 //     }
 //     return ret;
 // }
-void find_data_int(std::ifstream &src, std::string &line, const std::string &str, int &res) { // ? use this function for other stuff
+void find_data_int(std::ifstream &src, std::string &line, const std::string &str, int &result) { // ? use this function for other stuff
     if(line.find(str, 0) != std::string::npos) { 
-        res = data_int(line);
+        result = data_int(line);
     }
 }
 
@@ -528,12 +528,13 @@ void save_state_info(const std::filesystem::path &path, std::vector<State> &stat
     }
 } 
 //   pops saving
-void save_pop(std::vector<State> &states, const std::string &name, const std::string &co, const std::string &cu, const std::string &r, const std::string &t, const int &s) { // ! TODO create a separate class for the parameters 
+std::ifstream::pos_type save_pop(std::ifstream &src, std::vector<State> &states, const std::string &name, const std::string &co, const std::string &cu, const std::string &r, const std::string &t, const int &s) { // ! TODO create a separate class for the parameters 
     for (State &st : states) {
         if(st.getName() == name) {
             st.create_pops(co, cu, r, t, s);
         }
     }
+    return src.tellg();
 }
 void save_state_pops(const std::filesystem::path &path, std::vector<State> &states, const std::filesystem::path *files) {
     std::filesystem::path pops{"common/history/pops"};
@@ -545,23 +546,23 @@ void save_state_pops(const std::filesystem::path &path, std::vector<State> &stat
         std::string line;
         std::string name{}, country{};
         getline(src, line);
+        int size{};
+        std::string type{}, cult{}, rel{};
         while(getline(src, line)) { 
-            int size{};
-            std::string type{}, cult{}, rel{};
-            name = find_name(src, line, "s:");
-            getline(src, line);
-            country = find_data(src, line, "region_state", ':');
-            getline(src, line);
-            getline(src, line);   
-            type = find_data(src, line,"pop_type");
-            getline(src, line);
-            cult = find_data(src, line, "cultre");
-            getline(src, line);
-            rel = find_data(src, line, "religion");
-            getline(src, line);
+            find_name(src, line, "s:", name);
+            // getline(src, line);
+            find_data(src, line, "region_state", ':', country);
+            // getline(src, line);
+            // getline(src, line);   
+            find_data(src, line, "pop_type", type);
+            // getline(src, line);
+            find_data(src, line, "culture", cult);
+            // getline(src, line);
+            find_data(src, line, "religion", rel);
+            // getline(src, line);
             if(find_string(line, "size")) { // ! TODO extract this as a function
                 size = data_int(line);
-                save_pop(states, name, country, cult, rel, type, size);
+                src.seekg(save_pop(src, states, name, country, cult, rel, type, size));
                 size = 0;
                 type = "";
                 cult = "";
@@ -572,13 +573,14 @@ void save_state_pops(const std::filesystem::path &path, std::vector<State> &stat
     }
 }
 // building saving
-void save_building(std::vector<State> &states, const std::string &name, const std::string &co, const std::string &t, const int &l, const int &r, std::vector<std::string> &pm) { // ! TODO create a separate class for the parameters 
+std::ifstream::pos_type save_building(std::ifstream &src, std::vector<State> &states, const std::string &name, const std::string &co, const std::string &t, const int &l, const int &r, std::vector<std::string> &pm) { // ! TODO create a separate class for the parameters 
 
     for (State &st : states) {
         if(st.getName() == name) {
             st.create_buildings(co, t, l, r, pm);
         }
     }
+    return src.tellg();
 }
 void save_state_builds(const std::filesystem::path &path, std::vector<State> &states, const std::filesystem::path *files) {
     std::filesystem::path builds{"common/history/buildings"};
@@ -590,26 +592,26 @@ void save_state_builds(const std::filesystem::path &path, std::vector<State> &st
         std::string line;
         std::string name{}, country{};
         getline(src, line);
+        int lvl{}, res{};
+        std::string type{};
+        std::vector<std::string> pm{};
         while(getline(src, line)) { 
-            int lvl{}, res{};
-            std::string type{};
-            std::vector<std::string> pm{};
-            name = find_name(src, line, "s:");
-            getline(src, line);
-            country = find_data(src, line, "region_state", ':');
-            getline(src, line);
+            find_name(src, line, "s:", name);
+            // getline(src, line);
+            find_data(src, line, "region_state", ':', country);
+            // getline(src, line);
             if(find_string(line, "create_building")){ // ? TODO make this a function
                 getline(src, line);
             }   
-            type = find_data(src, line,"building");
-            getline(src, line);
+            find_data(src, line,"building", type);
+            // getline(src, line);
             find_data_int(src, line, "level", lvl);
-            getline(src, line);
+            // getline(src, line);
             find_data_int(src, line, "reserves", res);
-            getline(src, line);
+            // getline(src, line);
             if(find_string(line, "activate_production_methods")) { // ! TODO extract this as a function
                 variable_string_vector(pm, line);
-                save_building(states, name, country, type, lvl, res, pm);
+                src.seekg(save_building(src, states, name, country, type, lvl, res, pm));
                 type = "";
                 lvl = 0;
                 res = 0;
