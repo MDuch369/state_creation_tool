@@ -359,6 +359,12 @@ void State::print_state() {
     }
     dst << "\t}" << std::endl;
 }
+void State::print_entry() {
+    this->print_state_region();
+    this->print_pops();
+    this->print_buildings();
+    this->print_state();
+}
 
 // Setters
 void State::setName(const std::string &n) {this->name = n;}

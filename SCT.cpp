@@ -682,18 +682,7 @@ int main() {
     for(int i {}; i < tr_states.size(); i++){tr_states[i].create_target_states(tar_states);}
     for(int i {}; i < tr_states.size(); i++){tr_states[i].create_remaining_states(remaining_states, states);}
     for(int i {}; i < tr_states.size(); i++){tr_states[i].calculate_remaining_resources(remaining_states);}
-    for(int i {}; i < tar_states.size(); i++){  // target state printing // TODO create a single function calling the other ones
-        tar_states[i].print_state_region();
-        tar_states[i].print_pops();
-        tar_states[i].print_buildings();
-        tar_states[i].print_state();
-    }
-    for(int i {}; i < remaining_states.size(); i++) { // state remains printing // TODO create a single function calling the other ones
-        remaining_states[i].print_state_region();
-        remaining_states[i].print_pops();
-        remaining_states[i].print_buildings();
-        remaining_states[i].print_state();
-    }
-
+    for(int i {}; i < tar_states.size(); i++){ tar_states[i].print_entry();}
+    for(int i {}; i < remaining_states.size(); i++) {remaining_states[i].print_entry();}
     return 0;
 }

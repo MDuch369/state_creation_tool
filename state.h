@@ -75,7 +75,11 @@ protected:
     // hubs = 0-city, 1-port, 2-farm, 3-mine, 4-wood
     // res = 0-arable land, 1-coal, 2-iron, 3-lead, 4-sulfur, 5-logging, 6-fishing, 7-whaling, 8-gold, 9-disc. gold, 10-rubber, 11-oil
 // Functions:
-
+// data printing
+    void print_state_region();
+    void print_pops();
+    void print_buildings();
+    void print_state();
 public:
 // constructors 
     State();
@@ -108,10 +112,7 @@ public:
     void variable_string_vector(std::vector<std::string> &t, std::string &line);
 
 // data printing
-    void print_state_region();
-    void print_pops();
-    void print_buildings();
-    void print_state();
+    void print_entry();
 
 // getters
     inline std::string getName() {return name;}
