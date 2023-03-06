@@ -8,7 +8,7 @@
 
 
 // data maniopulation
-// TODO try to use polymorphism here
+// TODO try to use function overloading here
 std::string data(std::string &line){
     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
     int pos{line.find("=") + 1};
@@ -684,5 +684,6 @@ int main() {
     for(int i {}; i < tr_states.size(); i++){tr_states[i].calculate_remaining_resources(remaining_states);}
     for(int i {}; i < tar_states.size(); i++){ tar_states[i].print_entry();}
     for(int i {}; i < remaining_states.size(); i++) {remaining_states[i].print_entry();}
+    
     return 0;
 }
