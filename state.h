@@ -6,6 +6,7 @@
 #include <sstream>
 #include <fstream>
 #include <filesystem> 
+
 class State {
 //sublcasses
 protected:
@@ -74,12 +75,14 @@ protected:
     unsigned int res[12]{};
     // hubs = 0-city, 1-port, 2-farm, 3-mine, 4-wood
     // res = 0-arable land, 1-coal, 2-iron, 3-lead, 4-sulfur, 5-logging, 6-fishing, 7-whaling, 8-gold, 9-disc. gold, 10-rubber, 11-oil
+
 // Functions:
 // data printing
     void print_state_region();
     void print_pops();
     void print_buildings();
     void print_state();
+
 public:
 // constructors 
     State();
@@ -87,13 +90,12 @@ public:
     State(const unsigned int &, const std::string &);
     State(const unsigned int[]);
     State(const std::string &);
-    // State(State_transfer &);
 
 // countries
     void create_country(const std::string &, std::vector<std::string> &);
 
 // pops  
-    void create_pops(const std::string &, const std::string &, const std::string &, const std::string &, const int & /*std::vector<State::Pop> &*/);
+    void create_pops(const std::string &, const std::string &, const std::string &, const std::string &, const int &);
     void add_pop(const std::string &, const std::string &, const std::string &, const int &);
 
 // buildings
@@ -117,27 +119,9 @@ public:
 // getters
     inline std::string getName() {return name;}
     inline std::string getSub() {return sub;}
-    /*inline std::string getCity() {return city;}
-    inline std::string getPort() {return port;}
-    inline std::string getFarm() {return farm;}
-    inline std::string getMine() {return mine;}
-    inline std::string getWood() {return wood;}*/
     inline std::string getId() {return id;}
-    // inline unsigned int getLand() {return ar_land;}
-    /*inline unsigned int getCoal() {return coal;}
-    inline unsigned int getIron() {return iron;}
-    inline unsigned int getLead() {return lead;}
-    inline unsigned int getSulfur() {return sulfur;}
-    inline unsigned int getLog() {return log;}
-    inline unsigned int getFish() {return fish;}
-    inline unsigned int getWhale() {return whale;}
-    inline unsigned int getOil() {return oil;}
-    inline unsigned int getRubber() {return rubber;}
-    inline unsigned int getGold() {return gold;}
-    inline unsigned int getDiscGold() {return disc_gold;} */
     inline std::string getNavalExit() {return naval_exit;}
     inline const unsigned int* getRes() {return res;}
-    // inline std::vector<std::string> getProvs() {return provs;}
     inline std::vector<std::string> getTraits() {return traits;}
     inline std::vector<std::string> getResources() {return ar_res;}
     inline std::vector<std::string> getImProvs() {return im_provs;}            
@@ -151,41 +135,35 @@ public:
    void setId(const std::string &);
    void setSub(const std::string &);
    void setTraits(const std::vector<std::string> &);
-   void setHubs(const std::string [/*5*/]);
+   void setHubs(const std::string []);
    void setLand(const int &);
    void setArRes(const std::vector<std::string> &);
-   void setRes(const int [/*12*/]);
+   void setRes(const int []);
    void setProvs(const std::vector<std::string> &);
    void setProv(const int &, const std::string &);
    void setPopSize(const int &, const int &);
-   // void setResources(const std::vector<std::string> &);
    void setHomeland(const std::string &);
    void setClaim(const std::string &);
    void setArable(const int &);
    void setNavEx(const std::string &);
 
-// debug functions
-    // void debug_print_provs();
 };
 
 /**** STATE TRANSFER CLASS ****/
 
 class State_transfer : public State {
 // data
-    // bool origin_found{0};
     int origin_pos{};
     std::string origin{};
     std::vector<std::string> transfer_provs;
 
 // Functions:
-    // double calculate_ratio(const std::vector<std::string> &); 
     unsigned int find_states(const std::string &, std::vector<State_transfer> &);
 
 public:
 // constructors
     State_transfer(const std::string &, const std::string &, const std::string &); // TODO replace this constructor with the one below
     State_transfer(const std::string &, const std::string &, const std::vector<std::string> &);  
-    // State_transfer(const std::string &, const int &, const std::vector<std::string> &);
 
 // countries
     State::Country create_transfer_country(State::Country &, std::vector<std::string> &, const double &);
@@ -197,9 +175,9 @@ public:
 // transfer
     void find_origin_states(const std::vector<State> &, std::vector<State_transfer> &);
     void calculate_resources(std::vector<State> &);
-    void create_target_states(std::vector<State_transfer> &/*, std::vector<State> &*/);
+    void create_target_states(std::vector<State_transfer> &);
     void create_remaining_states(std::vector<State> &, std::vector<State> &);
-    void calculate_remaining_resources(std::vector<State> &/*, std::vector<State> &*/);
+    void calculate_remaining_resources(std::vector<State> &);
 
 // debug functions
     void debug_print_provs();

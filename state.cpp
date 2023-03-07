@@ -12,107 +12,6 @@ State::State(const std::filesystem::path &path) {
     std::string line{};
     std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);   
 }
-// State::State(const unsigned int &cur_line, const std::string &file) { // copies data from map_data/state_regions
-//     unsigned int copy_line{}, len{};
-//     std::string line{};
-//     std::ifstream  src(file, std::ios::binary);
-//     this->file_name = file;
-//     while(getline(src, line)) {
-//         copy_line++;
-//         if (copy_line >= cur_line - 3) {
-//             if((copy_line > cur_line) && (line[0] == 'S')) {
-//                 break;
-//             }
-//             if(copy_line == cur_line - 3) { 
-//                 this->name = line.substr(0, line.find ("=") - 1);
-//             }
-//             if(compare_string("id", line)) { 
-//                 this->id = data_int(line);
-//             }
-//             if(compare_string("subsistence_building", line)) {
-//                 this->sub = data(line);
-//             }
-//             // if(compare_string("provinces", line)) {
-//             //     data_vector(this->provs, line, 6);
-//             // }
-//             if(compare_string("impassable", line)) {
-//                 data_vector(this->im_provs, line, 6);
-//             }
-//             if(compare_string("traits", line)) {
-//                 variable_string_vector(this->traits, line);
-//             }
-//             if(compare_string("city", line)) {
-//                 this->city = data(line);
-//             }
-//             if(compare_string("port", line)) {
-//                 this->port = data(line);
-//             }
-//             if(compare_string("farm", line)) {
-//                 this->farm = data(line);
-//             }
-//             if(compare_string("mine", line)) {
-//                 this->mine = data(line);
-//             }
-//             if(compare_string("wood", line)) {
-//                 this->wood = data(line);
-//             }
-//             if(compare_string("arable_land", line)) {
-//                 this->ar_land = data_int(line);
-//             }
-//             if(compare_string("arable_resources", line)) {
-//                 variable_string_vector(this->ar_res, line);
-//             }
-//             if(compare_string("bg_coal_mining", line)) {
-//                 this->coal = data_int(line);
-//             }
-//             if(compare_string("bg_iron_mining", line)) {
-//                 this->iron = data_int(line);
-//             }
-//             if(compare_string("bg_sulfur_mining", line)) {
-//                 this->sulfur = data_int(line);
-//             }
-//             if(compare_string("bg_logging", line)) {
-//                 this->log = data_int(line);
-//             }
-//             if(compare_string("bg_whaling", line)) {
-//                 this->whale = data_int(line);
-//             }
-//             if(compare_string("bg_fishing", line)) {
-//                 this->fish = data_int(line);
-//             }
-//             if(compare_string("resource", line)) {
-//                 getline(src, line);
-//                 if(compare_string("bg_gold_fields", line)) {
-//                     getline(src, line);
-//                     if(compare_string("undiscovered_amount", line)) {
-//                         this->gold = data_int(line);
-//                     }
-//                     if(compare_string("discovered_amount", line)) {
-//                         this->disc_gold = data_int(line);
-//                     }                    
-//                 }
-//                 if(compare_string("bg_rubber", line)) {
-//                     getline(src, line);
-//                     if(compare_string("undiscovered_amount", line)) {
-//                         this->rubber = data_int(line);
-//                     }
-//                 }
-//                 if(compare_string("bg_oil_extraction", line)) {
-//                     getline(src, line);
-//                     if(compare_string("undiscovered_amount", line)) {
-//                         this->oil = data_int(line);
-//                     }                    
-//                 }                
-//             }                                                                                                             
-//             if(compare_string("naval_exit_id", line)) {
-//                 this->naval_exit = data_int(line);
-//             }
-//         }
-//     }
-//     src.close();
-// }
-// State::State(const unsigned int res[]) 
-//     :ar_land{res[0]}, coal{res[1]}, iron{res[2]}, lead{res[3]}, sulfur{res[4]}, log{res[5]}, fish{res[6]}, whale{res[7]}, oil{res[8]}, rubber{res[9]}, gold{res[10]}, disc_gold{res[11]} {}
 State::State(const std::string &name) :name{name} {} 
 State::Country::Country(const std::string &name):country{name} {}
 State::Country::Country(const std::string &name, const std::vector<std::string> &pr) :country{name}, provs{pr} {}
@@ -135,9 +34,6 @@ void State::create_pops(const std::string &co, const std::string &cul, const std
         }
     }
 }
-// void State::add_pop(const std::string &cul, const std::string &rel, const std::string &type, const int &size) {
-//     this->pops.emplace_back(cul, rel, type, size);
-// }
 
 // buildings
 void State::create_buildings(const std::string &co, const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pm) {
@@ -195,15 +91,6 @@ void State::copy_state_info(State &st) {
     this->homelands = st.getHomelands();
 
 }
-// void State::calculate_remaining_provs(State &st) {
-//     for (std::string a : st.getProvs()) {
-//         for(int i{}; i < provs.size(); i++) {
-//             if (a == provs[i]) {
-//                 provs.erase(provs.begin() + i);
-//             }
-//         }
-//     }
-// }
 void State::create_homelands(const std::string &file) {
     std::string line;
     std::ifstream  src(file, std::ios::binary);
@@ -372,32 +259,12 @@ void State::setId(const std::string &i) {this->id = i;}
 void State::setSub(const std::string &s){this->sub = s;}
 void State::setTraits(const std::vector<std::string> &t){this->traits = t;}
 void State::setHubs(const std::string h[5]){for(int i{}; i < 5; i++) {this->hubs[i] = h[i];} }
-// void State::setLand(const int &l){this->ar_land = l;}
 void State::setArRes(const std::vector<std::string> &r) {this->ar_res = r;}
 void State::setRes(const int r[/*12*/]){ for(int i{}; i < 12; i++) {this->res[i] = r[i];} }
-// void State::setProvs(const std::vector<std::string> &p) {this->provs = p;}
-// void State::setProv(const int &i, const std::string &s) {this->provs[i] = s;}
-// void State::setPopSize(const int &i, const int &size) {this->pops[i].setSize(size);}
 void State::Country::Pop::setSize(const int &size) {this->size = size;}
 void State::Country::Building::setLvl(const int &level) {this->level = level;}
-// void State::setTraits(const std::vector<std::string> &tr) {
-//     this->traits = tr;
-// }
-// void save_data ( const std::string &line, std::ifstream src) {
-//     getline(src, line);
-// }
-// void State::setSub(const std::string &s){
-//     this->sub = s;
-// }
-// void State::setTraits(const std::vector<std::string> &t){
-//     this->traits = t;
-// }
-// void State::setResources(const std::vector<std::string> &r){
-//     this->ar_res = r;
-// }
 void State::setHomeland(const std::string &home) {this->homelands.push_back(home);}
 void State::setClaim(const std::string &claim) {this->claims.push_back(claim);}
-// void State::setArable(const int &ar) { this->ar_land = ar;}
 void State::Country::setCountryType(const std::string &type) {this->type = type;}
 void State::setNavEx(const std::string &nx){this->naval_exit = nx;}
 
