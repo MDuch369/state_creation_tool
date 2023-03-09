@@ -3,11 +3,12 @@
 
 #include <iostream>
 #include <vector>
+#include <sstream>
 #include "state.h"
 
 class State_list {
 // data
-    std::vector<State* const> states;
+    std::vector<State *const> states;
 public: // TODO make some of the functons private
 // functions 
 
@@ -23,7 +24,7 @@ public: // TODO make some of the functons private
     std::ifstream::pos_type save_oil(std::ifstream &, int *, std::string &);
     std::ifstream::pos_type save_resources(std::ifstream &, int *, std::string &);
     std::ifstream::pos_type save_capped_resources(std::ifstream &, int *, std::string &);
-    std::ifstream::pos_type save_subsistence_building(std::ifstream &, std::string &line, std::string &);
+    std::ifstream::pos_type save_subsistence_building(std::ifstream &, std::string &, std::string &);
     std::ifstream::pos_type save_state(std::ifstream &, State* const, std::string &);
     void browse_file(std::ifstream &/* , std::vector<State> & */); 
     void save_state_info(const std::filesystem::path &, const std::filesystem::path *);
@@ -36,5 +37,14 @@ public: // TODO make some of the functons private
     std::ifstream::pos_type save_building(std::ifstream &/* , std::vector<State> & */, const std::string &, const std::string &, const std::string &, const int &, const int &, std::vector<std::string> &);
     void save_state_builds(const std::filesystem::path &, const std::filesystem::path *);
 
+public:
+    // getters
+    inline std::vector<State *const>& getStates() {return this->states;}
+    inline size_t getSize() {return this->states.size();}
+    // state information saving
+    void save_states(const std::filesystem::path &);
+    void save_state_info(const std::filesystem::path &, const std::filesystem::path *); // ? consolidate these functions into one
+    void save_state_pops(const std::filesystem::path &, const std::filesystem::path *);
+    void save_state_builds(const std::filesystem::path &, const std::filesystem::path *);
 };
 #endif

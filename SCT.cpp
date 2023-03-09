@@ -180,10 +180,11 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
 }
 
 // transfer info input
-/* std::vector<Transfer_state> */ State_list new_state_info() {
+State_list new_state_info() {
     int num{};
     std::string name{}, provs{}, id{};
-    std::vector<Transfer_state> states;
+    State_list states{};
+    std::vector<Transfer_state> temp;
     std::cout << "Number of states to be created: " << std::endl;
     std::cin >> num;
     for(int i{}; i < num; i++) {
@@ -195,8 +196,14 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
         std::cout << "Provinces to transfer to state number " << i + 1 << ": ";
         std::getline(std::cin, provs);
         std::cout << std::endl;
-        states.emplace_back(name, id, provs);
+
+        temp.emplace_back(name, id, provs);
+        // states.emplace_back(name, id, provs);
     } 
+    int i{}; // TODO find a better way to do this
+    for (auto trs : temp) {
+        states.getStates()[i] = &trs;
+    }
     return states;
 }
 

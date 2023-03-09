@@ -98,7 +98,7 @@ std::ifstream::pos_type State_list::save_rubber(std::ifstream &src, int *cap_res
 std::ifstream::pos_type State_list::save_oil(std::ifstream &src, int *cap_res, std::string &line) {
     while(getline(src, line)) {
         find_data_int(src, line, "undiscovered_amount", cap_res[11]);
-        if(find_string(line, "}")){
+        if(find_string(line, "}", 1)){
             getline(src, line); 
             break;
         }
