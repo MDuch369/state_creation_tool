@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <filesystem> 
+#include "parser.h" 
 #include "state_base.h"
 
 // constructors

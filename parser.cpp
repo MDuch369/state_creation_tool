@@ -44,6 +44,11 @@ void variable_string_vector(std::vector<std::string> &t, std::string &line) {
         end_pos = line.find("\"",beg_pos + 1);
     }
 }
+bool compare_string(const std::string &str, std::string l) {
+    l.erase (std::remove(l.begin(), l.end(), '\t'), l.end());
+    l.erase (std::remove(l.begin(), l.end(), ' '), l.end());
+    return str == l.substr(0, str.size());
+}
 std::string data_name(std::string &line ) {
     int pos{};
     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());

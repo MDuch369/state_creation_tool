@@ -26,6 +26,17 @@ public:
 
 };
 
+/**** REMNANT STATE CLASS ****/
+
+class Remnant_state : public State  {
+public:
+    void remove_prov ();
+    void calculate_remaining_provs(State &);
+
+    // void create_country(const std::string &, std::vector<std::string> &);
+    Remnant_state::Country *const create_country(const std::string &, std::vector<std::string> &);
+};
+
 /**** TRANSFER STATE CLASS ****/
 
 class Transfer_state : public State{
@@ -59,17 +70,6 @@ public:
 
 // debug functions
     void debug_print_provs();
-};
-
-/**** REMNANT STATE CLASS ****/
-
-class Remnant_state : public State  {
-public:
-    void remove_prov ();
-    void calculate_remaining_provs(State &);
-
-    // void create_country(const std::string &, std::vector<std::string> &);
-    Remnant_state::Country *const create_country(const std::string &, std::vector<std::string> &);
 };
 
 #endif
