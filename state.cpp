@@ -7,7 +7,7 @@
 #include "state.h"
 
 // constructors
-State::State() {}
+/* State::State() {}
 State::State(const std::filesystem::path &path) {
     std::string line{};
     std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);   
@@ -19,272 +19,20 @@ State::Country::Country(const std::string &name, const std::string &type, const 
 State::Country::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
     : culture{cult}, religion{rel}, type{t}, size{s} {}
 State::Country::Building::Building(const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pr) 
-    : type{type}, /*region{reg}, dlc{dlc}, */prod{pr}, level{lvl}, reserves{res} {}
+    : type{type}, prod{pr}, level{lvl}, reserves{res} {}
+ */
 
-// Countries
-void State::create_country(const std::string &name, std::vector<std::string> &pr) {
-    this->countries.emplace_back(name, pr);
+Origin_state::Country *const State::create_country(const std::string &name, std::vector<std::string> &pr) {
+    State::Country country(name, pr);
+    State::Country *const country_ptr = &country;
+    this->countries.push_back(country);
+    return country_ptr;
 }
-
-// pops
-void State::create_pops(const std::string &co, const std::string &cul, const std::string &rel, const std::string &type, const int &size){
-    for (State::Country &c : countries) {
-        if(c.getName() == co) {
-            c.getPops().emplace_back(cul, rel, type, size);
-        }
-    }
-}
-
-// buildings
-void State::create_buildings(const std::string &co, const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pm) {
-    for (State::Country &c : countries) {
-        if(c.getName() == co) {
-            c.getBuilds().emplace_back(type, lvl, res, pm);
-        }
-    }
-}
-
-// data calculating/copying
-std::string State::data( std::string &line){
-    line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
-    int pos{line.find("=") + 1};
-    return line.substr(pos, line.find ("\n") - pos);
-}
-unsigned int State::data_int( std::string line) {
-    line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
-    int pos{line.find("=") + 1};
-    std::string arg{line.substr(pos, line.find ("\n") - pos)};
-    return stoi(arg);
-}
-void State::data_vector(std::vector<std::string> &vec, const std::string &line, int len) {
-    int i{};
-
-    for ( char c : line ) {
-        if(c == 'x') {
-            vec.push_back(line.substr(i + 1, len));
-        }
-        i++; 
-    }
-}
-void State::variable_string_vector(std::vector<std::string> &t, std::string &line) {
-    int beg_pos{}, end_pos{};
-    line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
-    beg_pos = line.find("\"") + 1;
-    end_pos = line.find('\"', beg_pos);
-
-    while( end_pos != std::string::npos ) {
-        t.push_back(line.substr(beg_pos, end_pos - beg_pos));
-        beg_pos = end_pos + 2;
-        end_pos = line.find("\"",beg_pos + 1);
-    }
-}
-bool State::compare_string(const std::string &str, std::string l) {
-    l.erase (std::remove(l.begin(), l.end(), '\t'), l.end());
-    l.erase (std::remove(l.begin(), l.end(), ' '), l.end());
-    return str == l.substr(0, str.size());
-}
-void State::copy_state_info(State &st) {
-    this->traits = st.getTraits();
-    this->sub = st.getSub();
-    this->ar_res = st.getResources();
-    this->naval_exit = st.getNavalExit();
-    this->homelands = st.getHomelands();
-
-}
-void State::create_homelands(const std::string &file) {
-    std::string line;
-    std::ifstream  src(file, std::ios::binary);
-
-    while(getline(src, line)) {
-        if(line.find(this->name, 0) != std::string::npos) {
-            getline(src, line);
-            while(true) {
-                if(compare_string("s:STATE", line) == true) {
-                    break;
-                }
-                getline(src, line);
-                if(compare_string("add_homeland", line)) {
-                    this->homelands.push_back(data(line));
-                }
-            }
-        }
-    }    
-}
-
-// data printing
-void State::print_state_region(){ 
-    // std::ofstream  dst("output/map_data/state_regions/to.txt", std::ios::binary | std::ios::app);
-    std::ofstream  dst("new.txt", std::ios::binary | std::ios::app);
-    dst << "STATE_" << this->name << " = {" << std::endl
-        << "\tid = " << this->id << std::endl
-        << "\tsubsistence_building = " << this->sub << std::endl
-        << "\tprovinces = { ";
-    for (State::Country co : this->getCountries()) {
-        for (std::string prov : co.getProvs()) {dst << "\"x" << prov << "\" ";}
-    }
-    dst << "}" << std::endl; 
-    if (this->traits.empty() != true) {
-        dst << "\ttraits = { "; 
-        for (std::string s : this->traits) {dst << "\"" << s << "\" ";}
-        dst << "}" << std::endl; 
-    }
-    dst << "\tcity = " << this->hubs[0] << std::endl;
-    if(this->hubs[1] != "") {dst<< "\tport = " << this->hubs[1] << std::endl;}
-    dst << "\tfarm = " << this->hubs[2] << std::endl
-        << "\tmine = " << this->hubs[3] << std::endl
-        << "\twood = " << this->hubs[4] << std::endl
-        << "\tarable_land = " << this->res[0] << std::endl
-        << "\tarable_resources = { ";
-    for (std::string s : this->ar_res) {dst << "\"" << s << "\" ";} 
-    dst << "}" << std::endl
-        << "\tcapped_resources = {" << std::endl;
-    if(this->res[1] != 0) {dst << "\t\tbg_coal_mining = " << this->res[1] << std::endl; }
-    if(this->res[2] != 0) {dst << "\t\tbg_iron_mining = " << this->res[2] << std::endl; }
-    if(this->res[3] != 0) {dst << "\t\tbg_lead_mining = " << this->res[3] << std::endl; }
-    if(this->res[4] != 0) {dst << "\t\tbg_sulfur_mining = " << this->res[4] << std::endl; }
-    if(this->res[5] != 0) {dst << "\t\tbg_logging = " << this->res[5] << std::endl; }
-    if(this->res[6] != 0) {dst << "\t\tbg_fishing = " << this->res[6] << std::endl; }
-    if(this->res[7] != 0) {dst << "\t\tbg_whaling = " << this->res[7] << std::endl; }
-    dst << "\t}" << std::endl;
-    if(this->res[8] != 0) {
-        dst << "\tresource = {" << std::endl 
-            << "\t\ttype = \"bg_gold_fields\"" << std::endl
-            << "\t\tdepleted_type = \"bg_gold_mining\"" << std::endl
-            << "\t\tundiscovered_amount =" << this->res[8] << std::endl;
-        if(this->res[9] != 0) {dst << "\t\tdiscovered_amount = " << this->res[9] << std::endl;}
-        dst << "\t}" << std::endl;
-    }
-    if(this->res[10] != 0) {
-        dst << "\tresource = {" << std::endl
-            << "\t\ttype = \"bg_rubber\"" << std::endl
-            << "\t\tundiscovered_amount =" << this->res[10] << std::endl;
-        dst << "\t}" << std::endl;
-    }
-    if(this->res[11] != 0) {
-        dst << "\tresource = {" << std::endl
-            << "\t\ttype = \"bg_oil_extraction\"" << std::endl
-            << "\t\tundiscovered_amount =" << this->res[11] << std::endl;
-        dst << "\t}" << std::endl;
-    }
-    if(this->naval_exit != "") {dst << "\tnaval_exit_id = " << this->naval_exit << std::endl;}
-    dst << "}" << std::endl << std::endl;
-}
-void State::print_pops() { 
-    // std::ofstream  dst("output/common/history/pops/new_pops.txt", std::ios::binary | std::ios::app);
-    std::ofstream  dst("new_pops.txt", std::ios::binary | std::ios::app);
-    dst << "\ts:STATE_" << this->name << " = {" << std::endl;
-    for(State::Country co : this->getCountries()) {
-        if(co.getPops().empty()) {continue;}
-        dst << "\t\tregion_state:" << co.getName() << " = {" << std::endl;
-        for(auto pop : co.getPops()) {
-            if(pop.getSize() == 0) {continue;}
-            dst << "\t\t\tcreate_pop = {" << std::endl;
-            if (pop.getType() != "") {dst << "\t\t\t\tpop_type = " << pop.getType() << std::endl;}
-            dst << "\t\t\t\tculture = " << pop.getCult() << std::endl;
-            if (pop.getRel() != "") {dst << "\t\t\t\treligion = " << pop.getRel() << std::endl;}
-            dst << "\t\t\t\tsize = " << pop.getSize() << std::endl
-                << "\t\t\t}" << std::endl;
-        }
-        dst << "\t\t}" << std::endl; 
-    }
-    dst << "\t}" << std::endl;
-}
-void State::print_buildings(){ 
-    // std::ofstream  dst("output/common/history/buildings/new_buildings.txt", std::ios::binary | std::ios::app);
-    std::ofstream  dst("new_buildings.txt", std::ios::binary | std::ios::app);
-    // int size{this->buildings.size()};
-    dst << "\ts:STATE_" << this->name << " = {" << std::endl;
-    for(State::Country co : this->getCountries()) {
-        if(co.getBuilds().empty()) {continue;}
-        dst << "\t\tregion_state:" << co.getName() << " = {" << std::endl;
-        for(auto build : co.getBuilds()) {
-            if(build.getLvl() == 0) {continue;}
-            dst << "\t\t\tcreate_building = {" << std::endl;
-            dst << "\t\t\t\tbuilding = " << build.getType() << std::endl;
-            dst << "\t\t\t\tlevel = " << build.getLvl() << std::endl;
-            dst << "\t\t\t\treserves = " << build.getRes() << std::endl;
-            dst << "\t\t\t\tactivate_production_methods = { ";
-            for(std::string prod : build.getProd()) {dst << "\"" << prod << "\" ";}
-            dst << "} " << std::endl << "\t\t\t}" << std::endl;
-        }
-        dst << "\t\t}" << std::endl;
-    }
-    dst << "\t}" << std::endl;
-    // for(int i{}; i < size; i++){
-    //     std::string reg{this->buildings[i].getRegion()};
-    //     if(this->buildings[i].getLvl() > 0 ) {
-    //         if(i > 0 && reg != this->buildings[i-1].getRegion()) {
-    //             dst << "\t\tregion_state:" << reg <<" = {" << std::endl;
-    //         }
-    //     }
-    //     if(i < (size - 1) && reg != this->buildings[i+1].getRegion() ) {
-    //         dst << "\t\t}" << std::endl;
-    //     }
-    //     if(i == size - 1) {
-    //         dst << "\t\t}" << std::endl;
-    //     }
-    // }
-    // dst << "\t}" << std::endl;
-}
-void State::print_state() {
-    // std::ofstream  dst("output/common/history/states/new_states.txt", std::ios::binary | std::ios::app);
-    std::ofstream  dst("new_states.txt", std::ios::binary | std::ios::app);
-    dst << "\ts:STATE_" << this->name << " = {" << std::endl;
-    for(State::Country co : this->countries) {
-        if(co.getProvs().empty()) {continue;}
-        dst << "\t\tcreate_state = {" << std::endl
-            << "\t\t\tcountry = c:" << co.getName() << std::endl
-            << "\t\t\towned_provinces = { ";
-        for(std::string s : co.getProvs()) {dst << "x" << s << " ";}
-        dst << "}" << std::endl << "\t\t}" << std::endl;
-    }
-    for(std::string t : this->homelands) {
-        dst << "\t\tadd_homeland = " << t << std::endl;
-    }
-    for(std::string c : this->claims) {
-        dst << "\t\tadd_claim = " << c << std::endl;
-    }
-    dst << "\t}" << std::endl;
-}
-void State::print_entry() {
-    this->print_state_region();
-    this->print_pops();
-    this->print_buildings();
-    this->print_state();
-}
-
-// Setters
-void State::setName(const std::string &n) {this->name = n;}
-void State::setId(const std::string &i) {this->id = i;}
-void State::setSub(const std::string &s){this->sub = s;}
-void State::setTraits(const std::vector<std::string> &t){this->traits = t;}
-void State::setHubs(const std::string h[5]){for(int i{}; i < 5; i++) {this->hubs[i] = h[i];} }
-void State::setArRes(const std::vector<std::string> &r) {this->ar_res = r;}
-void State::setRes(const int r[/*12*/]){ for(int i{}; i < 12; i++) {this->res[i] = r[i];} }
-void State::Country::Pop::setSize(const int &size) {this->size = size;}
-void State::Country::Building::setLvl(const int &level) {this->level = level;}
-void State::setHomeland(const std::string &home) {this->homelands.push_back(home);}
-void State::setClaim(const std::string &claim) {this->claims.push_back(claim);}
-void State::Country::setCountryType(const std::string &type) {this->type = type;}
-void State::setNavEx(const std::string &nx){this->naval_exit = nx;}
-
-// debug functions
-// void State::debug_print_provs(){
-//     std::ofstream  dst("provs_debug", std::ios::binary | std::ios::app);
-//     for(State::Country co : this->getCountries()){
-//         int i{};
-//         for (char c : co.getProvs()[0]) {
-//             dst << c;
-//             i++;
-//         }
-//     dst << " " << i << std::endl;    
-//     }
-// }
 
 /**** STATE TRANSFER CLASS ****/
 
 // constructor
-State_transfer::State_transfer(const std::string &name, const std::string &id, const std::string &provs) {
+Transfer_state::Transfer_state(const std::string &name, const std::string &id, const std::string &provs) {
     std::string prov, tmp; 
     this->name = name;
     this->id = id;
@@ -299,14 +47,21 @@ State_transfer::State_transfer(const std::string &name, const std::string &id, c
         }
     }
 }
-State_transfer::State_transfer(const std::string &name, const std::string &id, const std::vector<std::string> &provs) {
+Transfer_state::Transfer_state(const std::string &name, const std::string &id, const std::vector<std::string> &provs) {
     this->name = name;
     this->id = id;
     this->transfer_provs = provs;
 }
 
+// void Transfer_state::create_country(const std::string &name, std::vector<std::string> &pr) {
+//     this->countries.emplace_back(name, pr);
+// }
+
 // data calculating/copying
-State::Country State_transfer::create_transfer_country(State::Country &country, std::vector<std::string> &provs, const double &ratio) {
+// Transfer_state::Country *const State::create_country(const std::string &name, std::vector<std::string> &pr) {
+
+// }
+State::Country Transfer_state::create_country(State::Country &country, std::vector<std::string> &provs, const double &ratio) {
     State::Country new_country(country.getName(), country.getType(), provs);
     for(auto pop : country.getPops()) {
         new_country.getPops().emplace_back(pop.getCult(), pop.getRel(), pop.getType(), pop.getSize() * ratio);
@@ -316,11 +71,11 @@ State::Country State_transfer::create_transfer_country(State::Country &country, 
     }
     return new_country;
 }
-void State_transfer::find_origin_states(const std::vector<State> &states, std::vector<State_transfer> &tr_st) { // ? refactor
+void Transfer_state::find_origin_states(const std::vector<Origin_state> &states, std::vector<Transfer_state> &tr_st) { // ? refactor
     std::vector<std::string> p{}, diff_ori{};
     bool or_found{0}, state_end{0};
 
-    for(State st : states) {
+    for(Origin_state st : states) {
         for(State::Country co : st.getCountries()) {
             for(std::string or_pr : co.getProvs()) {
                 for(std::string &pr : this->transfer_provs) { 
@@ -336,7 +91,7 @@ void State_transfer::find_origin_states(const std::vector<State> &states, std::v
             }
             if(p.empty() != true){ // creates new transfer country from [p]rovince vector
                 double ps{p.size()}, cs{co.getProvs().size()};// ? find a better method of calculating this
-                this->countries.push_back(create_transfer_country(co, p, ps/cs));
+                this->countries.push_back(create_country(co, p, ps/cs));
                 p.clear();
                 // this->ratio.push_back(ps/cs);
                 // for(auto pop : co.getPops()) {}
@@ -354,10 +109,10 @@ void State_transfer::find_origin_states(const std::vector<State> &states, std::v
         tr_st.emplace_back(this->name, this->id, diff_ori);
     }
 }    
-void State_transfer::calculate_resources(std::vector<State> &states) {
+void Transfer_state::calculate_resources(std::vector<Origin_state> &states) {
     double origin_provs{}, provs{};
     double ratio{};
-    State origin{states[this->origin_pos]};
+    Origin_state origin{states[this->origin_pos]};
     this->homelands = origin.getHomelands();
     this->claims = origin.getClaims();
     this->traits = origin.getTraits();
@@ -375,9 +130,9 @@ void State_transfer::calculate_resources(std::vector<State> &states) {
         this->res[i] = origin.getRes()[i] * ratio;
     }
 }
-void State_transfer::create_target_states(std::vector<State_transfer> &target_st/*, std::vector<State> &origin_st*/) {
+void Transfer_state::create_target_states(std::vector<Transfer_state> &target_st/*, std::vector<State> &origin_st*/) { //TODO denest
     bool target{};
-    // State_transfer trs{*this};
+    // Transfer_state trs{*this};
     // if (target_st.empty()) {target_st.emplace_back(*this);} 
     // else {
         for(State& st : target_st) {
@@ -433,9 +188,9 @@ void State_transfer::create_target_states(std::vector<State_transfer> &target_st
     // }
     if (!target) {target_st.emplace_back(*this);} 
 }
-void State_transfer::create_remaining_states(std::vector<State> &rem_st, std::vector<State> &ori_st){ // ? merge with calculate_remaining_resources
+void Transfer_state::create_remaining_states(std::vector<Remnant_state> &rem_st, std::vector<Origin_state> &ori_st){ // ? merge with calculate_remaining_resources
     bool found{};
-    for(State st : rem_st) {
+    for(Remnant_state st : rem_st) {
         if (st.getName() == this->getOrigin()) {
             found = 1;
             break;
@@ -443,7 +198,7 @@ void State_transfer::create_remaining_states(std::vector<State> &rem_st, std::ve
     }
     if(!found) {rem_st.emplace_back(ori_st[this->origin_pos]);}
 }
-void State_transfer::calculate_remaining_resources(std::vector<State> &rem_st/*, std::vector<State> &ori_st*/) {
+void Transfer_state::calculate_remaining_resources(std::vector<Origin_state> &rem_st/*, std::vector<State> &ori_st*/) { // TODO denest
     for(State& st : rem_st) {
         if(this->origin == st.getName()) {
             for(State::Country& co : st.getCountries()) { // country subtracting
@@ -487,44 +242,3 @@ void State_transfer::calculate_remaining_resources(std::vector<State> &rem_st/*,
         }
     }
 }
-
-    // ! TODO finish
-// unsigned int State_transfer::find_states(const std::string &path, std::vector<State_transfer> &states) {
-//     std::vector<std::string> diff_origin_st{};
-//     // std::string *pr = &this->provs[0]; 
-//     auto pr = provs.begin();
-//     unsigned int cur_line{};
-//     std::string line{};
-//     // bool mult_donor_st{false};
-//     std::ifstream  src(path + "common/history/states/00_states.txt", std::ios::binary);
-//     while(getline(src, line)) {
-//         cur_line++;
-//         if (line.find(*pr, 0) != std::string::npos) {
-//             pr++;
-//             while(pr != provs.end()) {
-//                 if ((line.find(*pr, 0) == std::string::npos)) {
-//                     diff_origin_st.push_back(*pr);
-//                     pr = provs.erase(pr);
-//                 } else { pr++; }
-//             }          
-//             break;
-//         }
-//     }
-//     states.emplace_back(this->name, this->id, diff_origin_st);
-//     src.close();
-//     return cur_line;
-// }
-
-/**** TARGET STATE CONSTRUCTOR ****/
-// State::State(State_transfer &trs) :name{trs.getName()}, id{trs.getId()}, traits{trs.getTraits()}, ar_res{trs.getResources()}, homelands{trs.getHomelands()},  claims{trs.getClaims()}, sub{trs.getSub()}, ar_land{trs.getLand()}, res{*trs.getRes()}, countries{trs.getCountries()} {}
-
-// debug functions
-// void State_transfer::debug_print_provs() {
-//     std::ofstream  dst("provs_debug", std::ios::binary | std::ios::app);
-//     int i{};
-//     for (char c : this->getProvs()[0]) {
-//         dst << c;
-//         i++;
-//     }
-//     dst << " " << i << std::endl;
-// }
