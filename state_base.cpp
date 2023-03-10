@@ -7,7 +7,7 @@
 #include "state_base.h"
 
 // constructors
-State::State() {}
+/* State::State() {}
 State::State(const std::filesystem::path &path) {
     std::string line{};
     std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);   
@@ -19,95 +19,11 @@ State::Country::Country(const std::string &name, const std::string &type, const 
 State::Country::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
     : culture{cult}, religion{rel}, type{t}, size{s} {}
 State::Country::Building::Building(const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pr) 
-    : type{type}, /*region{reg}, dlc{dlc}, */prod{pr}, level{lvl}, reserves{res} {}
-
+    : type{type}, region{reg}, dlc{dlc}, prod{pr}, level{lvl}, reserves{res} {}
+ */
 // Countries
-// void State::create_country(const std::string &name, std::vector<std::string> &pr) {
-//     this->countries.emplace_back(name, pr);
-// }
-
-// pops
-void State::create_pops(const std::string &co, const std::string &cul, const std::string &rel, const std::string &type, const int &size){
-    for (State::Country &c : countries) {
-        if(c.getName() == co) {
-            c.getPops().emplace_back(cul, rel, type, size);
-        }
-    }
-}
-
-// buildings
-void State::create_buildings(const std::string &co, const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pm) {
-    for (State::Country &c : countries) {
-        if(c.getName() == co) {
-            c.getBuilds().emplace_back(type, lvl, res, pm);
-        }
-    }
-}
-
-// data calculating/copying
-// std::string State::data( std::string &line){
-//     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
-//     int pos{line.find("=") + 1};
-//     return line.substr(pos, line.find ("\n") - pos);
-// }
-// unsigned int State::data_int( std::string line) {
-//     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
-//     int pos{line.find("=") + 1};
-//     std::string arg{line.substr(pos, line.find ("\n") - pos)};
-//     return stoi(arg);
-// }
-// void State::data_vector(std::vector<std::string> &vec, const std::string &line, int len) {
-//     int i{};
-//     for ( char c : line ) {
-//         if(c == 'x') {
-//             vec.push_back(line.substr(i + 1, len));
-//         }
-//         i++; 
-//     }
-// }
-// void State::variable_string_vector(std::vector<std::string> &t, std::string &line) {
-//     int beg_pos{}, end_pos{};
-//     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
-//     beg_pos = line.find("\"") + 1;
-//     end_pos = line.find('\"', beg_pos);
-
-//     while( end_pos != std::string::npos ) {
-//         t.push_back(line.substr(beg_pos, end_pos - beg_pos));
-//         beg_pos = end_pos + 2;
-//         end_pos = line.find("\"",beg_pos + 1);
-//     }
-// }
-// bool State::compare_string(const std::string &str, std::string l) {
-//     l.erase (std::remove(l.begin(), l.end(), '\t'), l.end());
-//     l.erase (std::remove(l.begin(), l.end(), ' '), l.end());
-//     return str == l.substr(0, str.size());
-// }
-void State::copy_state_info(State &st) {
-    this->traits = st.getTraits();
-    this->sub = st.getSub();
-    this->ar_res = st.getResources();
-    this->naval_exit = st.getNavalExit();
-    this->homelands = st.getHomelands();
-
-}
-void State::create_homelands(const std::string &file) {
-    std::string line;
-    std::ifstream  src(file, std::ios::binary);
-
-    while(getline(src, line)) {
-        if(line.find(this->name, 0) != std::string::npos) {
-            getline(src, line);
-            while(true) {
-                if(compare_string("s:STATE", line) == true) {
-                    break;
-                }
-                getline(src, line);
-                if(compare_string("add_homeland", line)) {
-                    this->homelands.push_back(data(line));
-                }
-            }
-        }
-    }    
+State::Country *const State::create_country(const std::string &name, std::vector<std::string> &pr) {
+    this->countries.emplace_back(name, pr);
 }
 
 // data printing

@@ -262,13 +262,13 @@ int main() {
 
     transfer_states = new_state_info();
 
-    for(int i {}; i < transfer_states.size(); i++){transfer_states[i].find_origin_states(states, transfer_states);}
-    for(int i {}; i < transfer_states.size(); i++){transfer_states[i].calculate_resources(states);}
-    for(int i {}; i < transfer_states.size(); i++){transfer_states[i].create_target_states(target_states);}
-    for(int i {}; i < transfer_states.size(); i++){transfer_states[i].create_remaining_states(remnant_states, states);}
-    for(int i {}; i < transfer_states.size(); i++){transfer_states[i].calculate_remaining_resources(remnant_states);}
-    for(int i {}; i < target_states.size(); i++){ target_states[i].print_entry();}
-    for(int i {}; i < remnant_states.size(); i++) {remnant_states[i].print_entry();}
+    // for(int i {}; i < transfer_states.size(); i++){transfer_states[i].find_origin_states(states, transfer_states);}
+    // for(int i {}; i < transfer_states.size(); i++){transfer_states[i].calculate_resources(states);}
+    // for(int i {}; i < transfer_states.size(); i++){transfer_states[i].create_target_states(target_states);}
+    // for(int i {}; i < transfer_states.size(); i++){transfer_states[i].create_remaining_states(remnant_states, states);}
+    // for(int i {}; i < transfer_states.size(); i++){transfer_states[i].calculate_remaining_resources(remnant_states);}
+    // for(int i {}; i < target_states.size(); i++){ target_states[i].print_entry();}
+    // for(int i {}; i < remnant_states.size(); i++) {remnant_states[i].print_entry();}
     
     return 0;
 }

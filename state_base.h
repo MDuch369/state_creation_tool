@@ -18,7 +18,7 @@ protected:
             std::string culture, religion{}, type{};
 
         public:
-        // constructor
+        // constructor 
             Pop(const std::string &, const std::string &, const std::string &, const int &);
         // getters
             inline std::string getCult() {return culture;}
@@ -76,7 +76,6 @@ protected:
     // hubs = 0-city, 1-port, 2-farm, 3-mine, 4-wood
     // res = 0-arable land, 1-coal, 2-iron, 3-lead, 4-sulfur, 5-logging, 6-fishing, 7-whaling, 8-gold, 9-disc. gold, 10-rubber, 11-oil
 
-// Functions:
 // data printing
     virtual void print_state_region();
     virtual void print_pops();
@@ -84,37 +83,14 @@ protected:
     virtual void print_state();
 
 public:
-// constructors 
-    State();
-    State(const std::filesystem::path &);
-    State(const unsigned int &, const std::string &);
-    State(const unsigned int[]);
-    State(const std::string &);
-
-// countries
-    virtual State::Country *const create_country(const std::string &, std::vector<std::string> &) = 0;
-
-// pops  
-    virtual void create_pops(const std::string &, const std::string &, const std::string &, const std::string &, const int &);
-    virtual void add_pop(const std::string &, const std::string &, const std::string &, const int &);
-
-// buildings
-    virtual void create_buildings(const std::string &, const std::string &, const int &, const int &, const std::vector<std::string> &);
-    virtual void add_building(const std::string &, const std::string &, const std::string &, const std::string &, const int &, const int &);
-
-// data manipulation
-    virtual void copy_state_info(State &); // ? move to subclasses
-    virtual void create_homelands(const std::string &); // ? merge with copy_state_info
-    // virtual std::string data( std::string &); // ? create separate class for data methods
-    // virtual unsigned int data_int(std::string);
-    // virtual void data_vector(std::vector<std::string> &, const std::string &, int);
-    // virtual bool compare_string(const std::string &, std::string);
-    // virtual void variable_string_vector(std::vector<std::string> &t, std::string &line);
+    virtual State::Country *const create_country(const std::string &, std::vector<std::string> &); 
+    virtual void create_pops(const std::string &, const std::string &, const std::string &, const std::string &, const int &) = 0; 
+    virtual void create_buildings(const std::string &, const std::string &, const int &, const int &, const std::vector<std::string> &) = 0;
 
 // data printing
     virtual void print_entry();
 
-// getters
+// getters // ? refactor
     inline std::string getName() {return name;}
     inline std::string getSub() {return sub;}
     inline std::string getId() {return id;}
@@ -128,7 +104,7 @@ public:
     inline std::vector<State::Country>& getCountries() {return countries;}
     inline State::Country& getCo(const int &i) {return countries[i];}
 
-// setters
+// setters // ? refactor
    void setName(const std::string &);
    void setId(const std::string &);
    void setSub(const std::string &);

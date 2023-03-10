@@ -41,10 +41,6 @@ public:
     // getters
     inline std::vector<State *const>& getStates() {return this->states;}
     inline size_t getSize() {return this->states.size();}
-    // state information saving
-    void save_states(const std::filesystem::path &);
-    void save_state_info(const std::filesystem::path &, const std::filesystem::path *); // ? consolidate these functions into one
-    void save_state_pops(const std::filesystem::path &, const std::filesystem::path *);
-    void save_state_builds(const std::filesystem::path &, const std::filesystem::path *);
+
 };
 #endif

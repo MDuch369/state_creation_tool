@@ -6,13 +6,17 @@
 #include <filesystem>
 #include "state.h"
 
+/**** ORIGIN STATE CLASS ****/
+
 // constructors
-/* State::State() {}
-State::State(const std::filesystem::path &path) {
+Origin_state::Origin_state() {}
+Origin_state::Origin_state(const std::string &name)/*  :name{name}  */{
+    this->State::name = name;
+} 
+/* State::State(const std::filesystem::path &path) {
     std::string line{};
     std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);   
 }
-State::State(const std::string &name) :name{name} {} 
 State::Country::Country(const std::string &name):country{name} {}
 State::Country::Country(const std::string &name, const std::vector<std::string> &pr) :country{name}, provs{pr} {}
 State::Country::Country(const std::string &name, const std::string &type, const std::vector<std::string> &pr) :country{name}, type {type}, provs{pr} {}
@@ -28,8 +32,22 @@ Origin_state::Country *const State::create_country(const std::string &name, std:
     this->countries.push_back(country);
     return country_ptr;
 }
+void State::create_pops(const std::string &co, const std::string &cul, const std::string &rel, const std::string &type, const int &size){
+    for (State::Country &c : countries) {
+        if(c.getName() == co) {
+            c.getPops().emplace_back(cul, rel, type, size);
+        }
+    }
+}
+void State::create_buildings(const std::string &co, const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pm) {
+    for (State::Country &c : countries) {
+        if(c.getName() == co) {
+            c.getBuilds().emplace_back(type, lvl, res, pm);
+        }
+    }
+}
 
-/**** STATE TRANSFER CLASS ****/
+/**** TRANSFER STATE CLASS ****/
 
 // constructor
 Transfer_state::Transfer_state(const std::string &name, const std::string &id, const std::string &provs) {
@@ -90,7 +108,7 @@ void Transfer_state::find_origin_states(const std::vector<Origin_state> &states,
                 }
             }
             if(p.empty() != true){ // creates new transfer country from [p]rovince vector
-                double ps{p.size()}, cs{co.getProvs().size()};// ? find a better method of calculating this
+                double ps = p.size(), cs = co.getProvs().size();// ? find a better method of calculating this
                 this->countries.push_back(create_country(co, p, ps/cs));
                 p.clear();
                 // this->ratio.push_back(ps/cs);
@@ -188,15 +206,21 @@ void Transfer_state::create_target_states(std::vector<Transfer_state> &target_st
     // }
     if (!target) {target_st.emplace_back(*this);} 
 }
-void Transfer_state::create_remaining_states(std::vector<Remnant_state> &rem_st, std::vector<Origin_state> &ori_st){ // ? merge with calculate_remaining_resources
+void Transfer_state::create_remaining_states(State_list &rem_st, State_list &ori_st){ // ? merge with calculate_remaining_resources
     bool found{};
-    for(Remnant_state st : rem_st) {
-        if (st.getName() == this->getOrigin()) {
+    for(State *const st : rem_st.getStates()) {
+        if (st->getName() == this->getOrigin()) {
             found = 1;
             break;
         }
     }
-    if(!found) {rem_st.emplace_back(ori_st[this->origin_pos]);}
+    if(!found) {
+        Remnant_state new_remnant_state{ori_st.getStates()[this->origin_pos]};
+        Remnant_state *const new_remnant_state_ptr = &new_remnant_state;
+        // new_remnant_state.State = ori_st.getStates()[this->origin_pos].State;
+        // rem_st.getStates().emplace_back(ori_st.getStates()[this->origin_pos]);
+        rem_st.getStates().push_back(new_remnant_state_ptr); // ! test if the new_remnant_state exist when functions exits, otherwise the pointer will be unhappy
+    }
 }
 void Transfer_state::calculate_remaining_resources(std::vector<Origin_state> &rem_st/*, std::vector<State> &ori_st*/) { // TODO denest
     for(State& st : rem_st) {
@@ -242,3 +266,19 @@ void Transfer_state::calculate_remaining_resources(std::vector<Origin_state> &re
         }
     }
 }
+void Transfer_state::copy_state_info(State &st) {
+    this->traits = st.getTraits();
+    this->sub = st.getSub();
+    this->ar_res = st.getResources();
+    this->naval_exit = st.getNavalExit();
+    this->homelands = st.getHomelands();
+
+}
+
+State::Country *const Transfer_state::create_country(const std::string &, std::vector<std::string> &){} // this function exist so the class is not abstract
+
+/**** REMNANT STATE CLASS ****/
+
+Remnant_state::Remnant_state(State *const state) 
+    : State{*state}
+{}

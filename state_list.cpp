@@ -58,7 +58,7 @@ void State_list::save_states(const std::filesystem::path &path/* , std::vector<S
     std::vector<std::string> provs{}, homelands{}, claims{};
     std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);  
 
-    while(getline(src, line)) { // TODO move this function inside state class, and override it in subclasses
+    while(getline(src, line)) { // ? move this function inside state class, and override it in subclasses
         if(find_string(line, "s:")) {
             std::string name{data_name(line)};
             Origin_state state{name};
