@@ -8,14 +8,14 @@
 
 class State_list {
 // data
-    std::vector<State *const> states;
+    std::vector<State*> states;
 public: // TODO make some of the functons private
 // functions 
 
     // creating an array of states info //? TODO refactor using regex, create a class for the functions
-    std::ifstream::pos_type create_state(std::ifstream &, Origin_state* const , std::string &);
-    std::ifstream::pos_type add_homelands(std::ifstream &, Origin_state* const , std::string &);
-    std::ifstream::pos_type add_claims(std::ifstream &, Origin_state* const , std::string &);
+    std::ifstream::pos_type create_state(std::ifstream &, State* , std::string &);
+    std::ifstream::pos_type add_homelands(std::ifstream &, State* , std::string &);
+    std::ifstream::pos_type add_claims(std::ifstream &, State* , std::string &);
     void save_states(const std::filesystem::path &);
     
     // state info saving
@@ -25,7 +25,7 @@ public: // TODO make some of the functons private
     std::ifstream::pos_type save_resources(std::ifstream &, int *, std::string &);
     std::ifstream::pos_type save_capped_resources(std::ifstream &, int *, std::string &);
     std::ifstream::pos_type save_subsistence_building(std::ifstream &, std::string &, std::string &);
-    std::ifstream::pos_type save_state(std::ifstream &, State* const, std::string &);
+    std::ifstream::pos_type save_state(std::ifstream &, State* , std::string &);
     void browse_file(std::ifstream &/* , std::vector<State> & */); 
     void save_state_info(const std::filesystem::path &, const std::filesystem::path *);
     
@@ -39,7 +39,7 @@ public: // TODO make some of the functons private
 
 public:
     // getters
-    inline std::vector<State *const>& getStates() {return this->states;}
+    inline std::vector<State*>& getStates() {return this->states;}
     inline size_t getSize() {return this->states.size();}
 
 };

@@ -6,7 +6,7 @@
 #include "state_list.h"
 
 // creating an array of states info //? TODO refactor using regex
-std::ifstream::pos_type State_list::create_state(std::ifstream &src, Origin_state *const state, std::string &line){
+std::ifstream::pos_type State_list::create_state(std::ifstream &src, State* state, std::string &line){
     std::string country{};
     std::vector<std::string> provs{};
     
@@ -39,14 +39,14 @@ std::ifstream::pos_type State_list::create_state(std::ifstream &src, Origin_stat
     }
     return src.tellg();
 }
-std::ifstream::pos_type State_list::add_homelands(std::ifstream &src, Origin_state *const state, std::string &line) {
+std::ifstream::pos_type State_list::add_homelands(std::ifstream &src, State* state, std::string &line) {
     while(find_string(line, "add_homeland")) {
         state->setHomeland(data(line));
         getline(src, line);
     }
     return src.tellg();
 }
-std::ifstream::pos_type State_list::add_claims(std::ifstream &src, Origin_state *const state, std::string &line) {
+std::ifstream::pos_type State_list::add_claims(std::ifstream &src, State* state, std::string &line) {
     while(find_string(line, "add_claim")) {
         state->setClaim(data(line));
         getline(src, line);
@@ -62,7 +62,7 @@ void State_list::save_states(const std::filesystem::path &path/* , std::vector<S
         if(find_string(line, "s:")) {
             std::string name{data_name(line)};
             Origin_state state{name};
-            Origin_state *const st_ptr = &state; 
+            Origin_state* st_ptr = &state; 
             this->states.push_back(st_ptr);
             // int cur{this->states.size() - 1};
 

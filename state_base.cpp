@@ -7,23 +7,31 @@
 #include "state_base.h"
 
 // constructors
-/* State::State() {}
-State::State(const std::filesystem::path &path) {
-    std::string line{};
-    std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);   
-}
-State::State(const std::string &name) :name{name} {} 
 State::Country::Country(const std::string &name):country{name} {}
 State::Country::Country(const std::string &name, const std::vector<std::string> &pr) :country{name}, provs{pr} {}
 State::Country::Country(const std::string &name, const std::string &type, const std::vector<std::string> &pr) :country{name}, type {type}, provs{pr} {}
+// State::State() {}
+/* State::State(const std::filesystem::path &path) {
+    std::string line{};
+    std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);   
+}
+State::State(const std::string &name) :name{name} {}  */
 State::Country::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
     : culture{cult}, religion{rel}, type{t}, size{s} {}
 State::Country::Building::Building(const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pr) 
-    : type{type}, region{reg}, dlc{dlc}, prod{pr}, level{lvl}, reserves{res} {}
- */
+    : type{type}, dlc{dlc}, prod{pr}, level{lvl}, reserves{res} {}
+
+
+// destructors
+    State::~State() {}
+
 // Countries
-State::Country *const State::create_country(const std::string &name, std::vector<std::string> &pr) {
+State::Country* State::create_country(const std::string &name, std::vector<std::string> &pr) { // ! placeholder
     this->countries.emplace_back(name, pr);
+    State::Country country(name, pr);
+    State::Country* country_ptr = &country;
+    this->countries.push_back(country);
+    return country_ptr;
 }
 
 // data printing
