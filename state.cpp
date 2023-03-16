@@ -4,6 +4,7 @@
 #include <fstream>
 #include <algorithm>
 #include <filesystem>
+
 #include "state.h"
 
 /**** ORIGIN STATE CLASS ****/
@@ -27,21 +28,25 @@ State::Country::Building::Building(const std::string &type, const int &lvl, cons
  */
 Origin_state::~Origin_state() {}
 
-Origin_state::Country* Origin_state::create_country(const std::string &name, std::vector<std::string> &pr) {
-    State::Country country(name, pr);
+std::unique_ptr<State::Country> Origin_state::create_country(const std::string &name, std::vector<std::string> &pr) {
+    this->countries.emplace_back(name, pr);
+    std::unique_ptr<State::Country> country_ptr(new State::Country(name, pr));
+    this->countries.push_back(*country_ptr);
+    return country_ptr;
+/*     State::Country country(name, pr);
     State::Country *const country_ptr = &country;
     this->countries.push_back(country);
-    return country_ptr;
+    return country_ptr; */
 }
 void Origin_state::create_pops(const std::string &co, const std::string &cul, const std::string &rel, const std::string &type, const int &size){
-    for (State::Country &c : countries) {
+    for (State::Country &c : this->countries) {
         if(c.getName() == co) {
             c.getPops().emplace_back(cul, rel, type, size);
         }
     }
 }
 void Origin_state::create_buildings(const std::string &co, const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pm) {
-    for (State::Country &c : countries) {
+    for (State::Country &c : this->countries) {
         if(c.getName() == co) {
             c.getBuilds().emplace_back(type, lvl, res, pm);
         }
@@ -58,7 +63,7 @@ Transfer_state::Transfer_state(const std::string &name, const std::string &id, c
     this->name = name;
     this->id = id;
     std::getline(std::cin, prov);
-    prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end());
+    prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end()); // TODO extract this function
     prov.erase (std::remove(prov.begin(), prov.end(), ' '), prov.end());
     transform(prov.begin(), prov.end(), prov.begin(), toupper);
     std::stringstream ss(prov);
@@ -79,7 +84,7 @@ Transfer_state::~Transfer_state() {}
 //     this->countries.emplace_back(name, pr);
 // }
 
-State::Country Transfer_state::create_country(State::Country &country, std::vector<std::string> &provs, const double &ratio) {
+State::Country Transfer_state::create_country(State::Country &country, const std::vector<std::string> &provs, const double &ratio) {
     State::Country new_country(country.getName(), country.getType(), provs);
     for(auto pop : country.getPops()) {
         new_country.getPops().emplace_back(pop.getCult(), pop.getRel(), pop.getType(), pop.getSize() * ratio);
@@ -102,7 +107,7 @@ State::Country Transfer_state::create_country(State::Country &country, std::vect
 } */
 void Transfer_state::find_origin_states(const std::vector<Origin_state> &states, std::vector<Transfer_state> &tr_st) { // ? refactor, move to State_list class
     std::vector<std::string> p{}, diff_ori{};
-    bool or_found{0}, state_end{0};
+    bool or_found{0}/* , state_end{0} */;
 
     for(Origin_state st : states) {
         for(State::Country co : st.getCountries()) {
@@ -138,7 +143,7 @@ void Transfer_state::find_origin_states(const std::vector<Origin_state> &states,
         tr_st.emplace_back(this->name, this->id, diff_ori);
     }
 }    
-void Transfer_state::calculate_resources(std::vector<Origin_state> &states) {
+void Transfer_state::calculate_resources(const std::vector<Origin_state> &states) {
     double origin_provs{}, provs{};
     double ratio{};
     Origin_state origin{states[this->origin_pos]};
@@ -173,6 +178,7 @@ void Transfer_state::create_target_states(std::vector<Transfer_state> &target_st
                                 bool present;
                                 present = 0;
                                 for(std::string tar_prov : tar_co.getProvs()) {
+                                    // if(std::any_of(tar_co.getProvs().begin(), tar_co.getProvs().end(), == prov))
                                     if(prov == tar_prov) {
                                         present = 1;
                                         break;
@@ -217,7 +223,7 @@ void Transfer_state::create_target_states(std::vector<Transfer_state> &target_st
     // }
     if (!target) {target_st.emplace_back(*this);} 
 }
-void Transfer_state::create_remaining_states(std::vector<State*> &rem_st, std::vector<State*> &ori_st){ // ? merge with calculate_remaining_resources
+void Transfer_state::create_remaining_states(std::vector<State*> &rem_st, const std::vector<State*> &ori_st){ // ? merge with calculate_remaining_resources
     bool found{};
     for(State* st : rem_st) {
         if (st->getName() == this->getOrigin()) {
@@ -258,7 +264,7 @@ void Transfer_state::calculate_remaining_resources(std::vector<Origin_state> &re
                             }
                         }
                         for(auto& build : co.getBuilds()) { // building subtracting
-                            bool present{};
+                            // bool present{};
                             for(auto tr_build : tr_co.getBuilds()) {
                                 if(build.getType() == tr_build.getType()) {
                                     build.setLvl(build.getLvl() - tr_build.getLvl()); // TODO refactor using operator overlading
@@ -294,17 +300,21 @@ void Transfer_state::create_pops(const std::string &co, const std::string &cul, 
     }
 }
 void Transfer_state::create_buildings(const std::string &co, const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pm) {
-    for (State::Country &c : countries) {
+    for (State::Country &c : this->countries) {
         if(c.getName() == co) {
             c.getBuilds().emplace_back(type, lvl, res, pm);
         }
     }
 }
-State::Country* Transfer_state::create_country(const std::string &name, std::vector<std::string> &pr){  
-    State::Country country(name, pr);
+std::unique_ptr<State::Country> Transfer_state::create_country(const std::string &name, std::vector<std::string> &pr){  
+    this->countries.emplace_back(name, pr);
+    std::unique_ptr<State::Country> country_ptr(new State::Country(name, pr));
+    this->countries.push_back(*country_ptr);
+    return country_ptr;
+/*     State::Country country(name, pr);
     State::Country *const country_ptr = &country;
     this->countries.push_back(country);
-    return country_ptr;
+    return country_ptr; */
 } 
 
 /**** REMNANT STATE CLASS ****/

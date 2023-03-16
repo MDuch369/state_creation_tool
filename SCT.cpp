@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <vector>
 #include <algorithm>
+#include <memory>
 #include "state.h"
 #include "state_list.h"
 
@@ -109,7 +110,7 @@ std::filesystem::path change_path(const char &io) {
     
     return line;
 }
-void list_current_i_o_paths(std::filesystem::path &in, std::filesystem::path &out) {
+void list_current_i_o_paths(const std::filesystem::path &in, const std::filesystem::path &out) {
     std::cout << "current input path: " << in << std::endl;
     std::cout << "current output path: " <<  out << std::endl;
 }
@@ -123,7 +124,7 @@ void list_current_i_o_paths(std::filesystem::path &in, std::filesystem::path &ou
 //     }
 // }
 void /*change_*/file_list(const std::filesystem::path &path, std::filesystem::path *files) { // TODO sort the list of files
-    std::vector<std::filesystem::path>f;
+    // std::vector<std::filesystem::path>f;
     int i{};
     for (const std::filesystem::path& entry : std::filesystem::directory_iterator(path / "map_data/state_regions/")){
         if(entry.filename() == "99_seas.txt") {continue;}
@@ -180,11 +181,11 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
 }
 
 // transfer info input
-State_list new_state_info() {
+/* State_list */void new_state_info(State_list &states) {
     int num{};
     std::string name{}, provs{}, id{};
-    State_list states{};
-    std::vector<Transfer_state> temp;
+    // State_list states{};
+    // std::vector<Transfer_state> temp;
     std::cout << "Number of states to be created: " << std::endl;
     std::cin >> num;
     for(int i{}; i < num; i++) {
@@ -196,15 +197,10 @@ State_list new_state_info() {
         std::cout << "Provinces to transfer to state number " << i + 1 << ": ";
         std::getline(std::cin, provs);
         std::cout << std::endl;
-
-        temp.emplace_back(name, id, provs);
-        // states.emplace_back(name, id, provs);
+        // std::unique_ptr<State> state(new Transfer_state(name, id, provs));
+        // states.add_state(std::move(state));
+        states.add_state(std::unique_ptr<State>(new Transfer_state(name, id, provs)));
     } 
-    int i{}; // TODO find a better way to do this
-    for (auto trs : temp) {
-        states.getStates()[i] = &trs;
-    }
-    return states;
 }
 
 void save_provinces(std::vector<std::string> &provs) { // TODO move inside Transfer_State class
@@ -246,8 +242,8 @@ int main() {
     std::filesystem::path files[15], input{}, output{};
     std::vector<std::string> provinces{};
     // std::vector<Transfer_state> transfer_states{}, target_states{};
-    std::string filename, new_state_name{}/*, strat_reg{}*/;
-    int new_state_id{}; 
+    std::string /* filename, */ new_state_name{}/*, strat_reg{}*/;
+    // int new_state_id{}; 
     
     check_i_o_file(input, output);
     file_list(input, files);
@@ -260,7 +256,7 @@ int main() {
     states.save_state_builds(input, files);
     
 
-    transfer_states = new_state_info();
+    /* transfer_states =  */new_state_info(transfer_states);
 
     // for(int i {}; i < transfer_states.size(); i++){transfer_states[i].find_origin_states(states, transfer_states);}
     // for(int i {}; i < transfer_states.size(); i++){transfer_states[i].calculate_resources(states);}

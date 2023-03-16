@@ -9,7 +9,8 @@
 
 class State {
 //sublcasses
-protected:
+// protected:
+public:
     class Country {
     // subclasses
         class Pop {
@@ -46,7 +47,7 @@ protected:
         // setters
             void setLvl(const int &);
         };
-
+    protected:
     // data
         std::string country, type{};
         std::vector<std::string> provs;
@@ -85,7 +86,7 @@ protected:
 public:
     virtual ~State();
 
-    virtual State::Country* create_country(const std::string &, std::vector<std::string> &); 
+    virtual std::unique_ptr<State::Country> create_country(const std::string &, std::vector<std::string> &); 
     virtual void create_pops(const std::string &, const std::string &, const std::string &, const std::string &, const int &) = 0; 
     virtual void create_buildings(const std::string &, const std::string &, const int &, const int &, const std::vector<std::string> &) = 0;
 

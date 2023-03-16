@@ -14,10 +14,10 @@
     void variable_string_vector(std::vector<std::string> &, std::string &);
     bool compare_string(const std::string &, std::string);
     std::string data_name(std::string &);
-    bool find_string(std::string &, const std::string &, const int &pos = 0);
+    bool find_string(const std::string &, const std::string &, const int &pos = 0);
     void find_name(std::ifstream &, std::string &, const std::string &, std::string &);
     void find_data(std::ifstream &, std::string &, const std::string &, std::string &);
     void find_data(std::ifstream &, std::string &, const std::string &, const char &, std::string &);
-    void find_data_int(std::ifstream &, std::string &, const std::string &, int &);
+    void find_data_int(std::ifstream &, const std::string &, const std::string &, int &);
 
 #endif

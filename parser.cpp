@@ -35,7 +35,7 @@ void data_vector(std::vector<std::string> &vec, const std::string &line, int len
     }
 }
 void variable_string_vector(std::vector<std::string> &t, std::string &line) {
-    int beg_pos{}, end_pos{};
+    long unsigned int beg_pos{}, end_pos{};
     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
     beg_pos = line.find("\"") + 1;
     end_pos = line.find('\"', beg_pos);
@@ -62,7 +62,7 @@ std::string data_name(std::string &line ) {
     std::string name{line.substr(pos, line.find ("\n") - pos)};
     return name;
 }
-bool find_string(std::string &line, const std::string &str, const int &pos) {
+bool find_string(const std::string &line, const std::string &str, const int &pos) {
     if(line.find(str, pos) != std::string::npos) { 
         return true; 
     }
@@ -83,7 +83,7 @@ void find_data(std::ifstream &src, std::string &line, const std::string &str, co
         result = data(line, delim);
     }
 }
-void find_data_int(std::ifstream &src, std::string &line, const std::string &str, int &result) { // ? use this function for other stuff
+void find_data_int(std::ifstream &src, const std::string &line, const std::string &str, int &result) { // ? use this function for other stuff
     if(line.find(str, 0) != std::string::npos) { 
         result = data_int(line);
     }

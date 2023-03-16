@@ -17,20 +17,22 @@ State::Country::Country(const std::string &name, const std::string &type, const 
 }
 State::State(const std::string &name) :name{name} {}  */
 State::Country::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
-    : culture{cult}, religion{rel}, type{t}, size{s} {}
+    : size{s}, culture{cult}, religion{rel}, type{t}  {}
 State::Country::Building::Building(const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pr) 
-    : type{type}, dlc{dlc}, prod{pr}, level{lvl}, reserves{res} {}
+    : level{lvl}, reserves{res}, type{type}, dlc{dlc}, prod{pr} {} 
 
 
 // destructors
     State::~State() {}
 
 // Countries
-State::Country* State::create_country(const std::string &name, std::vector<std::string> &pr) { // ! placeholder
+std::unique_ptr<State::Country> State::create_country(const std::string &name, std::vector<std::string> &pr) { // ! placeholder
     this->countries.emplace_back(name, pr);
-    State::Country country(name, pr);
-    State::Country* country_ptr = &country;
-    this->countries.push_back(country);
+    std::unique_ptr<State::Country> country_ptr(new State::Country(name, pr));
+    // State::Country country(name, pr);
+    // State::Country* country_ptr = &country;
+    // this->countries.emplace_back(country);
+    this->countries.push_back(*country_ptr);
     return country_ptr;
 }
 

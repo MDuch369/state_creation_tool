@@ -22,10 +22,10 @@ public:
     Origin_state(const unsigned int[]);
 */
 //destructor
-    ~Origin_state();
+    ~Origin_state() override;
 
 // countries
-    Origin_state::Country* create_country(const std::string &, std::vector<std::string> &) override;
+    std::unique_ptr<State::Country> create_country(const std::string &, std::vector<std::string> &) override;
     void create_pops(const std::string &, const std::string &, const std::string &, const std::string &, const int &) override; 
     void create_buildings(const std::string &, const std::string &, const int &, const int &, const std::vector<std::string> &) override;
 
@@ -45,7 +45,7 @@ public:
     Remnant_state(State*);
 
 // destructor
-    ~Remnant_state();
+    ~Remnant_state() override;
 
     void remove_prov ();
     void calculate_remaining_provs(State &);
@@ -70,17 +70,18 @@ class Transfer_state : public State{
 public:
 // constructors
     // Transfer_state();
+    // Transfer_state(Transfer_state const&);
     Transfer_state(Transfer_state const&);
     Transfer_state(const std::string &, const std::string &, const std::string &); // TODO replace this constructor with the one below
     Transfer_state(const std::string &, const std::string &, const std::vector<std::string> &);  
 
 // destructor
-    ~Transfer_state();
+    ~Transfer_state() override;
 
 // countries
     // State::Country create_country(State::Country &, std::vector<std::string> &, const double &); // ? merge the two functions
-    State::Country create_country(State::Country &, std::vector<std::string> &, const double &);
-    Transfer_state::Country* create_country(const std::string &, std::vector<std::string> &) override; // this function exist so the class is not abstract
+    State::Country create_country(State::Country &, const std::vector<std::string> &, const double &);
+    std::unique_ptr<State::Country> create_country(const std::string &, std::vector<std::string> &) override; // this function exist so the class is not abstract
 
     void create_pops(const std::string &, const std::string &, const std::string &, const std::string &, const int &) override; 
     void create_buildings(const std::string &, const std::string &, const int &, const int &, const std::vector<std::string> &) override;
@@ -91,9 +92,9 @@ public:
 
 // transfer
     void find_origin_states(const std::vector<Origin_state> &, std::vector<Transfer_state> &);
-    void calculate_resources(std::vector<Origin_state> &);
+    void calculate_resources(const std::vector<Origin_state> &);
     void create_target_states(std::vector<Transfer_state> &);
-    void create_remaining_states(std::vector<State*> &, std::vector<State*> &);
+    void create_remaining_states(std::vector<State*> &, const std::vector<State*> &);
     void calculate_remaining_resources(std::vector<Origin_state> &);
     void copy_state_info(State &);
 
