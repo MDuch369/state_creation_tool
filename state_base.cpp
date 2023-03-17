@@ -19,7 +19,7 @@ State::State(const std::string &name) :name{name} {}  */
 State::Country::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
     : size{s}, culture{cult}, religion{rel}, type{t}  {}
 State::Country::Building::Building(const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pr) 
-    : level{lvl}, reserves{res}, type{type}, dlc{dlc}, prod{pr} {} 
+    : level{lvl}, reserves{res}, type{type}/* , dlc{dlc} */, prod{pr} {} 
 
 
 // destructors
@@ -27,7 +27,7 @@ State::Country::Building::Building(const std::string &type, const int &lvl, cons
 
 // Countries
 std::unique_ptr<State::Country> State::create_country(const std::string &name, std::vector<std::string> &pr) { // ! placeholder
-    this->countries.emplace_back(name, pr);
+    // this->countries.emplace_back(name, pr);
     std::unique_ptr<State::Country> country_ptr(new State::Country(name, pr));
     // State::Country country(name, pr);
     // State::Country* country_ptr = &country;

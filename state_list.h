@@ -12,7 +12,7 @@ class State_list {
     std::vector<std::unique_ptr<State>> states;
 public: // TODO make some of the functons private
 // functions 
-    ~State_list();
+    // ~State_list();
     // creating an array of states info //? TODO refactor using regex
     std::ifstream::pos_type create_state(std::ifstream &, std::unique_ptr<State> & , std::string &);
     std::ifstream::pos_type add_homelands(std::ifstream &, std::unique_ptr<State> & , std::string &);

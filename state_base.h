@@ -33,14 +33,14 @@ public:
         class Building {
         // data
             int level, reserves;
-            std::string type, dlc{}; 
+            std::string type/* , dlc{} */; 
             std::vector<std::string> prod;
         public:
         // constructor
             Building(const std::string &, const int &, const int &, const std::vector<std::string> &);
         // getters
             inline std::string getType() {return type;}
-            inline std::string getDlc() {return dlc;}
+            // inline std::string getDlc() {return dlc;}
             inline std::vector<std::string> getProd() {return prod;}
             inline int getLvl() {return level;}
             inline int getRes() {return reserves;}        

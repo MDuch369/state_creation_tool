@@ -29,7 +29,7 @@ State::Country::Building::Building(const std::string &type, const int &lvl, cons
 Origin_state::~Origin_state() {}
 
 std::unique_ptr<State::Country> Origin_state::create_country(const std::string &name, std::vector<std::string> &pr) {
-    this->countries.emplace_back(name, pr);
+    // this->countries.emplace_back(name, pr);
     std::unique_ptr<State::Country> country_ptr(new State::Country(name, pr));
     this->countries.push_back(*country_ptr);
     return country_ptr;

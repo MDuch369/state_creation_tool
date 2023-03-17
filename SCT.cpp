@@ -8,8 +8,6 @@
 #include "state.h"
 #include "state_list.h"
 
-
-
 // input/output paths
 void save_i_o_path() { // TODO add output path handling
     std::string line{};
@@ -145,6 +143,8 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
     std::cout << "5 - add new output path " << std::endl;
     std::cout << "6 - change current input path" << std::endl;
     std::cout << "7 - change current output path" << std::endl;
+    // std::cout << "8 - debug - print state list" << std::endl;
+
     // std::cout << "[e]xit" << std::endl;
     std::cin >> action; 
     std::cout << std::endl;
@@ -173,6 +173,9 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
     case '7':
         (out = change_path('o'));
         return true;
+    // case '8':
+    //     (out = change_path('o'));
+    //     return true;
     // case 'e':
     //     exit();
     default:

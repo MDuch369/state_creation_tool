@@ -6,7 +6,7 @@
 #include "state.h"
 #include "state_list.h"
 
-State_list::~State_list() {};
+// State_list::~State_list() {};
 
 // creating an array of states info //? TODO refactor using regex
 std::ifstream::pos_type State_list::create_state(std::ifstream &src, std::unique_ptr<State> &state, std::string &line){
@@ -26,6 +26,8 @@ std::ifstream::pos_type State_list::create_state(std::ifstream &src, std::unique
             // State::Country *const pres{state->create_country(country, provs)};
             // std::unique_ptr<State::Country> ;
             std::unique_ptr<State::Country> pres{state->create_country(country, provs)};
+            // std::unique_ptr<State::Country> pres{};
+            // pres = state->create_country(country, provs);
             provs.clear();
             getline(src, line);
             if(find_string(line, "#")) {
@@ -296,9 +298,9 @@ void State_list::save_state_pops(const std::filesystem::path &path/* , std::vect
 // building saving
 std::ifstream::pos_type State_list::save_building(std::ifstream &src/* , std::vector<State> &states */, const std::string &name, const std::string &co, const std::string &t, const int &l, const int &r, const std::vector<std::string> &pm) { // ! TODO create a separate class for the parameters 
 
-    for (std::unique_ptr<State>/* auto */ &st : this->states) {
+    for (/* std::unique_ptr<State> */auto &st : this->states) {
         if(st->getName() == name) {
-            // st->create_buildings(co, t, l, r, pm);
+            st->create_buildings(co, t, l, r, pm);
         }
     }
     return src.tellg();
@@ -322,7 +324,7 @@ void State_list::save_state_builds(const std::filesystem::path &path/* , std::ve
             if(find_string(line, "create_building")){ // ? TODO make this a function
                 getline(src, line);
             }   
-            find_data(src, line,"building", type);
+            find_data(src, line,"building=", type);
             find_data_int(src, line, "level", lvl);
             find_data_int(src, line, "reserves", res);
             if(find_string(line, "activate_production_methods")) { // ! TODO extract this as a function
