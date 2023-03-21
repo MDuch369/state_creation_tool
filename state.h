@@ -63,6 +63,7 @@ class Transfer_state : public State{
     int origin_pos{};
     std::string origin{};
     std::vector<std::string> transfer_provs;
+    /* const */ std::shared_ptr<State> origin_ptr{};
 
 // Functions:
     unsigned int find_states(const std::string &, std::vector<Transfer_state> &);
@@ -91,11 +92,11 @@ public:
     inline std::string getOrigin() {return this->origin;}
 
 // transfer
-    void find_origin_states(const std::vector<Origin_state> &, std::vector<Transfer_state> &);
-    void calculate_resources(const std::vector<Origin_state> &);
-    void create_target_states(std::vector<Transfer_state> &);
-    void create_remaining_states(std::vector<State*> &, const std::vector<State*> &);
-    void calculate_remaining_resources(std::vector<Origin_state> &);
+    void find_origin_states(State_list &, State_list &);
+    void calculate_resources(State_list &);
+    void create_target_states(State_list &);
+    void create_remaining_states(State_list &, const State_list &);
+    void calculate_remaining_resources(State_list &);
     void copy_state_info(State &);
 
 // debug functions

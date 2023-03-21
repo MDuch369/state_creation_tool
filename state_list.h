@@ -9,7 +9,7 @@
 
 class State_list {
 // data
-    std::vector<std::unique_ptr<State>> states;
+    std::vector<std::shared_ptr<State>> states;
 public: // TODO make some of the functons private
 // functions 
     // ~State_list();
@@ -26,7 +26,7 @@ public: // TODO make some of the functons private
     std::ifstream::pos_type save_resources(std::ifstream &, int *, std::string &);
     std::ifstream::pos_type save_capped_resources(std::ifstream &, int *, std::string &);
     std::ifstream::pos_type save_subsistence_building(std::ifstream &, std::string &, std::string &);
-    std::ifstream::pos_type save_state(std::ifstream &, std::unique_ptr<State> & , std::string &);
+    std::ifstream::pos_type save_state(std::ifstream &, std::shared_ptr<State> & , std::string &);
     void browse_file(std::ifstream &/* , std::vector<State> & */); 
     void save_state_info(const std::filesystem::path &, const std::filesystem::path *);
     
@@ -40,7 +40,7 @@ public: // TODO make some of the functons private
 
 // public:
     // getters
-    inline std::vector<std::unique_ptr<State>>& getStates() {return this->states;}
+    inline std::vector<std::shared_ptr<State>>& getStates() {return this->states;}
     inline size_t getSize() {return this->states.size();}
 
     void add_state(std::unique_ptr<State>&&);

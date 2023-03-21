@@ -261,13 +261,33 @@ int main() {
 
     /* transfer_states =  */new_state_info(transfer_states);
 
-    // for(int i {}; i < transfer_states.size(); i++){transfer_states[i].find_origin_states(states, transfer_states);}
-    // for(int i {}; i < transfer_states.size(); i++){transfer_states[i].calculate_resources(states);}
-    // for(int i {}; i < transfer_states.size(); i++){transfer_states[i].create_target_states(target_states);}
-    // for(int i {}; i < transfer_states.size(); i++){transfer_states[i].create_remaining_states(remnant_states, states);}
-    // for(int i {}; i < transfer_states.size(); i++){transfer_states[i].calculate_remaining_resources(remnant_states);}
-    // for(int i {}; i < target_states.size(); i++){ target_states[i].print_entry();}
-    // for(int i {}; i < remnant_states.size(); i++) {remnant_states[i].print_entry();}
+    //  TODO refactor, make one function to call all the others
+    for(int i {}; i < transfer_states.getStates().size(); i++){
+        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        tr_ptr->find_origin_states(states, transfer_states);
+    }
+    for(int i {}; i < transfer_states.getStates().size(); i++){
+        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        tr_ptr->calculate_resources(states);
+    }
+    for(int i {}; i < transfer_states.getStates().size(); i++){
+        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        tr_ptr->create_target_states(target_states);
+        }
+    for(int i {}; i < transfer_states.getStates().size(); i++){
+        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        tr_ptr->create_remaining_states(remnant_states, states);
+    }
+    for(int i {}; i < transfer_states.getStates().size(); i++){
+        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        tr_ptr->calculate_remaining_resources(remnant_states);
+    }
+    for(int i {}; i < target_states.getStates().size(); i++){ 
+        target_states.getStates()[i]->print_entry();
+    }
+    for(int i {}; i < remnant_states.getStates().size(); i++) {
+        remnant_states.getStates()[i]->print_entry();
+    }
     
     return 0;
 }

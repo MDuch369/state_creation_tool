@@ -105,17 +105,24 @@ State::Country Transfer_state::create_country(State::Country &country, const std
     // std::vector<State::Country::Pop>;
 
 } */
-void Transfer_state::find_origin_states(const std::vector<Origin_state> &states, std::vector<Transfer_state> &tr_st) { // ? refactor, move to State_list class
+// TODO denest
+void Transfer_state::find_origin_states( State_list &states, State_list &transfer_states) { // ? refactor, move to State_list class
     std::vector<std::string> p{}, diff_ori{};
     bool or_found{0}/* , state_end{0} */;
 
-    for(Origin_state st : states) {
-        for(State::Country co : st.getCountries()) {
+    for(std::shared_ptr<State> &st : states.getStates()) {
+        for(State::Country co : st->getCountries()) {
             for(std::string or_pr : co.getProvs()) {
                 for(std::string &pr : this->transfer_provs) { 
                     if(or_pr == pr) { // moves found provs into [p]rovince vector
                         if(this->origin == ""){
-                            this->origin = st.getName();
+                            this->origin = st->getName();
+                            // WIP converting the state to shared pointer 
+                            std::shared_ptr<State> or_ptr(std::move(st));
+                            this->origin_ptr = or_ptr;
+                            // st = std::move(or_ptr);
+                            // states.getStates().emplace_back(std::shared_ptr<State>(std::move(st)));
+                            // std::shared_ptr<State> shared_ptr = std::shared_ptr<State>(std::move(st));
                         }
                         or_found = 1;
                         p.push_back(pr);
@@ -133,27 +140,28 @@ void Transfer_state::find_origin_states(const std::vector<Origin_state> &states,
             }
         }
         if(or_found) {break;}
-        this->origin_pos++;
+        // this->origin_pos++;
     }
     this->transfer_provs.erase(std::remove(this->transfer_provs.begin(), this->transfer_provs.end(), ""), this->transfer_provs.end());
     if(this->transfer_provs.empty() != true) { // creates another transfer state if this one still has provs left
         for(std::string pr : this->transfer_provs) {
             diff_ori.push_back(pr);
         }
-        tr_st.emplace_back(this->name, this->id, diff_ori);
+        transfer_states.getStates().emplace_back(this->name, this->id, diff_ori);
     }
 }    
-void Transfer_state::calculate_resources(const std::vector<Origin_state> &states) {
+void Transfer_state::calculate_resources(State_list &states) {
     double origin_provs{}, provs{};
     double ratio{};
-    Origin_state origin{states[this->origin_pos]};
-    this->homelands = origin.getHomelands();
-    this->claims = origin.getClaims();
-    this->traits = origin.getTraits();
-    this->sub = origin.getSub();
-    this->ar_res = origin.getResources();
-    this->naval_exit = origin.getNavalExit();
-    for(State::Country co : origin.getCountries()) {
+    // Origin_state origin{states[this->origin_pos]};
+
+    this->homelands = this->origin_ptr->getHomelands();
+    this->claims = this->origin_ptr->getClaims();
+    this->traits = this->origin_ptr->getTraits();
+    this->sub = this->origin_ptr->getSub();
+    this->ar_res = this->origin_ptr->getResources();
+    this->naval_exit = this->origin_ptr->getNavalExit();
+    for(State::Country co : this->origin_ptr->getCountries()) {
         origin_provs += co.getProvs().size();
     }
     for(State::Country co : this->getCountries()) {
@@ -161,24 +169,31 @@ void Transfer_state::calculate_resources(const std::vector<Origin_state> &states
     }
     ratio = provs/origin_provs;
     for(int i{}; i < 12; i++) {
-        this->res[i] = origin.getRes()[i] * ratio;
+        this->res[i] = this->origin_ptr->getRes()[i] * ratio;
     }
 }
-void Transfer_state::create_target_states(std::vector<Transfer_state> &target_st/*, std::vector<State> &origin_st*/) { //TODO denest
+
+void prov_copy(State::Country &tar_co) {
+
+}
+void Transfer_state::create_target_states(State_list &target_st/*, std::vector<State> &origin_st*/) { //TODO denest
     bool target{};
     // Transfer_state trs{*this};
     // if (target_st.empty()) {target_st.emplace_back(*this);} 
     // else {
-        for(State& st : target_st) {
-            if(st.getName() == this->getName()) {
+        for(std::shared_ptr<State> &st : target_st.getStates()) {
+            if(st->getName() == this->getName()) {
                 for(State::Country co : this->getCountries()) { // country copying
-                    for(State::Country& tar_co : st.getCountries()) {
+                    for(State::Country& tar_co : st->getCountries()) {
                         if(co.getName() == tar_co.getName()) {
                             for(std::string prov : co.getProvs()) { // prov copying
                                 bool present;
                                 present = 0;
+                                // WIP replacing loop with any_of algorithm
+                                // if(std::any_of(tar_co.getProvs().begin(), tar_co.getProvs().end(), 
+                                    // [&prov](const std::string &target) { return target == prov; }))
+                                // {
                                 for(std::string tar_prov : tar_co.getProvs()) {
-                                    // if(std::any_of(tar_co.getProvs().begin(), tar_co.getProvs().end(), == prov))
                                     if(prov == tar_prov) {
                                         present = 1;
                                         break;
@@ -192,7 +207,7 @@ void Transfer_state::create_target_states(std::vector<Transfer_state> &target_st
                                 bool present{};
                                 for(auto tar_pop : tar_co.getPops()) {
                                     if(pop.getCult() == tar_pop.getCult() && pop.getRel() == tar_pop.getRel()) {
-                                        tar_pop.setSize(tar_pop.getSize() + pop.getSize()); // TODO refactor using operator overlading
+                                        tar_pop.setSize(tar_pop.getSize() + pop.getSize()); // ? refactor using operator overlading
                                         present = 1;
                                         break;
                                     }
@@ -203,7 +218,7 @@ void Transfer_state::create_target_states(std::vector<Transfer_state> &target_st
                                 bool present{};
                                 for(auto tar_build : tar_co.getBuilds()) {
                                     if(build.getType() == tar_build.getType()) {
-                                        tar_build.setLvl(tar_build.getLvl() + build.getLvl()); // TODO refactor using operator overlading
+                                        tar_build.setLvl(tar_build.getLvl() + build.getLvl()); // ? refactor using operator overlading
                                         present = 1;
                                         break;
                                     }
@@ -214,35 +229,42 @@ void Transfer_state::create_target_states(std::vector<Transfer_state> &target_st
                     }
                 } 
                 int res[12]{};
-                for(int i{}; i < 11; i++) {res[i] = st.getRes()[i] + this->getRes()[i];}
-                st.setRes(res);
+                for(int i{}; i < 11; i++) {res[i] = st->getRes()[i] + this->getRes()[i];}
+                st->setRes(res);
                 target = 1;
                 break;
             }
         }
     // }
-    if (!target) {target_st.emplace_back(*this);} 
+    if (!target) {
+        target_st.getStates().emplace_back(*this);
+    } 
 }
-void Transfer_state::create_remaining_states(std::vector<State*> &rem_st, const std::vector<State*> &ori_st){ // ? merge with calculate_remaining_resources
+void Transfer_state::create_remaining_states(State_list &rem_st, const State_list &ori_st){ // ? merge with calculate_remaining_resources
     bool found{};
-    for(State* st : rem_st) {
+    for(std::shared_ptr<State> &st : rem_st.getStates()) {
         if (st->getName() == this->getOrigin()) {
             found = 1;
             break;
         }
     }
     if(!found) {
+        // ! TODO test if this is corrrect
+        rem_st.getStates().emplace_back(std::move(this->origin_ptr)); 
+        /*         
+        // std::shared_ptr<State> new_remnant_state{ori_st[this->origin_pos]};
         Remnant_state new_remnant_state{ori_st[this->origin_pos]};
         Remnant_state *new_remnant_state_ptr = &new_remnant_state;
         // new_remnant_state.State = ori_st.getStates()[this->origin_pos].State;
         // rem_st.getStates().emplace_back(ori_st.getStates()[this->origin_pos]);
-        rem_st.push_back(new_remnant_state_ptr); // ! test if the new_remnant_state exist when functions exits, otherwise the pointer will be unhappy
+        rem_st.push_back(new_remnant_state_ptr); 
+        */
     }
 }
-void Transfer_state::calculate_remaining_resources(std::vector<Origin_state> &rem_st/*, std::vector<State> &ori_st*/) { // TODO denest
-    for(State& st : rem_st) {
-        if(this->origin == st.getName()) {
-            for(State::Country& co : st.getCountries()) { // country subtracting
+void Transfer_state::calculate_remaining_resources(State_list &rem_st/*, std::vector<State> &ori_st*/) { // TODO denest
+    for(std::shared_ptr<State> &st : rem_st.getStates()) {
+        if(this->origin == st->getName()) {
+            for(State::Country& co : st->getCountries()) { // country subtracting
                 for(State::Country tr_co : this->getCountries()) {
                     if(co.getName() == tr_co.getName()) {
                         for(std::string& prov : co.getProvs()) { // prov subtracting
@@ -277,8 +299,8 @@ void Transfer_state::calculate_remaining_resources(std::vector<Origin_state> &re
                 co.getProvs().erase(std::remove(co.getProvs().begin(), co.getProvs().end(), ""), co.getProvs().end());
             }
             int res[/*st.getRes().size()*/12]{};
-            for(int i{}; i < 11; i++) {res[i] = st.getRes()[i] - this->getRes()[i];}
-            st.setRes(res);
+            for(int i{}; i < 11; i++) {res[i] = st->getRes()[i] - this->getRes()[i];}
+            st->setRes(res);
             break;
         }
     }

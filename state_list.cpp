@@ -159,7 +159,7 @@ std::ifstream::pos_type State_list::save_subsistence_building(std::ifstream &src
     } 
     return src.tellg();
 }
-std::ifstream::pos_type State_list::save_state(std::ifstream &src, std::unique_ptr<State> & st, std::string &line){
+std::ifstream::pos_type State_list::save_state(std::ifstream &src, std::shared_ptr<State> & st, std::string &line){
     int cap_res[12]{};
     std::string nav_ex{}, name{}, id{}, subsist{};
     std::vector<std::string> traits{}, ar_res{};
@@ -235,7 +235,7 @@ void State_list::browse_file(std::ifstream &src/* , std::vector<State> &states *
     while(getline(src, line)) {
         if(find_string(line, "STATE")) {
             name = data_name(line);
-            for (std::unique_ptr<State> &st : this->states) {
+            for (std::shared_ptr<State> &st : this->states) {
                 if(st->getName() == name) {
                     src.seekg(save_state(src, st, line));
                 }
@@ -298,7 +298,7 @@ void State_list::save_state_pops(const std::filesystem::path &path/* , std::vect
 // building saving
 std::ifstream::pos_type State_list::save_building(std::ifstream &src/* , std::vector<State> &states */, const std::string &name, const std::string &co, const std::string &t, const int &l, const int &r, const std::vector<std::string> &pm) { // ! TODO create a separate class for the parameters 
 
-    for (/* std::unique_ptr<State> */auto &st : this->states) {
+    for (std::shared_ptr<State> &st : this->states) {
         if(st->getName() == name) {
             st->create_buildings(co, t, l, r, pm);
         }
