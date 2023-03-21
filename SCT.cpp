@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <memory>
 #include "state.h"
+#include "transfer_state.h"
 #include "state_list.h"
 
 // input/output paths
