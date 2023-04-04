@@ -9,7 +9,7 @@
 // State_list::~State_list() {};
 
 // creating an array of states info //? TODO refactor using regex
-std::ifstream::pos_type State_list::create_state(std::ifstream &src, std::unique_ptr<State> &state, std::string &line){
+std::ifstream::pos_type State_list::create_state(std::ifstream &src, std::shared_ptr<State> &state, std::string &line){
     std::string country{};
     std::vector<std::string> provs{};
     
@@ -24,9 +24,9 @@ std::ifstream::pos_type State_list::create_state(std::ifstream &src, std::unique
                 }
             }
             // State::Country *const pres{state->create_country(country, provs)};
-            // std::unique_ptr<State::Country> ;
-            std::unique_ptr<State::Country> pres{state->create_country(country, provs)};
-            // std::unique_ptr<State::Country> pres{};
+            // std::shared_ptr<State::Country> ;
+            std::shared_ptr<State::Country> pres{state->create_country(country, provs)};
+            // std::shared_ptr<State::Country> pres{};
             // pres = state->create_country(country, provs);
             provs.clear();
             getline(src, line);
@@ -45,14 +45,14 @@ std::ifstream::pos_type State_list::create_state(std::ifstream &src, std::unique
     }
     return src.tellg();
 }
-std::ifstream::pos_type State_list::add_homelands(std::ifstream &src, std::unique_ptr<State> &state, std::string &line) {
+std::ifstream::pos_type State_list::add_homelands(std::ifstream &src, std::shared_ptr<State> &state, std::string &line) {
     while(find_string(line, "add_homeland")) {
         state->setHomeland(data(line));
         getline(src, line);
     }
     return src.tellg();
 }
-std::ifstream::pos_type State_list::add_claims(std::ifstream &src, std::unique_ptr<State> &state, std::string &line) {
+std::ifstream::pos_type State_list::add_claims(std::ifstream &src, std::shared_ptr<State> &state, std::string &line) {
     while(find_string(line, "add_claim")) {
         state->setClaim(data(line));
         getline(src, line);
@@ -67,7 +67,7 @@ void State_list::save_states(const std::filesystem::path &path/* , std::vector<S
     while(getline(src, line)) { // ? move this function inside state class, and override it in subclasses
         if(find_string(line, "s:")) {
             std::string name{data_name(line)};
-            std::unique_ptr<State> state(new Origin_state(name));
+            std::shared_ptr<State> state(new Origin_state(name));
             src.seekg(create_state(src, state, line));
             src.seekg(add_homelands(src, state, line));
             src.seekg(add_claims(src, state, line));
@@ -257,7 +257,7 @@ void State_list::save_state_info(const std::filesystem::path &path/* , std::vect
 
 //   pops saving
 std::ifstream::pos_type State_list::save_pop(std::ifstream &src/* , std::vector<State> &states */, const std::string &name, const std::string &co, const std::string &cu, const std::string &r, const std::string &t, const int &s) { // ! TODO create a separate class for the parameters 
-    for (/* std::unique_ptr<State> */auto &st : this->states) {
+    for (/* std::shared_ptr<State> */auto &st : this->states) {
         if(st->getName() == name) {
             st->create_pops(co, cu, r, t, s);
         }

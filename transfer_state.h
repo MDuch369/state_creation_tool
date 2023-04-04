@@ -33,7 +33,7 @@ public:
 // countries
     // State::Country create_country(State::Country &, std::vector<std::string> &, const double &); // ? merge the two functions
     State::Country create_country(State::Country &, const std::vector<std::string> &, const double &);
-    std::unique_ptr<State::Country> create_country(const std::string &, std::vector<std::string> &) override; // this function exist so the class is not abstract
+    std::shared_ptr<State::Country> create_country(const std::string &, std::vector<std::string> &) override; // this function exist so the class is not abstract
 
     void create_pops(const std::string &, const std::string &, const std::string &, const std::string &, const int &) override; 
     void create_buildings(const std::string &, const std::string &, const int &, const int &, const std::vector<std::string> &) override;

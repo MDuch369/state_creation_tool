@@ -86,7 +86,7 @@ public:
 public:
     virtual ~State();
 
-    virtual std::unique_ptr<State::Country> create_country(const std::string &, std::vector<std::string> &); 
+    virtual std::shared_ptr<State::Country> create_country(const std::string &, std::vector<std::string> &); 
     virtual void create_pops(const std::string &, const std::string &, const std::string &, const std::string &, const int &) = 0; 
     virtual void create_buildings(const std::string &, const std::string &, const int &, const int &, const std::vector<std::string> &) = 0;
 

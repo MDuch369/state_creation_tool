@@ -14,9 +14,9 @@ public: // TODO make some of the functons private
 // functions 
     // ~State_list();
     // creating an array of states info //? TODO refactor using regex
-    std::ifstream::pos_type create_state(std::ifstream &, std::unique_ptr<State> & , std::string &);
-    std::ifstream::pos_type add_homelands(std::ifstream &, std::unique_ptr<State> & , std::string &);
-    std::ifstream::pos_type add_claims(std::ifstream &, std::unique_ptr<State> & , std::string &);
+    std::ifstream::pos_type create_state(std::ifstream &, std::shared_ptr<State> & , std::string &);
+    std::ifstream::pos_type add_homelands(std::ifstream &, std::shared_ptr<State> & , std::string &);
+    std::ifstream::pos_type add_claims(std::ifstream &, std::shared_ptr<State> & , std::string &);
     void save_states(const std::filesystem::path &);
     
     // state info saving

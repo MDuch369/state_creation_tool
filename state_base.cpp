@@ -26,9 +26,9 @@ State::Country::Building::Building(const std::string &type, const int &lvl, cons
     State::~State() {}
 
 // Countries
-std::unique_ptr<State::Country> State::create_country(const std::string &name, std::vector<std::string> &pr) { // ! placeholder
+std::shared_ptr<State::Country> State::create_country(const std::string &name, std::vector<std::string> &pr) { // ! placeholder
     // this->countries.emplace_back(name, pr);
-    std::unique_ptr<State::Country> country_ptr(new State::Country(name, pr));
+    std::shared_ptr<State::Country> country_ptr(new State::Country(name, pr));
     // State::Country country(name, pr);
     // State::Country* country_ptr = &country;
     // this->countries.emplace_back(country);

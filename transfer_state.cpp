@@ -291,9 +291,9 @@ void Transfer_state::create_buildings(const std::string &co, const std::string &
         }
     }
 }
-std::unique_ptr<State::Country> Transfer_state::create_country(const std::string &name, std::vector<std::string> &pr){  
+std::shared_ptr<State::Country> Transfer_state::create_country(const std::string &name, std::vector<std::string> &pr){  
     this->countries.emplace_back(name, pr);
-    std::unique_ptr<State::Country> country_ptr(new State::Country(name, pr));
+    std::shared_ptr<State::Country> country_ptr(new State::Country(name, pr));
     this->countries.push_back(*country_ptr);
     return country_ptr;
 /*     State::Country country(name, pr);

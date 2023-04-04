@@ -25,7 +25,7 @@ public:
     ~Origin_state() override;
 
 // countries
-    std::unique_ptr<State::Country> create_country(const std::string &, std::vector<std::string> &) override;
+    std::shared_ptr<State::Country> create_country(const std::string &, std::vector<std::string> &) override;
     void create_pops(const std::string &, const std::string &, const std::string &, const std::string &, const int &) override; 
     void create_buildings(const std::string &, const std::string &, const int &, const int &, const std::vector<std::string> &) override;
 

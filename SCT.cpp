@@ -205,9 +205,9 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
         std::getline(std::cin, provs);
         data_vector(prov_vec, provs,6);
         std::cout << std::endl;
-        // std::unique_ptr<State> state(new Transfer_state(name, id, provs));
+        // std::shared_ptr<State> state(new Transfer_state(name, id, provs));
         // states.add_state(std::move(state));
-        states.add_state(std::unique_ptr<State>(new Transfer_state(name, id, prov_vec)));
+        states.add_state(std::shared_ptr<State>(new Transfer_state(name, id, prov_vec)));
     } 
 }
 
