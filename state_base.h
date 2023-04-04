@@ -116,8 +116,8 @@ public:
    void setLand(const int &);
    void setArRes(const std::vector<std::string> &);
    void setRes(const int []);
-   void setProvs(const std::vector<std::string> &);
-   void setProv(const int &, const std::string &);
+//    void setProvs(const std::vector<std::string> &);
+//    void setProv(const int &, const std::string &);
    void setPopSize(const int &, const int &);
    void setHomeland(const std::string &);
    void setClaim(const std::string &);

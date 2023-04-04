@@ -12,7 +12,7 @@
 // constructor
 // Transfer_state::Transfer_state() {}
 Transfer_state::Transfer_state(Transfer_state const&) {}
-Transfer_state::Transfer_state(const std::string &name, const std::string &id, const std::string &provs) {
+/* Transfer_state::Transfer_state(const std::string &name, const std::string &id, const std::string &provs) {
     std::string prov, tmp; 
     this->name = name;
     this->id = id;
@@ -26,7 +26,7 @@ Transfer_state::Transfer_state(const std::string &name, const std::string &id, c
         this->transfer_provs.push_back(tmp);
         }
     }
-}
+} */
 Transfer_state::Transfer_state(const std::string &name, const std::string &id, const std::vector<std::string> &provs) {
     this->name = name;
     this->id = id;
@@ -101,7 +101,11 @@ void Transfer_state::find_origin_states( State_list &states, State_list &transfe
         for(std::string pr : this->transfer_provs) {
             diff_ori.push_back(pr);
         }
-        transfer_states.getStates().emplace_back(this->name, this->id, diff_ori);
+        // ! TODO TEST THIS IMPLEMENTATION
+        std::shared_ptr<Transfer_state> new_transfer_state = std::dynamic_pointer_cast<Transfer_state>(transfer_states.add_state());
+        new_transfer_state->setName(this->name);
+        new_transfer_state->setId(this->id);
+        new_transfer_state->setProvs(diff_ori);
     }
 }    
 void Transfer_state::calculate_resources(State_list &states) {
@@ -183,7 +187,9 @@ void Transfer_state::create_target_states(State_list &target_st/*, std::vector<S
                     }
                 } 
                 int res[12]{};
-                for(int i{}; i < 11; i++) {res[i] = st->getRes()[i] + this->getRes()[i];}
+                for(int i{}; i < 11; i++) {
+                    res[i] = st->getRes()[i] + this->getRes()[i];
+                }
                 st->setRes(res);
                 target = 1;
                 break;
@@ -191,7 +197,9 @@ void Transfer_state::create_target_states(State_list &target_st/*, std::vector<S
         }
     // }
     if (!target) {
-        target_st.getStates().emplace_back(*this);
+        // ! TODO TEST THIS IMPLEMENTATION
+        std::shared_ptr<Transfer_state> target_state{this};
+        target_st.add_state(std::dynamic_pointer_cast<State>(target_state));
     } 
 }
 void Transfer_state::create_remaining_states(State_list &rem_st, const State_list &ori_st){ // ? merge with calculate_remaining_resources
@@ -267,6 +275,7 @@ void Transfer_state::copy_state_info(State &st) {
     this->homelands = st.getHomelands();
 
 }
+
 // ! placeholder functions
 void Transfer_state::create_pops(const std::string &co, const std::string &cul, const std::string &rel, const std::string &type, const int &size){
     for (State::Country &c : countries) {
@@ -292,3 +301,7 @@ std::unique_ptr<State::Country> Transfer_state::create_country(const std::string
     this->countries.push_back(country);
     return country_ptr; */
 } 
+void Transfer_state::setProvs(const std::vector<std::string> &transfer_provs)
+{
+    this->transfer_provs = transfer_provs;
+}

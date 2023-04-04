@@ -340,7 +340,20 @@ void State_list::save_state_builds(const std::filesystem::path &path/* , std::ve
     }
 }
 
-void State_list::add_state(std::unique_ptr<State> &&state) {
+void State_list::add_state(std::shared_ptr<State> state) {
     // this->states.emplace_back(state);
     this->states.push_back(std::move(state));
 }
+
+std::shared_ptr<State> State_list::add_state()
+{
+    std::shared_ptr<State> new_transfer_state;
+    this->states.push_back(new_transfer_state);
+    return new_transfer_state;
+}
+
+/* std::shared_ptr<State> State_list::add_state(const std::string &name, const std::string &id, const std::vector<std::string> &provs)
+{
+    this->states.emplace_back(name, id, provs);
+    return std::shared_ptr<State>();
+} */

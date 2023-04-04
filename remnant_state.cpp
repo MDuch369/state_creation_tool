@@ -11,8 +11,7 @@
 
 Remnant_state::Remnant_state() {}
 Remnant_state::Remnant_state(State* state) 
-    : State{*state}
-{}
+    : State{*state} {}
 Remnant_state::~Remnant_state() {}
 
 // ! placeholder functions

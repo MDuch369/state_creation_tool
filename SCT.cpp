@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
+#include "parser.h"
 #include "state.h"
 #include "transfer_state.h"
 #include "state_list.h"
@@ -188,6 +189,7 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
 /* State_list */void new_state_info(State_list &states) {
     int num{};
     std::string name{}, provs{}, id{};
+    std::vector<std::string> prov_vec{};
     // State_list states{};
     // std::vector<Transfer_state> temp;
     std::cout << "Number of states to be created: " << std::endl;
@@ -198,12 +200,14 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
         std::cin >> name;
         std::cout << "Id of the state to be created number " << i + 1 << ": " << std::endl;
         std::cin >> id;
-        std::cout << "Provinces to transfer to state number " << i + 1 << ": ";
+        std::cout << "Provinces to transfer to state number " << i + 1 << ": " << std::endl;
+        std::cin >> std::ws;
         std::getline(std::cin, provs);
+        data_vector(prov_vec, provs,6);
         std::cout << std::endl;
         // std::unique_ptr<State> state(new Transfer_state(name, id, provs));
         // states.add_state(std::move(state));
-        states.add_state(std::unique_ptr<State>(new Transfer_state(name, id, provs)));
+        states.add_state(std::unique_ptr<State>(new Transfer_state(name, id, prov_vec)));
     } 
 }
 

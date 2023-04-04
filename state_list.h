@@ -43,7 +43,10 @@ public: // TODO make some of the functons private
     inline std::vector<std::shared_ptr<State>>& getStates() {return this->states;}
     inline size_t getSize() {return this->states.size();}
 
-    void add_state(std::unique_ptr<State>&&);
+    void add_state(std::shared_ptr<State>);
+    // WIP State adding function returning a shared pointer
+    std::shared_ptr<State> add_state();
+    // std::shared_ptr<State> add_state(const std::string &, const std::string &, const std::vector<std::string> &);
 
 };
 #endif

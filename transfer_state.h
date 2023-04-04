@@ -21,11 +21,11 @@ class Transfer_state : public State{
 
 public:
 // constructors
+    Transfer_state(Transfer_state const&);
+    Transfer_state(const std::string &, const std::string &, const std::vector<std::string> &);  
     // Transfer_state();
     // Transfer_state(Transfer_state const&);
-    Transfer_state(Transfer_state const&);
-    Transfer_state(const std::string &, const std::string &, const std::string &); // TODO replace this constructor with the one below
-    Transfer_state(const std::string &, const std::string &, const std::vector<std::string> &);  
+    // Transfer_state(const std::string &, const std::string &, const std::string &);
 
 // destructor
     ~Transfer_state() override;
@@ -49,6 +49,8 @@ public:
     void create_remaining_states(State_list &, const State_list &);
     void calculate_remaining_resources(State_list &);
     void copy_state_info(State &);
+
+    void setProvs(const std::vector<std::string> &);
 
 // debug functions
     void debug_print_provs();
