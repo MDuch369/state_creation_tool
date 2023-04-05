@@ -1,5 +1,5 @@
-#ifndef _TRANSFER_STATE_H_
-#define _TRANSFER_STATE_H_
+#ifndef REMNANT_STATE_H_
+#define REMNANT_STATE_H_
 
 #include <iostream>
 #include <vector>
