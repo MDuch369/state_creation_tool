@@ -24,7 +24,6 @@ public:
     Transfer_state(Transfer_state const&);
     Transfer_state(const std::string &, const std::string &, const std::vector<std::string> &);  
     // Transfer_state();
-    // Transfer_state(Transfer_state const&);
     // Transfer_state(const std::string &, const std::string &, const std::string &);
 
 // destructor

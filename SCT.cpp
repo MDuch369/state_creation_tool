@@ -8,6 +8,7 @@
 #include "parser.h"
 #include "state.h"
 #include "transfer_state.h"
+#include "remnant_state.h"
 #include "state_list.h"
 
 // input/output paths
@@ -226,6 +227,9 @@ void save_provinces(std::vector<std::string> &provs) { // TODO move inside Trans
     }
 }
 
+
+
+
 // debug functions //TODO create a class for this functions
 void debug_print_file_list(const std::filesystem::path *files) {
     for (int i{}; i < 16; i++){
@@ -240,8 +244,29 @@ void debug_print_state_pos(std::vector<State> &states) {
         pos++;
     }
 }
-
-
+// WIP consolidating the functions creating new states
+void new_state_creation(State_list &states, State_list &transfer_states, State_list &target_states, State_list &remnant_states) {
+    for(int i {}; i < transfer_states.getStates().size(); i++){
+        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        tr_ptr->find_origin_states(states, transfer_states);
+    }
+    for(int i {}; i < transfer_states.getStates().size(); i++){
+        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        tr_ptr->calculate_resources(states);
+    }
+    for(int i {}; i < transfer_states.getStates().size(); i++){
+        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        tr_ptr->create_target_states(target_states);
+        }
+    for(int i {}; i < transfer_states.getStates().size(); i++){
+        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        tr_ptr->create_remaining_states(remnant_states, states);
+    }
+    for(int i {}; i < transfer_states.getStates().size(); i++){
+        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        tr_ptr->calculate_remaining_resources(remnant_states);
+    }
+}
 
 int main() {
 // variables
@@ -267,7 +292,7 @@ int main() {
     /* transfer_states =  */new_state_info(transfer_states);
 
     //  TODO refactor, make one function to call all the others
-    for(int i {}; i < transfer_states.getStates().size(); i++){
+/*     for(int i {}; i < transfer_states.getStates().size(); i++){
         auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
         tr_ptr->find_origin_states(states, transfer_states);
     }
@@ -292,7 +317,11 @@ int main() {
     }
     for(int i {}; i < remnant_states.getStates().size(); i++) {
         remnant_states.getStates()[i]->print_entry();
-    }
+        // auto rm_ptr = std::dynamic_pointer_cast<Remnant_state>(remnant_states.getStates()[i]);
+        // rm_ptr->print_entry();
+    } */
     
+    new_state_creation(states, transfer_states, target_states, remnant_states);
+
     return 0;
 }

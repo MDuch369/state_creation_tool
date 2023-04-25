@@ -131,9 +131,54 @@ void Transfer_state::calculate_resources(State_list &states) {
     }
 }
 
-void prov_copy(State::Country &tar_co) {
-
+void prov_copy(State::Country &tar_co, State::Country &co) {
+    for(std::string prov : co.getProvs()) { // prov copying
+        bool present;
+        present = 0;
+        // WIP replacing loop with any_of algorithm
+        // if(std::any_of(tar_co.getProvs().begin(), tar_co.getProvs().end(), 
+            // [&prov](const std::string &target) { return target == prov; }))
+        // {
+        for(std::string tar_prov : tar_co.getProvs()) {
+            if(prov == tar_prov) {
+                present = 1;
+                break;
+            }
+        }
+        if(!present){
+            tar_co.getProvs().push_back(prov);
+        } 
+    }
 }
+void pop_copy(State::Country &tar_co, State::Country &co) 
+{
+    for(auto pop : co.getPops()) { // pop copying
+        bool present{};
+        for(auto tar_pop : tar_co.getPops()) {
+            if(pop.getCult() == tar_pop.getCult() && pop.getRel() == tar_pop.getRel()) {
+                tar_pop.setSize(tar_pop.getSize() + pop.getSize()); // ? refactor using operator overlading
+                present = 1;
+                break;
+            }
+        }
+        if(!present){tar_co.getPops().push_back(pop);}
+    }
+}
+void building_copy(State::Country &tar_co, State::Country &co)
+{
+  for(auto build : co.getBuilds()) { // building copying
+    bool present{};
+    for(auto tar_build : tar_co.getBuilds()) {
+        if(build.getType() == tar_build.getType()) {
+            tar_build.setLvl(tar_build.getLvl() + build.getLvl()); // ? refactor using operator overlading
+            present = 1;
+            break;
+        }
+    }
+    if(!present){tar_co.getBuilds().push_back(build);}
+    }  
+}
+
 void Transfer_state::create_target_states(State_list &target_st/*, std::vector<State> &origin_st*/) { //TODO denest
     bool target{};
     // Transfer_state trs{*this};
@@ -144,45 +189,9 @@ void Transfer_state::create_target_states(State_list &target_st/*, std::vector<S
                 for(State::Country co : this->getCountries()) { // country copying
                     for(State::Country& tar_co : st->getCountries()) {
                         if(co.getName() == tar_co.getName()) {
-                            for(std::string prov : co.getProvs()) { // prov copying
-                                bool present;
-                                present = 0;
-                                // WIP replacing loop with any_of algorithm
-                                // if(std::any_of(tar_co.getProvs().begin(), tar_co.getProvs().end(), 
-                                    // [&prov](const std::string &target) { return target == prov; }))
-                                // {
-                                for(std::string tar_prov : tar_co.getProvs()) {
-                                    if(prov == tar_prov) {
-                                        present = 1;
-                                        break;
-                                    }
-                                }
-                                if(!present){
-                                    tar_co.getProvs().push_back(prov);
-                                } 
-                            }
-                            for(auto pop : co.getPops()) { // pop copying
-                                bool present{};
-                                for(auto tar_pop : tar_co.getPops()) {
-                                    if(pop.getCult() == tar_pop.getCult() && pop.getRel() == tar_pop.getRel()) {
-                                        tar_pop.setSize(tar_pop.getSize() + pop.getSize()); // ? refactor using operator overlading
-                                        present = 1;
-                                        break;
-                                    }
-                                }
-                                if(!present){tar_co.getPops().push_back(pop);}
-                            }
-                            for(auto build : co.getBuilds()) { // building copying
-                                bool present{};
-                                for(auto tar_build : tar_co.getBuilds()) {
-                                    if(build.getType() == tar_build.getType()) {
-                                        tar_build.setLvl(tar_build.getLvl() + build.getLvl()); // ? refactor using operator overlading
-                                        present = 1;
-                                        break;
-                                    }
-                                }
-                                if(!present){tar_co.getBuilds().push_back(build);}
-                            }
+                            prov_copy(tar_co, co);
+                            pop_copy(tar_co, co); 
+                            building_copy(tar_co, co);
                         }
                     }
                 } 
@@ -195,13 +204,11 @@ void Transfer_state::create_target_states(State_list &target_st/*, std::vector<S
                 break;
             }
         }
-    // }
     if (!target) {
-        // ! TODO TEST THIS IMPLEMENTATION
-        std::shared_ptr<Transfer_state> target_state{this};
-        target_st.add_state(std::dynamic_pointer_cast<State>(target_state));
+        target_st.add_state(std::make_shared<Transfer_state>(*this));
     } 
 }
+
 void Transfer_state::create_remaining_states(State_list &rem_st, const State_list &ori_st){ // ? merge with calculate_remaining_resources
     bool found{};
     for(std::shared_ptr<State> &st : rem_st.getStates()) {
