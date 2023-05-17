@@ -6,7 +6,7 @@
 #include <sstream>
 #include <fstream>
 #include <filesystem>
-#include "state_base.h"
+#include "state.h"
 #include "state_list.h"
 
 class Remnant_state : public State  {

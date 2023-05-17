@@ -6,7 +6,7 @@
 #include <sstream>
 #include <fstream>
 #include <filesystem>
-#include "state_base.h"
+#include "state.h"
 #include "state_list.h"
 
 class Transfer_state : public State{
@@ -40,9 +40,10 @@ public:
 // getters
     inline std::vector<std::string> getProvs() {return this->transfer_provs;}
     inline std::string getOrigin() {return this->origin;}
+    inline std::shared_ptr<State> getOriginPtr() {return this->origin_ptr;}
 
 // transfer
-    void find_origin_states(State_list &, State_list &);
+    // void find_origin_states(State_list &, State_list &);
     void calculate_resources(State_list &);
     void create_target_states(State_list &);
     void create_remaining_states(State_list &, const State_list &);
@@ -50,6 +51,11 @@ public:
     void copy_state_info(State &);
 
     void setProvs(const std::vector<std::string> &);
+    void remove_transfer_provs();
+    bool check_transfer_provs();
+    // std::vector<std::string> add_different_origin_provs();
+    std::vector<std::string> handle_transfer_provs();
+
 
 // debug functions
     void debug_print_provs();

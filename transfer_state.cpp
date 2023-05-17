@@ -5,27 +5,16 @@
 #include <algorithm>
 #include <filesystem>
 
-#include "state.h"
+#include "origin_state.h"
 #include "transfer_state.h"
 
 
 // constructor
 // Transfer_state::Transfer_state() {}
 Transfer_state::Transfer_state(Transfer_state const&) {}
-/* Transfer_state::Transfer_state(const std::string &name, const std::string &id, const std::string &provs) {
-    std::string prov, tmp; 
-    this->name = name;
-    this->id = id;
-    std::getline(std::cin, prov);
-    prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end()); // TODO extract this function
-    prov.erase (std::remove(prov.begin(), prov.end(), ' '), prov.end());
-    transform(prov.begin(), prov.end(), prov.begin(), toupper);
-    std::stringstream ss(prov);
-    while(getline(ss, tmp, 'X')){
-        if(tmp != "") {
-        this->transfer_provs.push_back(tmp);
-        }
-    }
+    // :countries{}
+/* {
+    this->countries = {};
 } */
 Transfer_state::Transfer_state(const std::string &name, const std::string &id, const std::vector<std::string> &provs) {
     this->name = name;
@@ -33,10 +22,6 @@ Transfer_state::Transfer_state(const std::string &name, const std::string &id, c
     this->transfer_provs = provs;
 }
 Transfer_state::~Transfer_state() {}
-
-// void Transfer_state::create_country(const std::string &name, std::vector<std::string> &pr) {
-//     this->countries.emplace_back(name, pr);
-// }
 
 State::Country Transfer_state::create_country(State::Country &country, const std::vector<std::string> &provs, const double &ratio) {
     State::Country new_country(country.getName(), country.getType(), provs);
@@ -59,10 +44,34 @@ State::Country Transfer_state::create_country(State::Country &country, const std
     // std::vector<State::Country::Pop>;
 
 } */
+
+void Transfer_state::remove_transfer_provs(){
+    this->transfer_provs.erase(std::remove(this->transfer_provs.begin(), this->transfer_provs.end(), ""), this->transfer_provs.end());
+}
+bool Transfer_state::check_transfer_provs(){
+    return this->transfer_provs.empty();
+}
+/* std::vector<std::string> Transfer_state::add_different_origin_provs() {
+    std::vector<std::string> diff_ori{};
+    for(std::string pr : this->transfer_provs) {
+        diff_ori.push_back(pr);
+    }
+    return diff_ori{};
+} */
+std::vector<std::string> Transfer_state::handle_transfer_provs(){
+    std::vector<std::string> diff_ori{};
+    this->remove_transfer_provs();
+    if(this->check_transfer_provs() != true) {
+        for(std::string pr : this->transfer_provs) {
+            diff_ori.push_back(pr);
+        }
+    }
+    return diff_ori;
+}
 // TODO denest
-void Transfer_state::find_origin_states( State_list &states, State_list &transfer_states) { // ? refactor, move to State_list class
+/* void Transfer_state::find_origin_states( State_list &states, State_list &transfer_states) { // ? refactor, move to State_list class
     std::vector<std::string> p{}, diff_ori{};
-    bool or_found{0}/* , state_end{0} */;
+    bool or_found{0}/* , state_end{0} *//*;
 
     for(std::shared_ptr<State> &st : states.getStates()) {
         for(State::Country co : st->getCountries()) {
@@ -102,12 +111,18 @@ void Transfer_state::find_origin_states( State_list &states, State_list &transfe
             diff_ori.push_back(pr);
         }
         // ! TODO TEST THIS IMPLEMENTATION
-        std::shared_ptr<Transfer_state> new_transfer_state = std::dynamic_pointer_cast<Transfer_state>(transfer_states.add_state());
+        // std::shared_ptr<Transfer_state> new_transfer_state = std::dynamic_pointer_cast<Transfer_state>(transfer_states.add_state());
+        // std::shared_ptr<Transfer_state> new_transfer_state = transfer_states.add_state(std::make_shared<Transfer_state>(*this));
+        // transfer_states.add_state(std::make_shared<Transfer_state>(*this));
+        // transfer_states.add_state(std::shared_ptr<State>(new Transfer_state(*this)));
+        // transfer_states.add_state(*this);
+        // std::shared_ptr<Transfer_state> new_transfer_state = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates().back());
+        std::shared_ptr<Transfer_state> new_transfer_state = std::dynamic_pointer_cast<Transfer_state>(transfer_states.add_state_ptr(*this));
         new_transfer_state->setName(this->name);
         new_transfer_state->setId(this->id);
         new_transfer_state->setProvs(diff_ori);
     }
-}    
+}     */
 void Transfer_state::calculate_resources(State_list &states) {
     double origin_provs{}, provs{};
     double ratio{};
@@ -181,9 +196,6 @@ void building_copy(State::Country &tar_co, State::Country &co)
 
 void Transfer_state::create_target_states(State_list &target_st/*, std::vector<State> &origin_st*/) { //TODO denest
     bool target{};
-    // Transfer_state trs{*this};
-    // if (target_st.empty()) {target_st.emplace_back(*this);} 
-    // else {
         for(std::shared_ptr<State> &st : target_st.getStates()) {
             if(st->getName() == this->getName()) {
                 for(State::Country co : this->getCountries()) { // country copying
@@ -220,14 +232,6 @@ void Transfer_state::create_remaining_states(State_list &rem_st, const State_lis
     if(!found) {
         // ! TODO test if this is corrrect
         rem_st.getStates().emplace_back(std::move(this->origin_ptr)); 
-        /*         
-        // std::shared_ptr<State> new_remnant_state{ori_st[this->origin_pos]};
-        Remnant_state new_remnant_state{ori_st[this->origin_pos]};
-        Remnant_state *new_remnant_state_ptr = &new_remnant_state;
-        // new_remnant_state.State = ori_st.getStates()[this->origin_pos].State;
-        // rem_st.getStates().emplace_back(ori_st.getStates()[this->origin_pos]);
-        rem_st.push_back(new_remnant_state_ptr); 
-        */
     }
 }
 void Transfer_state::calculate_remaining_resources(State_list &rem_st/*, std::vector<State> &ori_st*/) { // TODO denest
@@ -303,10 +307,6 @@ std::shared_ptr<State::Country> Transfer_state::create_country(const std::string
     std::shared_ptr<State::Country> country_ptr(new State::Country(name, pr));
     this->countries.push_back(*country_ptr);
     return country_ptr;
-/*     State::Country country(name, pr);
-    State::Country *const country_ptr = &country;
-    this->countries.push_back(country);
-    return country_ptr; */
 } 
 void Transfer_state::setProvs(const std::vector<std::string> &transfer_provs)
 {

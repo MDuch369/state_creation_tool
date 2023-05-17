@@ -3,7 +3,8 @@
 #include <fstream>
 #include <memory>
 #include "parser.h"
-#include "state.h"
+#include "origin_state.h"
+#include "transfer_state.h"
 #include "state_list.h"
 
 // State_list::~State_list() {};
@@ -236,6 +237,7 @@ void State_list::browse_file(std::ifstream &src/* , std::vector<State> &states *
         if(find_string(line, "STATE")) {
             name = data_name(line);
             for (std::shared_ptr<State> &st : this->states) {
+                // std::shared_ptr<Origin_state> or_st = std::dynamic_pointer_cast<Origin_state>(st);
                 if(st->getName() == name) {
                     src.seekg(save_state(src, st, line));
                 }
@@ -257,9 +259,11 @@ void State_list::save_state_info(const std::filesystem::path &path/* , std::vect
 
 //   pops saving
 std::ifstream::pos_type State_list::save_pop(std::ifstream &src/* , std::vector<State> &states */, const std::string &name, const std::string &co, const std::string &cu, const std::string &r, const std::string &t, const int &s) { // ! TODO create a separate class for the parameters 
-    for (/* std::shared_ptr<State> */auto &st : this->states) {
-        if(st->getName() == name) {
-            st->create_pops(co, cu, r, t, s);
+    for (std::shared_ptr<State> &st : this->states) { 
+        // HACK converting the pointer to <Origin_state> invalidates the polymorphism, but i couldn't find better solution 
+        std::shared_ptr<Origin_state> or_st = std::dynamic_pointer_cast<Origin_state>(st);
+        if(or_st->getName() == name) {
+            or_st->create_pops(co, cu, r, t, s);
         }
     }
     return src.tellg();
@@ -284,7 +288,7 @@ void State_list::save_state_pops(const std::filesystem::path &path/* , std::vect
             find_data(src, line, "religion", rel);
             if(find_string(line, "size")) { // ! TODO extract this as a function
                 size = data_int(line);
-                src.seekg(save_pop(src/* , this->states */, name, country, cult, rel, type, size));
+                src.seekg(save_pop(src,/*  this->states, */ name, country, cult, rel, type, size));
                 size = 0;
                 type = "";
                 cult = "";
@@ -299,8 +303,10 @@ void State_list::save_state_pops(const std::filesystem::path &path/* , std::vect
 std::ifstream::pos_type State_list::save_building(std::ifstream &src/* , std::vector<State> &states */, const std::string &name, const std::string &co, const std::string &t, const int &l, const int &r, const std::vector<std::string> &pm) { // ! TODO create a separate class for the parameters 
 
     for (std::shared_ptr<State> &st : this->states) {
-        if(st->getName() == name) {
-            st->create_buildings(co, t, l, r, pm);
+        // HACK converting the pointer to <Origin_state> invalidates the polymorphism, but i couldn't find better solution
+        std::shared_ptr<Origin_state> or_st = std::dynamic_pointer_cast<Origin_state>(st);
+        if(or_st->getName() == name) {
+            or_st->create_buildings(co, t, l, r, pm);
         }
     }
     return src.tellg();
@@ -339,17 +345,21 @@ void State_list::save_state_builds(const std::filesystem::path &path/* , std::ve
         }
     }
 }
-
+// ? consolidate the functions
 void State_list::add_state(std::shared_ptr<State> state) {
-    // this->states.emplace_back(state);
-    this->states.push_back(std::move(state));
+    // this->states.push_back(std::move(state));
+    this->states.emplace_back(state);
 }
+/* void State_list::add_state(const State &state) {
+    
+    this->states.emplace_back(state);
+} */
 
-std::shared_ptr<State> State_list::add_state()
+std::shared_ptr<State> State_list::add_state_ptr(const State &state)
 {
-    std::shared_ptr<State> new_transfer_state;
-    this->states.push_back(new_transfer_state);
-    return new_transfer_state;
+    std::shared_ptr<State> new_state = std::make_shared<State>(state);
+    this->states.push_back(new_state);
+    return new_state;
 }
 
 /* std::shared_ptr<State> State_list::add_state(const std::string &name, const std::string &id, const std::vector<std::string> &provs)
@@ -357,3 +367,73 @@ std::shared_ptr<State> State_list::add_state()
     this->states.emplace_back(name, id, provs);
     return std::shared_ptr<State>();
 } */
+// HACK - this entire function will propably cause an enormous  mess
+std::shared_ptr<State> State_list::emplace_transfer_state(std::shared_ptr<State> &transfer_st) {
+    this->states.emplace_back(transfer_st);
+    std::shared_ptr<Transfer_state> new_transfer_state = std::dynamic_pointer_cast<Transfer_state>(this->states.back());
+    return new_transfer_state;
+}
+
+void State_list::find_origin_states(State_list &states) { // ? refactor
+    std::vector<std::string> p{}, diff_ori{};
+    bool or_found{0}/* , state_end{0} */;
+
+    for(/* const */ std::shared_ptr<State> &tr_st : this->states) {
+        std::shared_ptr<Transfer_state> transfer_st = std::dynamic_pointer_cast<Transfer_state>(tr_st);
+        for(std::shared_ptr<State> &st : states.getStates()) {
+            for(State::Country co : st->getCountries()) {
+                for(std::string or_pr : co.getProvs()) {
+                    for(std::string &pr : transfer_st->getProvs()) { 
+                        if(or_pr == pr) { // moves found provs into [p]rovince vector
+                            if(transfer_st->getOrigin() == ""){
+                                transfer_st->getOrigin() = st->getName();
+                                // WIP converting the state to shared pointer 
+                                std::shared_ptr<State> or_ptr(std::move(st));
+                                transfer_st->getOriginPtr() = or_ptr;
+                                // st = std::move(or_ptr);
+                                // states.getStates().emplace_back(std::shared_ptr<State>(std::move(st)));
+                                // std::shared_ptr<State> shared_ptr = std::shared_ptr<State>(std::move(st));
+                            }
+                            or_found = 1;
+                            p.push_back(pr);
+                            pr = ""; // ? find a better method to erase the entry
+                        } 
+                    }
+                }
+                if(p.empty() != true){ // creates new transfer country from [p]rovince vector
+                    double ps = p.size(), cs = co.getProvs().size();// ? find a better method of calculating this
+                    State::Country new_country = transfer_st->create_country(co, p, ps/cs);
+                    // transfer_st->countries.push_back(create_country(co, p, ps/cs));
+                    transfer_st->countries.push_back(new_country);
+                    p.clear();
+                    // this->ratio.push_back(ps/cs);
+                    // for(auto pop : co.getPops()) {}
+                    // std::vector<State::Country::Pop>;
+                }
+            }
+        }
+        if(or_found) {
+            break;
+        }
+        // this->origin_pos++;
+        diff_ori = transfer_st->handle_transfer_provs();
+        if(transfer_st->check_transfer_provs() != true) { // creates another transfer state if this one still has provs left
+            // transfer_st->check_transfer_provs();
+            // ! TODO TEST THIS IMPLEMENTATION
+            // std::shared_ptr<Transfer_state> new_transfer_state = std::dynamic_pointer_cast<Transfer_state>(transfer_states.add_state());
+            // std::shared_ptr<Transfer_state> new_transfer_state = transfer_states.add_state(std::make_shared<Transfer_state>(*this));
+            // transfer_states.add_state(std::make_shared<Transfer_state>(*this));
+            // transfer_states.add_state(std::shared_ptr<State>(new Transfer_state(*this)));
+            // transfer_states.add_state(*this);
+            // std::shared_ptr<Transfer_state> new_transfer_state = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates().back());
+            // std::shared_ptr<Transfer_state> new_transfer_state = std::dynamic_pointer_cast<Transfer_state>(transfer_states.add_state_ptr(*this)); 
+            // HACK - doing it this way will probably backfire horribly, but what you gonna do ¯\_(ツ)_/¯ it has to work somehow
+            // std::shared_ptr<Transfer_state> new_transfer_state = this->emplace_transfer_state(transfer_st);
+            std::shared_ptr<State> new_state = this->emplace_transfer_state(tr_st);
+            std::shared_ptr<Transfer_state> new_transfer_state = std::dynamic_pointer_cast<Transfer_state>(new_state);
+            new_transfer_state->setName(transfer_st->getName());
+            new_transfer_state->setId(transfer_st->getId());
+            new_transfer_state->setProvs(diff_ori);
+        }
+    }
+}    

@@ -5,7 +5,9 @@
 #include <vector>
 #include <sstream>
 #include <memory>
-#include "state.h"
+#include "origin_state.h"
+// #include "transfer_state.h"
+
 
 class State_list {
 // data
@@ -44,9 +46,13 @@ public: // TODO make some of the functons private
     inline size_t getSize() {return this->states.size();}
 
     void add_state(std::shared_ptr<State>);
+    void add_state(const State&);
     // WIP State adding function returning a shared pointer
-    std::shared_ptr<State> add_state();
+    std::shared_ptr<State> add_state_ptr(const State &state);
     // std::shared_ptr<State> add_state(const std::string &, const std::string &, const std::vector<std::string> &);
+    std::shared_ptr<State> emplace_transfer_state(std::shared_ptr<State> &);
+
+    void find_origin_states(State_list &);
 
 };
 #endif
