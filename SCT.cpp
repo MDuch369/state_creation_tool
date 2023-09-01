@@ -232,28 +232,28 @@ void debug_print_state_pos(std::vector<State> &states) {
     }
 }
 // WIP consolidating the functions creating new states
-void new_state_creation(State_list &states, State_list &transfer_states, State_list &target_states, State_list &remnant_states) {
-/*     for(int i {}; i < transfer_states.getStates().size(); i++){
-        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-        tr_ptr->find_origin_states(states, transfer_states);
-    } */
-    for(int i {}; i < transfer_states.getStates().size(); i++){
-        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-        tr_ptr->calculate_resources(states);
-    }
-    for(int i {}; i < transfer_states.getStates().size(); i++){
-        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-        tr_ptr->create_target_states(target_states);
-        }
-    for(int i {}; i < transfer_states.getStates().size(); i++){
-        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-        tr_ptr->create_remaining_states(remnant_states, states);
-    }
-    for(int i {}; i < transfer_states.getStates().size(); i++){
-        auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-        tr_ptr->calculate_remaining_resources(remnant_states);
-    }
-}
+// void new_state_creation(State_list &states, State_list &transfer_states, State_list &target_states, State_list &remnant_states) {
+// /*     for(int i {}; i < transfer_states.getStates().size(); i++){
+//         auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+//         tr_ptr->find_origin_states(states, transfer_states);
+//     } */
+//     for(int i {}; i < transfer_states.getStates().size(); i++){
+//         auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+//         tr_ptr->calculate_resources(states);
+//     }
+//     for(int i {}; i < transfer_states.getStates().size(); i++){
+//         auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+//         tr_ptr->create_target_states(target_states);
+//         }
+//     for(int i {}; i < transfer_states.getStates().size(); i++){
+//         auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+//         tr_ptr->create_remaining_states(remnant_states, states);
+//     }
+//     for(int i {}; i < transfer_states.getStates().size(); i++){
+//         auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+//         tr_ptr->calculate_remaining_resources(remnant_states);
+//     }
+// }
 
 int main() {
 // variables

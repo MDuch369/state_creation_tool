@@ -1,5 +1,5 @@
-#ifndef REMNANT_STATE_H_
-#define REMNANT_STATE_H_
+#ifndef _REMNANT_STATE_H_
+#define _REMNANT_STATE_H_
 
 #include <iostream>
 #include <vector>
@@ -7,7 +7,7 @@
 #include <fstream>
 #include <filesystem>
 #include "state.h"
-#include "state_list.h"
+// #include "state_list.h"
 
 class Remnant_state : public State  {
 

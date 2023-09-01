@@ -1,0 +1,29 @@
+To convert a std::unique_ptr inside a vector to a std::shared_ptr, store the new std::shared_ptr in the same vector and delete the old std::unique_ptr, you can use the following steps:
+
+#include <memory>
+#include <vector>
+
+int main() {
+    std::vector<std::unique_ptr<int>> vec;
+
+    // Add some unique_ptrs to the vector
+    vec.push_back(std::make_unique<int>(1));
+    vec.push_back(std::make_unique<int>(2));
+
+    // Convert the unique_ptr to shared_ptr, store it in the same vector and delete the old pointer
+    for (auto& ptr : vec) {
+        std::shared_ptr<int> shared_ptr(std::move(ptr));
+        ptr = std::move(shared_ptr);
+    }
+
+    // Access the shared_ptrs in the vector
+    for (auto& ptr : vec) {
+        *ptr = 100;
+    }
+
+    return 0;
+}
+
+In this example, we first create a std::vector of std::unique_ptr<int> objects and add some elements to it. We then loop through the vector and convert each std::unique_ptr<int> to a std::shared_ptr<int> by moving the pointer into a new std::shared_ptr<int> object. We then move the new std::shared_ptr<int> object back into the original std::unique_ptr<int> object, effectively replacing the old pointer with the new one. Finally, we access the objects through the new std::shared_ptr<int> objects in the vector.
+
+Note that after the conversion, the std::unique_ptr<int> objects no longer own the objects, and should not be used to access or modify them. Also, be careful when storing std::shared_ptr objects in containers, as this can create circular dependencies and potential memory leaks.

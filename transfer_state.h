@@ -7,7 +7,7 @@
 #include <fstream>
 #include <filesystem>
 #include "state.h"
-#include "state_list.h"
+// #include "state_list.h"
 
 class Transfer_state : public State{
 // data
@@ -44,10 +44,6 @@ public:
 
 // transfer
     // void find_origin_states(State_list &, State_list &);
-    void calculate_resources(State_list &);
-    void create_target_states(State_list &);
-    void create_remaining_states(State_list &, const State_list &);
-    void calculate_remaining_resources(State_list &);
     void copy_state_info(State &);
 
     void setProvs(const std::vector<std::string> &);

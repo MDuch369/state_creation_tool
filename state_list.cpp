@@ -467,7 +467,7 @@ void State_list::create_remaining_states(State_list &rem_st){ // ? merge with ca
     }
 }
 
-void subtract_pop(State::Country &co, State::Country &transfer_co) {
+void subtract_prov(State::Country &co, State::Country &transfer_co) {
     for(std::string& prov : co.getProvs()) { // prov subtracting
         for(std::string transfer_prov : transfer_co.getProvs()) {
             if(prov == transfer_prov) { // ? TODO refactor using operator overlading
@@ -502,15 +502,16 @@ void subtract_country(std::shared_ptr<State> &remaining_state, std::shared_ptr<T
     for(State::Country& co : remaining_state->getCountries()) { // country subtracting
         for(State::Country tr_co : transfer_state->getCountries()) {
             if(co.getName() == tr_co.getName()) {
+                subtract_prov(co, tr_co);
                 subtract_pop(co, tr_co);
                 subtract_buildings(co, tr_co);
                 // std::vector<std::string> provs{co.getProvs()};
             }
         }
-        co.getProvs().erase(std::remove(co.getProvs().begin(), co.getProvs().end(), ""), co.getProvs().end());
+        co.getProvs().erase(std::remove(co.getProvs().begin(), co.getProvs().end(), ""), co.getProvs().end()); 
     }
 }
-//  TODO denest
+// ? TODO denest
 void State_list::calculate_remaining_resources(State_list &rem_st/*, std::vector<State> &ori_st*/) {
     for(std::shared_ptr<State> &state : this->states) {
         for(std::shared_ptr<State> &remaining_st : rem_st.getStates()) {
@@ -537,12 +538,13 @@ void State_list::add_state(std::shared_ptr<State> state) {
     this->states.emplace_back(state);
 } */
 
-std::shared_ptr<State> State_list::add_state_ptr(const State &state)
+/* std::shared_ptr<State> State_list::add_state_ptr(const State &state)
 {
     std::shared_ptr<State> new_state = std::make_shared<State>(state);
+    // std::shared_ptr<State> new_state{state};
     this->states.push_back(new_state);
     return new_state;
-}
+} */
 
 /* std::shared_ptr<State> State_list::add_state(const std::string &name, const std::string &id, const std::vector<std::string> &provs)
 {
@@ -556,6 +558,7 @@ std::shared_ptr<State> State_list::emplace_transfer_state(std::shared_ptr<State>
     return new_transfer_state;
 }
 
+// TODO denest
 void State_list::find_origin_states(State_list &states) { // ? refactor
     std::vector<std::string> p{}, diff_ori{};
     bool or_found{0}/* , state_end{0} */;
