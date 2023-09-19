@@ -27,6 +27,7 @@ void save_i_o_path() { // TODO add output path handling
     out_dst << "output: " << out << std::endl;
 */
 }
+
 void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) {
     std::string line{};
     std::ifstream  in_src("inputpath.txt", std::ios::binary);
@@ -38,6 +39,7 @@ void load_i_o_path(std::filesystem::path &in, std::filesystem::path &out) {
             out = line;
     }
 }
+
 void check_i_o_file(std::filesystem::path &in, std::filesystem::path &out) { // TODO add output path handling
     if (std::filesystem::exists("inputpath.txt") /*&& std::filesystem::exists("outputpath.txt")*/){
         load_i_o_path(in, out);
@@ -46,6 +48,7 @@ void check_i_o_file(std::filesystem::path &in, std::filesystem::path &out) { // 
         load_i_o_path(in, out);
     }
 }
+
 void add_i_o_path(const char &io) {
     std::string line{};
     // std::filesystem::path path{};
@@ -69,6 +72,7 @@ void add_i_o_path(const char &io) {
     // }
     // return 1;
 }
+
 void list_i_o_paths(const char &io) {
     std::string line{};
     std::ifstream  in_src("inputpath.txt", std::ios::binary);
@@ -95,6 +99,7 @@ void list_i_o_paths(const char &io) {
     }
      
 }
+
 std::filesystem::path change_path(const char &io) { 
     int path_num{};
     std::string line{};
@@ -112,10 +117,12 @@ std::filesystem::path change_path(const char &io) {
     
     return line;
 }
+
 void list_current_i_o_paths(const std::filesystem::path &in, const std::filesystem::path &out) {
     std::cout << "current input path: " << in << std::endl;
     std::cout << "current output path: " <<  out << std::endl;
 }
+
 void /*change_*/file_list(const std::filesystem::path &path, std::filesystem::path *files) { // TODO sort the list of files
     // std::vector<std::filesystem::path>f;
     int i{};
@@ -139,20 +146,24 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
     std::cout << "6 - change current input path" << std::endl;
     std::cout << "7 - change current output path" << std::endl;
     // std::cout << "8 - debug - print state list" << std::endl;
-
     // std::cout << "[e]xit" << std::endl;
+    
     std::cin >> action; 
     std::cout << std::endl;
+    
     switch (action) {
     case '1':
         return false;
+    
     case '2':
         list_current_i_o_paths(in, out);
         return true;
+    
     case '3':
         list_i_o_paths('i');
         list_i_o_paths('o');
         return true;
+    
     case '4':
         add_i_o_path('i');
         // return add_i_o_path('i');
@@ -162,17 +173,22 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
         add_i_o_path('o');
         // return add_i_o_path('o');
         return true;
+    
     case '6':
         (in = change_path('i'));
         return true;
+    
     case '7':
         (out = change_path('o'));
         return true;
+    
     // case '8':
     //     (out = change_path('o'));
     //     return true;
+    
     // case 'e':
     //     exit();
+    
     default:
         return true;
     }
@@ -216,12 +232,30 @@ void save_provinces(std::vector<std::string> &provs) { // TODO move inside Trans
     }
 }
 
+void new_state_creation(State_list &origin_states, State_list &transfer_states, State_list &target_states, State_list &remnant_states) 
+{    
+    transfer_states.find_origin_states(origin_states);
+    transfer_states.calculate_resources();
+    transfer_states.create_target_states(target_states);
+    transfer_states.create_remaining_states(remnant_states);
+    transfer_states.calculate_remaining_resources(remnant_states);
+}
+
+void state_saving(State_list &states, const std::filesystem::path &input, const std::filesystem::path files[]) 
+{
+    states.save_states(input); 
+    states.save_state_info(input, files);
+    states.save_state_pops(input, files);
+    states.save_state_builds(input, files);
+}
+
 // debug functions //TODO create a class for this functions
 void debug_print_file_list(const std::filesystem::path *files) {
     for (int i{}; i < 16; i++){
         std::cout << i << " " << files[i] << std::endl;
     }
 }
+
 void debug_print_state_pos(std::vector<State> &states) {
     std::ofstream  dst("output/debug/state_pos_list.txt", std::ios::binary);
     int pos{};
@@ -231,64 +265,32 @@ void debug_print_state_pos(std::vector<State> &states) {
     }
 }
 
-// WIP consolidating the functions creating new states
-void new_state_creation(State_list &origin_states, State_list &transfer_states, State_list &target_states, State_list &remnant_states) {
-    
-    transfer_states.find_origin_states(origin_states);
-    transfer_states.calculate_resources();
-    transfer_states.create_target_states(target_states);
-    transfer_states.create_remaining_states(remnant_states);
-    transfer_states.calculate_remaining_resources(remnant_states);
-
-    // for(int i {}; i < transfer_states.getStates().size(); i++){
-        // 
-        // 
-        // std::shared_ptr<Transfer_state> transfer_st = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-        // std::vector<std::string> diff_origin_provs = transfer_st->find_origin_states(origin_states.getStates());
-        // 
-        // if(diff_origin_provs.empty() != true) { 
-        //    origin_states.add_state(std::make_shared<Transfer_state>(transfer_st->getName(), transfer_st->getId(), diff_origin_provs)); 
-        // }
-    // } 
-    // for(int i {}; i < transfer_states.getStates().size(); i++){
-        // auto transfer_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-        // transfer_ptr->calculate_resources(origin_states);
-        // 
-    // }
-    // for(int i {}; i < transfer_states.getStates().size(); i++){
-        // auto transfer_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-        // transfer_ptr->create_target_states(target_states);
-    // }
-    // for(int i {}; i < transfer_states.getStates().size(); i++){
-        // auto transfer_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-        // transfer_ptr->create_remaining_states(remnant_states, origin_states);
-    // }
-    // for(int i {}; i < transfer_states.getStates().size(); i++){
-        // auto transfer_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-        // transfer_ptr->calculate_remaining_resources(remnant_states);
-    // }
-}
-
 int main() {
-// variables
+
     State_list states{}, remnant_states{}, transfer_states{}, target_states{};
     std::filesystem::path files[15], input{}, output{};
     std::vector<std::string> provinces{};
     std::string new_state_name{}/*, strat_reg{}*/;
     
     check_i_o_file(input, output);
+    
     file_list(input, files);
 
-    while(menu(input, output)) {continue;} 
-
-    states.save_states(input); // TODO make one functions call the others
-    states.save_state_info(input, files);
-    states.save_state_pops(input, files);
-    states.save_state_builds(input, files); 
+    while(menu(input, output)) 
+    {
+        continue;
+    } 
+    
+    state_saving(states, input, files);
 
     new_state_info(transfer_states);
-
+    
     new_state_creation(states, transfer_states, target_states, remnant_states);
+    
+    for (std::shared_ptr<State> state : target_states.getStates()) {
+
+        state->print_entry();
+    }
 
     return 0;
 }
