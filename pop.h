@@ -12,9 +12,6 @@ private:
     std::string culture, religion{}, type{};
 
 public:
-    
-    // Pop(const std::string &, const std::string &, const std::string &, const int &);
-
     Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
     : size{s}, culture{cult}, religion{rel}, type{t}
     {

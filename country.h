@@ -19,8 +19,6 @@ private:
     std::vector<std::shared_ptr<Building>> buildings{};
 
 public:
-    // Country(const std::string &, const std::vector<std::string> &, const std::string &);
-
     Country(const std::string &name, const std::vector<std::string> &pr, const std::string &type = "")
     :country{name}, type{type}, provs{pr}
     {
@@ -28,8 +26,6 @@ public:
     
     ~Country();
     
-    // std::shared_ptr<Country> create_country(const std::string &, std::vector<std::string> &); 
-
     void add_pop(const std::shared_ptr<Pop> &);
     
     void add_building(const std::shared_ptr<Building> &);

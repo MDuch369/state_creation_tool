@@ -14,8 +14,6 @@ private:
     std::vector<std::string> prod;
 
 public:
-    // Building(const std::string &, const int &, const int &, const std::vector<std::string> &);
-
     Building(const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pr)
     : level{lvl}, reserves{res}, type{type}/* , dlc{dlc} */, prod{pr}
     {
