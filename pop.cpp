@@ -1,6 +1,18 @@
-#include "pop.h"
 #include <fstream>
 #include <filesystem>
+
+#include "pop.h"
+
+
+
+Pop::~Pop()
+{
+}
+
+ void Pop::setSize(const int &s) 
+ {
+    this->size = s;
+ }
 
 void Pop::print_pops(std::ofstream  &dst) 
 { 

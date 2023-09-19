@@ -3,48 +3,26 @@
 #include <sstream>
 #include <fstream>
 #include <filesystem> 
+
 #include "parser.h" 
 #include "state.h"
 
-// constructors
-State::Country::Country(const std::string &name):country{name} {}
-State::Country::Country(const std::string &name, const std::vector<std::string> &pr) :country{name}, provs{pr} {}
-State::Country::Country(const std::string &name, const std::string &type, const std::vector<std::string> &pr) :country{name}, type {type}, provs{pr} {}
 // State::State() {}
-/* State::State(const std::filesystem::path &path) {
-    std::string line{};
-    std::ifstream  src(path / "common/history/states/00_states.txt", std::ios::binary);   
-}
-State::State(const std::string &name) :name{name} {}  */
-State::Country::Pop::Pop(const std::string &cult, const std::string &rel, const std::string &t, const int &s)
-    : size{s}, culture{cult}, religion{rel}, type{t}  {}
-State::Country::Building::Building(const std::string &type, const int &lvl, const int &res, const std::vector<std::string> &pr) 
-    : level{lvl}, reserves{res}, type{type}/* , dlc{dlc} */, prod{pr} {} 
 
+State::~State() {}
 
-// destructors
-    State::~State() {}
-
-// Countries
-std::shared_ptr<State::Country> State::create_country(const std::string &name, std::vector<std::string> &pr) { // ! placeholder
-    // this->countries.emplace_back(name, pr);
-    std::shared_ptr<State::Country> country_ptr(new State::Country(name, pr));
-    // State::Country country(name, pr);
-    // State::Country* country_ptr = &country;
-    // this->countries.emplace_back(country);
-    this->countries.push_back(*country_ptr);
-    return country_ptr;
+void State::add_country(const std::shared_ptr<Country> &country) {
+    this->countries.push_back(country);
 }
 
-// data printing
-void State::print_state_region(){ 
+/*void State::print_state_region() { 
     // std::ofstream  dst("output/map_data/state_regions/to.txt", std::ios::binary | std::ios::app);
     std::ofstream  dst("new.txt", std::ios::binary | std::ios::app);
     dst << "STATE_" << this->name << " = {" << std::endl
         << "\tid = " << this->id << std::endl
         << "\tsubsistence_building = " << this->sub << std::endl
         << "\tprovinces = { ";
-    for (State::Country co : this->getCountries()) {
+    for (std::shared_ptr<Country> co : this->countries) {
         for (std::string prov : co.getProvs()) {
             dst << "\"x" << prov << "\" ";
         }
@@ -118,6 +96,7 @@ void State::print_state_region(){
     }
     dst << "}" << std::endl << std::endl;
 }
+
 void State::print_pops() { 
     // std::ofstream  dst("output/common/history/pops/new_pops.txt", std::ios::binary | std::ios::app);
     std::ofstream  dst("new_pops.txt", std::ios::binary | std::ios::app);
@@ -146,7 +125,8 @@ void State::print_pops() {
     }
     dst << "\t}" << std::endl;
 }
-void State::print_buildings(){ 
+
+void State::print_buildings() { 
     // std::ofstream  dst("output/common/history/buildings/new_buildings.txt", std::ios::binary | std::ios::app);
     std::ofstream  dst("new_buildings.txt", std::ios::binary | std::ios::app);
     // int size{this->buildings.size()};
@@ -189,6 +169,7 @@ void State::print_buildings(){
     // }
     // dst << "\t}" << std::endl;
 }
+
 void State::print_state() {
     // std::ofstream  dst("output/common/history/states/new_states.txt", std::ios::binary | std::ios::app);
     std::ofstream  dst("new_states.txt", std::ios::binary | std::ios::app);
@@ -213,24 +194,50 @@ void State::print_state() {
     }
     dst << "\t}" << std::endl;
 }
+
 void State::print_entry() {
     this->print_state_region();
     this->print_pops();
     this->print_buildings();
     this->print_state();
+}*/
+
+void State::setName(const std::string &n) {
+    this->name = n;
 }
 
-// Setters
-void State::setName(const std::string &n) {this->name = n;}
-void State::setId(const std::string &i) {this->id = i;}
-void State::setSub(const std::string &s){this->sub = s;}
-void State::setTraits(const std::vector<std::string> &t){this->traits = t;}
-void State::setHubs(const std::string h[5]){for(int i{}; i < 5; i++) {this->hubs[i] = h[i];} }
-void State::setArRes(const std::vector<std::string> &r) {this->ar_res = r;}
-void State::setRes(const int r[/*12*/]){ for(int i{}; i < 12; i++) {this->res[i] = r[i];} }
-void State::setHomeland(const std::string &home) {this->homelands.push_back(home);}
-void State::setClaim(const std::string &claim) {this->claims.push_back(claim);}
-void State::setNavEx(const std::string &nx){this->naval_exit = nx;}
-void State::Country::setCountryType(const std::string &type) {this->type = type;}
-void State::Country::Pop::setSize(const int &size) {this->size = size;}
-void State::Country::Building::setLvl(const int &level) {this->level = level;}
+void State::setId(const std::string &i) {
+    this->id = i;
+}
+
+void State::setSub(const std::string &s) {
+    this->sub = s;
+}
+
+void State::setTraits(const std::vector<std::string> &t) {
+    this->traits = t;
+}
+
+void State::setHubs(const std::string h[5]) {
+    for(int i{}; i < 5; i++) {this->hubs[i] = h[i];} 
+}
+
+void State::setArRes(const std::vector<std::string> &r) {
+    this->ar_res = r;
+}
+
+void State::setRes(const int r[/*12*/]) {
+    for(int i{}; i < 12; i++) {this->res[i] = r[i];} 
+}
+
+void State::addHomeland(const std::string &home) {
+    this->homelands.push_back(home);
+}
+
+void State::addClaim(const std::string &claim) {
+    this->claims.push_back(claim);
+}
+
+void State::setNavExit(const std::string &nx) {
+    this->naval_exit = nx;
+}

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+
 #include "parser.h"
 
 
@@ -20,7 +21,7 @@ std::string data(std::string &line, const char &delim){ //? TODO refactor using 
 }
 unsigned int data_int( std::string line) {
     line.erase (std::remove(line.begin(), line.end(), ' '), line.end());
-    int pos{line.find("=") + 1};
+    unsigned long pos{line.find("=") + 1};
     std::string arg{line.substr(pos, line.find ("\n") - pos)};
     return stoi(arg);
 }

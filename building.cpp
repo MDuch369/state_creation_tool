@@ -1,5 +1,17 @@
-#include "building.h"
 #include <fstream>
+
+#include "building.h"
+
+
+
+Building::~Building()
+{
+}
+
+void Building::setLvl(const int &lvl)
+{
+    this->level = lvl;
+}
 
 void Building::print_buildings(std::ofstream &dst)
 {

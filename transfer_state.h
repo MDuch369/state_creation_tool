@@ -6,14 +6,18 @@
 #include <sstream>
 #include <fstream>
 #include <filesystem>
+
 #include "state.h"
 // #include "state_list.h"
 
 class Transfer_state : public State{
 // data
     int origin_pos{};
+
     std::string origin{};
+
     std::vector<std::string> transfer_provs;
+    
     /* const */ std::shared_ptr<State> origin_ptr{};
 
 // Functions:
@@ -29,32 +33,54 @@ public:
 // destructor
     ~Transfer_state() override;
 
-// countries
-    // State::Country create_country(State::Country &, std::vector<std::string> &, const double &); // ? merge the two functions
-    State::Country create_country(State::Country &, const std::vector<std::string> &, const double &);
-    std::shared_ptr<State::Country> create_country(const std::string &, std::vector<std::string> &) override; // this function exist so the class is not abstract
-
-    void create_pops(const std::string &, const std::string &, const std::string &, const std::string &, const int &) override; 
-    void create_buildings(const std::string &, const std::string &, const int &, const int &, const std::vector<std::string> &) override;
-
 // getters
-    inline std::vector<std::string> getProvs() {return this->transfer_provs;}
-    inline std::string getOrigin() {return this->origin;}
-    inline std::shared_ptr<State> getOriginPtr() {return this->origin_ptr;}
+    inline std::vector<std::string> getProvs() {
+        return this->transfer_provs;
+    }
+
+    inline std::string getOrigin() {
+        return this->origin;
+    }
+
+    inline std::shared_ptr<State> getOriginPtr() {
+        return this->origin_ptr;
+    }
+
+
+    void setOrigin(const std::string &);
+
+    void setOriginPtr(const std::shared_ptr<State> &);
+
+    void erase_province(const std::string &);
+
+
 
 // transfer
-    // void find_origin_states(State_list &, State_list &);
+    std::vector<std::string> find_origin_states(const std::vector<std::shared_ptr<State>> &);
+    
     void copy_state_info(State &);
 
     void setProvs(const std::vector<std::string> &);
+
     void remove_transfer_provs();
+
     bool check_transfer_provs();
+
     // std::vector<std::string> add_different_origin_provs();
+
     std::vector<std::string> handle_transfer_provs();
 
 
 // debug functions
     void debug_print_provs();
+
+// countries
+    void create_transfer_country(const std::shared_ptr<Country> &, const std::vector<std::string> &, const double &); // ? merge the two functions
+    // State::Country create_country(State::Country &, const std::vector<std::string> &, const double &);
+    // std::shared_ptr<State::Country> create_country(const std::string &, std::vector<std::string> &) override; // this function exist so the class is not abstract
+// 
+    // void create_pops(const std::string &, const std::string &, const std::string &, const std::string &, const int &) override; 
+    // void create_buildings(const std::string &, const std::string &, const int &, const int &, const std::vector<std::string> &) override;
 };
 
 #endif

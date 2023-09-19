@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
+
 #include "parser.h"
 #include "origin_state.h"
 #include "transfer_state.h"
@@ -178,10 +179,11 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
 }
 
 // transfer info input
-void new_state_info(State_list &states) {
+void new_state_info(State_list &transfer_states) {
     int num{};
     std::string name{}, provs{}, id{};
     std::vector<std::string> prov_vec{};
+
     std::cout << "Number of states to be created: " << std::endl;
     std::cin >> num;
     for(int i{}; i < num; i++) {
@@ -195,7 +197,7 @@ void new_state_info(State_list &states) {
         std::getline(std::cin, provs);
         data_vector(prov_vec, provs,6);
         std::cout << std::endl;
-        states.add_state(std::shared_ptr<State>(new Transfer_state(name, id, prov_vec)));
+        transfer_states.add_state(std::shared_ptr<State>(std::make_shared<Transfer_state>(name, id, prov_vec)));
     } 
 }
 
@@ -214,9 +216,6 @@ void save_provinces(std::vector<std::string> &provs) { // TODO move inside Trans
     }
 }
 
-
-
-
 // debug functions //TODO create a class for this functions
 void debug_print_file_list(const std::filesystem::path *files) {
     for (int i{}; i < 16; i++){
@@ -231,29 +230,44 @@ void debug_print_state_pos(std::vector<State> &states) {
         pos++;
     }
 }
+
 // WIP consolidating the functions creating new states
-// void new_state_creation(State_list &states, State_list &transfer_states, State_list &target_states, State_list &remnant_states) {
-// /*     for(int i {}; i < transfer_states.getStates().size(); i++){
-//         auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-//         tr_ptr->find_origin_states(states, transfer_states);
-//     } */
-//     for(int i {}; i < transfer_states.getStates().size(); i++){
-//         auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-//         tr_ptr->calculate_resources(states);
-//     }
-//     for(int i {}; i < transfer_states.getStates().size(); i++){
-//         auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-//         tr_ptr->create_target_states(target_states);
-//         }
-//     for(int i {}; i < transfer_states.getStates().size(); i++){
-//         auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-//         tr_ptr->create_remaining_states(remnant_states, states);
-//     }
-//     for(int i {}; i < transfer_states.getStates().size(); i++){
-//         auto tr_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
-//         tr_ptr->calculate_remaining_resources(remnant_states);
-//     }
-// }
+void new_state_creation(State_list &origin_states, State_list &transfer_states, State_list &target_states, State_list &remnant_states) {
+    
+    transfer_states.find_origin_states(origin_states);
+    transfer_states.calculate_resources();
+    transfer_states.create_target_states(target_states);
+    transfer_states.create_remaining_states(remnant_states);
+    transfer_states.calculate_remaining_resources(remnant_states);
+
+    // for(int i {}; i < transfer_states.getStates().size(); i++){
+        // 
+        // 
+        // std::shared_ptr<Transfer_state> transfer_st = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        // std::vector<std::string> diff_origin_provs = transfer_st->find_origin_states(origin_states.getStates());
+        // 
+        // if(diff_origin_provs.empty() != true) { 
+        //    origin_states.add_state(std::make_shared<Transfer_state>(transfer_st->getName(), transfer_st->getId(), diff_origin_provs)); 
+        // }
+    // } 
+    // for(int i {}; i < transfer_states.getStates().size(); i++){
+        // auto transfer_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        // transfer_ptr->calculate_resources(origin_states);
+        // 
+    // }
+    // for(int i {}; i < transfer_states.getStates().size(); i++){
+        // auto transfer_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        // transfer_ptr->create_target_states(target_states);
+    // }
+    // for(int i {}; i < transfer_states.getStates().size(); i++){
+        // auto transfer_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        // transfer_ptr->create_remaining_states(remnant_states, origin_states);
+    // }
+    // for(int i {}; i < transfer_states.getStates().size(); i++){
+        // auto transfer_ptr = std::dynamic_pointer_cast<Transfer_state>(transfer_states.getStates()[i]);
+        // transfer_ptr->calculate_remaining_resources(remnant_states);
+    // }
+}
 
 int main() {
 // variables
@@ -270,12 +284,11 @@ int main() {
     states.save_states(input); // TODO make one functions call the others
     states.save_state_info(input, files);
     states.save_state_pops(input, files);
-    states.save_state_builds(input, files);
-    
+    states.save_state_builds(input, files); 
 
     new_state_info(transfer_states);
 
-    // new_state_creation(states, transfer_states, target_states, remnant_states);
+    new_state_creation(states, transfer_states, target_states, remnant_states);
 
     return 0;
 }
