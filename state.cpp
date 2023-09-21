@@ -15,16 +15,16 @@ void State::add_country(const std::shared_ptr<Country> &country) {
     this->countries.push_back(country);
 }
 
-/*void State::print_state_region() { 
+void State::print_state_region() { 
     // std::ofstream  dst("output/map_data/state_regions/to.txt", std::ios::binary | std::ios::app);
     std::ofstream  dst("new.txt", std::ios::binary | std::ios::app);
     dst << "STATE_" << this->name << " = {" << std::endl
         << "\tid = " << this->id << std::endl
         << "\tsubsistence_building = " << this->sub << std::endl
         << "\tprovinces = { ";
-    for (std::shared_ptr<Country> co : this->countries) {
-        for (std::string prov : co.getProvs()) {
-            dst << "\"x" << prov << "\" ";
+    for (std::shared_ptr<Country> country : this->countries) {
+        for (std::string province : country->getProvs()) {
+            dst << "\"x" << province << "\" ";
         }
     }
     dst << "}" << std::endl; 
@@ -101,24 +101,24 @@ void State::print_pops() {
     // std::ofstream  dst("output/common/history/pops/new_pops.txt", std::ios::binary | std::ios::app);
     std::ofstream  dst("new_pops.txt", std::ios::binary | std::ios::app);
     dst << "\ts:STATE_" << this->name << " = {" << std::endl;
-    for(State::Country co : this->getCountries()) {
-        if(co.getPops().empty()) {
+    for(std::shared_ptr<Country> country : this->getCountries()) {
+        if(country->getPops().empty()) {
             continue;
         }
-        dst << "\t\tregion_state:" << co.getName() << " = {" << std::endl;
-        for(auto pop : co.getPops()) {
-            if(pop.getSize() == 0) {
+        dst << "\t\tregion_state:" << country->getName() << " = {" << std::endl;
+        for(std::shared_ptr<Pop> pop : country->getPops()) {
+            if(pop->getSize() == 0) {
                 continue;
             }
             dst << "\t\t\tcreate_pop = {" << std::endl;
-            if (pop.getType() != "") {
-                dst << "\t\t\t\tpop_type = " << pop.getType() << std::endl;
+            if (pop->getType() != "") {
+                dst << "\t\t\t\tpop_type = " << pop->getType() << std::endl;
             }
-            dst << "\t\t\t\tculture = " << pop.getCult() << std::endl;
-            if (pop.getRel() != "") {
-                dst << "\t\t\t\treligion = " << pop.getRel() << std::endl;
+            dst << "\t\t\t\tculture = " << pop->getCult() << std::endl;
+            if (pop->getRel() != "") {
+                dst << "\t\t\t\treligion = " << pop->getRel() << std::endl;
             }
-            dst << "\t\t\t\tsize = " << pop.getSize() << std::endl
+            dst << "\t\t\t\tsize = " << pop->getSize() << std::endl
                 << "\t\t\t}" << std::endl;
         }
         dst << "\t\t}" << std::endl; 
@@ -131,21 +131,21 @@ void State::print_buildings() {
     std::ofstream  dst("new_buildings.txt", std::ios::binary | std::ios::app);
     // int size{this->buildings.size()};
     dst << "\ts:STATE_" << this->name << " = {" << std::endl;
-    for(State::Country co : this->getCountries()) {
-        if(co.getBuilds().empty()) {
+    for(std::shared_ptr<Country> co : this->getCountries()) {
+        if(co->getBuilds().empty()) {
             continue;
         }
-        dst << "\t\tregion_state:" << co.getName() << " = {" << std::endl;
-        for(auto build : co.getBuilds()) {
-            if(build.getLvl() == 0) {
+        dst << "\t\tregion_state:" << co->getName() << " = {" << std::endl;
+        for(std::shared_ptr<Building> building : co->getBuilds()) {
+            if(building->getLvl() == 0) {
                 continue;
             }
             dst << "\t\t\tcreate_building = {" << std::endl;
-            dst << "\t\t\t\tbuilding = " << build.getType() << std::endl;
-            dst << "\t\t\t\tlevel = " << build.getLvl() << std::endl;
-            dst << "\t\t\t\treserves = " << build.getRes() << std::endl;
+            dst << "\t\t\t\tbuilding = " << building->getType() << std::endl;
+            dst << "\t\t\t\tlevel = " << building->getLvl() << std::endl;
+            dst << "\t\t\t\treserves = " << building->getRes() << std::endl;
             dst << "\t\t\t\tactivate_production_methods = { ";
-            for(std::string prod : build.getProd()) {
+            for(std::string prod : building->getProd()) {
                 dst << "\"" << prod << "\" ";
             }
             dst << "} " << std::endl << "\t\t\t}" << std::endl;
@@ -174,14 +174,14 @@ void State::print_state() {
     // std::ofstream  dst("output/common/history/states/new_states.txt", std::ios::binary | std::ios::app);
     std::ofstream  dst("new_states.txt", std::ios::binary | std::ios::app);
     dst << "\ts:STATE_" << this->name << " = {" << std::endl;
-    for(State::Country co : this->countries) {
-        if(co.getProvs().empty()) {
+    for(std::shared_ptr<Country> country : this->countries) {
+        if(country->getProvs().empty()) {
             continue;
         }
         dst << "\t\tcreate_state = {" << std::endl
-            << "\t\t\tcountry = c:" << co.getName() << std::endl
+            << "\t\t\tcountry = c:" << country->getName() << std::endl
             << "\t\t\towned_provinces = { ";
-        for(std::string s : co.getProvs()) {
+        for(std::string s : country->getProvs()) {
             dst << "x" << s << " ";
         }
         dst << "}" << std::endl << "\t\t}" << std::endl;
@@ -200,7 +200,7 @@ void State::print_entry() {
     this->print_pops();
     this->print_buildings();
     this->print_state();
-}*/
+}
 
 void State::setName(const std::string &n) {
     this->name = n;

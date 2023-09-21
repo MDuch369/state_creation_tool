@@ -32,6 +32,7 @@ void Transfer_state::create_transfer_country(const std::shared_ptr<Country> &cou
         new_country->add_building(std::make_shared<Building>(build->getType(), build->getLvl() * ratio, build->getRes(), build->getProd()));
     }
 
+    this->add_country(new_country);
 }
 
 /* void Transfer_state::new_transfer_country(const std::vector<std::string> &provs, const State::Country &country) { // [WIP] REFACTOR

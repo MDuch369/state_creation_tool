@@ -398,6 +398,7 @@ void State_list::calculate_resources() {
         for(int i{}; i < 12; i++) {
             res[i] = origin_ptr->getRes()[i] * ratio;
         }
+        
         transfer_state->setRes(res); 
     }
 }
@@ -643,6 +644,7 @@ void State_list::add_state( std::shared_ptr<State> state) {
     this->states.emplace_back(name, id, provs);
     return std::shared_ptr<State>();
 } */
+
 // HACK - this entire function will propably cause an enormous  mess
 std::shared_ptr<State> State_list::emplace_transfer_state(std::shared_ptr<State> &transfer_st) {
     this->states.emplace_back(transfer_st);
@@ -651,7 +653,7 @@ std::shared_ptr<State> State_list::emplace_transfer_state(std::shared_ptr<State>
 }
 
 // TODO denest
-void State_list::find_origin_states(State_list &origin_states) { // ? refactor
+void State_list::find_origin_states(State_list &origin_states) { // ? refactor/denest
     std::vector<std::string> provs{}, different_origin_provs{};
     bool origin_found{false};
 
@@ -689,12 +691,15 @@ void State_list::find_origin_states(State_list &origin_states) { // ? refactor
             }
         }
 
+        state = transfer_state;
+
         if(origin_found) {
             break;
         }
 
         // this->origin_pos++;
         different_origin_provs = transfer_state->handle_transfer_provs();
+
 
         if(transfer_state->check_transfer_provs() != true) { // creates another transfer state if this one still has provs left
             this->states.push_back(std::make_shared<Transfer_state>(transfer_state->getName(), transfer_state->getId(), different_origin_provs));

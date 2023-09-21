@@ -12,7 +12,7 @@
 #include "remnant_state.h"
 #include "state_list.h"
 
-// input/output paths
+// input/output paths/files
 void save_i_o_path() { // TODO add output path handling
     std::string line{};
     std::ofstream  in_dst("inputpath.txt", std::ios::binary | std::ios::app);
@@ -195,7 +195,8 @@ bool menu(std::filesystem::path &in, std::filesystem::path &out) {
 }
 
 // transfer info input
-void new_state_info(State_list &transfer_states) {
+void new_state_info(State_list &transfer_states) 
+{
     int num{};
     std::string name{}, provs{}, id{};
     std::vector<std::string> prov_vec{};
@@ -214,20 +215,25 @@ void new_state_info(State_list &transfer_states) {
         data_vector(prov_vec, provs,6);
         std::cout << std::endl;
         transfer_states.add_state(std::shared_ptr<State>(std::make_shared<Transfer_state>(name, id, prov_vec)));
+        // transfer_states.add_state(std::make_shared<Transfer_state>(name, id, prov_vec));
     } 
 }
 
-void save_provinces(std::vector<std::string> &provs) { // TODO move inside Transfer_State class
+void save_provinces(std::vector<std::string> &provs) // TODO move inside Transfer_State class
+{ 
     std::string prov, tmp; 
+    
     std::cout<<"Enter provinces to transfer: "<<std::endl;
     std::getline(std::cin, prov);
     prov.erase (std::remove(prov.begin(), prov.end(), '\"'), prov.end());
     prov.erase (std::remove(prov.begin(), prov.end(), ' '), prov.end());
     transform(prov.begin(), prov.end(), prov.begin(), toupper);
     std::stringstream ss(prov);
+    
     while(getline(ss, tmp, 'X')){
+        
         if(tmp != "") {
-        provs.push_back(tmp);
+            provs.push_back(tmp);
         }
     }
 }
@@ -287,8 +293,8 @@ int main() {
     
     new_state_creation(states, transfer_states, target_states, remnant_states);
     
-    for (std::shared_ptr<State> state : target_states.getStates()) {
-
+    for (std::shared_ptr<State> state : target_states.getStates()) // ? move inside state_list
+    {
         state->print_entry();
     }
 
